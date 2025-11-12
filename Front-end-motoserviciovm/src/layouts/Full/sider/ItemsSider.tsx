@@ -22,7 +22,7 @@ return (
             <Typography variant="h5" sx={{ 
               color: '#596d80',
               fontWeight: 'bold'
-             }}>ARCADESTORE</Typography>
+             }}>MOTO SERVICIO VM</Typography>
       </Toolbar>
       <List>
         {filteredMenu.map((item) => (

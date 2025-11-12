@@ -6,7 +6,7 @@ import { gamesRoutes } from "../modules/Games/routes";
 import { UsersRoutes } from "../modules/Users/routes";
 import { authRoutes } from "../modules/Auth/routes";
 
-const Home = lazy(() => import('../modules/Games/pages/GamesList'));
+const Home = lazy(() => import('../modules/Users/pages/UsersList'));
 
 
 const Router = [

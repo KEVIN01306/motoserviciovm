@@ -1,15 +1,15 @@
 
-import { PiGameControllerFill, PiUserCheckDuotone } from "react-icons/pi";
+import { PiUserCheckDuotone } from "react-icons/pi";
 
 const MenuItems = [
-    {
+    /*{
         name: "Games",
         link: "/games",
         icon: PiGameControllerFill,
         roles: ['admin','user']
-    },
+    },*/
     {
-        name: "Users",
+        name: "Usuarios",
         link: "/users",
         icon: PiUserCheckDuotone,
         roles: ['admin']

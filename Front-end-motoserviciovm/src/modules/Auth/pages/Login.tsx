@@ -5,7 +5,7 @@ import {
     Typography,
     Box,
     Button,
-    Link,
+    //Link,
     Divider,
 } from '@mui/material';
 import {
@@ -46,7 +46,7 @@ const Login = () => {
             const user =  useAuthStore.getState().user
             successToast("Auth Succes: Hello " + user?.firstName)
             reset()
-            goTo('/games')
+            goTo('/users')
         } catch (err: any) {
             errorToast(err.message)
         }
@@ -63,16 +63,16 @@ const Login = () => {
                                 Log in
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                Accede a tu cuenta de ARCADESTORE
+                                MOTOSERVICIOVM
                             </Typography>
                         </Box>
                         <Box sx={{ mt: 2 }}>
                             <InputsForm register={register} errors={errors} control={control} watch={watch} setValue={setValue} />
-                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1, mb: 3 }}>
+                            {/*<Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1, mb: 3 }}>
                                 <Link href="#" variant="body2" color="primary" sx={{ textDecoration: 'none' }}>
                                     ¿Olvidaste tu contraseña?
                                 </Link>
-                            </Box>
+                            </Box>*/}
 
                             <Button
                                 type="submit"
@@ -88,14 +88,14 @@ const Login = () => {
 
                         <Divider sx={{ my: 3 }} />
 
-                        <Box sx={{ textAlign: 'center' }}>
+                        {/*<Box sx={{ textAlign: 'center' }}>
                             <Typography variant="body2">
                                 ¿Aún no tienes cuenta?{' '}
                                 <Link href="/public/auth/register" variant="body2" color="secondary" sx={{ fontWeight: 'bold', textDecoration: 'none' }}>
                                     Register here
                                 </Link>
                             </Typography>
-                        </Box>
+                        </Box>*/}
 
                     </CardContent>
                 </Card>
