@@ -95,7 +95,7 @@ const putUser = async (id, data) => {
 			data: {
 				...userData,
 				roles:{
-					connect: rolesConnect
+					set: rolesConnect
 				}
 			},
 			include:{

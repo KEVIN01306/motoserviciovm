@@ -41,6 +41,7 @@ model User {
 model Rol {
   id              Int @id @default(autoincrement())
   rol             String @unique
+  descripcion     String?
 
   usuarios        User[] @relation("UserRoles")
   permisos        Permiso[] @relation("RolPermisos")
@@ -51,9 +52,9 @@ model Rol {
 
 model Permiso {
   id              Int @id @default(autoincrement())
-  permiso             String @unique
-
-  roles        Rol[] @relation("RolPermisos")
+  permiso         String @unique
+  modulo          String?
+  roles           Rol[] @relation("RolPermisos")
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

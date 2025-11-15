@@ -1,67 +1,70 @@
 import { FormControl, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material"
-import { Controller } from "react-hook-form"
+import { Controller, type Control, type FieldErrors, type UseFormRegister, type UseFormSetValue, type UseFormWatch } from "react-hook-form"
+import type { UserType } from "../../../types/userType";
 
 
-interface InputsFormProps{
-    register: any;
-    errors: any
-    control: any;
-    watch: any;
-    setValue: any;
+interface InputsFormProps {
+    register: UseFormRegister<UserType>;
+    errors: FieldErrors<UserType>;
+    control: Control<UserType>;
+    watch: UseFormWatch<UserType>;
+    setValue: UseFormSetValue<UserType>;
 }
-
 const InputsForm = ({register,errors, control}: InputsFormProps) => {
 
     return (
         <>
             <Grid size={{ xs: 6, md: 3 }}>
                 <TextField
-                    label="First Name *"
+                    label="Primer Nombre"
                     fullWidth
+                    required
                     variant="standard"
                     size="small"
-                    {...register("firstName")}
-                    error={!!errors.firstName}
-                    helperText={errors.firstName?.message}
+                    {...register("primerNombre")}
+                    error={!!errors.primerNombre}
+                    helperText={errors.primerNombre?.message}
                 />
             </Grid>
             <Grid size={{ xs: 6, md: 3 }}>
                 <TextField
-                    label="Second Name"
+                    label="Segundo Nombre"
                     fullWidth
                     variant="standard"
                     size="small"
-                    {...register("secondName")}
-                    error={!!errors.secondName}
-                    helperText={errors.secondName?.message}
+                    {...register("segundoNombre")}
+                    error={!!errors.segundoNombre}
+                    helperText={errors.segundoNombre?.message}
                 />
             </Grid>
             <Grid size={{ xs: 6, md: 3 }}>
                 <TextField
-                    label="First LastName *"
+                    label="Primer Apellido"
                     fullWidth
+                    required
                     variant="standard"
                     size="small"
-                    {...register("firstLastName")}
-                    error={!!errors.firstLastName}
-                    helperText={errors.firstLastName?.message}
+                    {...register("primerApellido")}
+                    error={!!errors.primerApellido}
+                    helperText={errors.primerApellido?.message}
                 />
             </Grid>
             <Grid size={{ xs: 6, md: 3 }}>
                 <TextField
-                    label="Second LastName"
+                    label="Segundo Apellido"
                     fullWidth
                     variant="standard"
                     size="small"
-                    {...register("secondLastName")}
-                    error={!!errors.secondLastName}
-                    helperText={errors.secondLastName?.message}
+                    {...register("segundoApellido")}
+                    error={!!errors.segundoApellido}
+                    helperText={errors.segundoApellido?.message}
                 />
             </Grid>
             <Grid size={{sm: 12, md: 12}}>
                 <TextField
-                    label="Email *"
+                    label="Email"
                     fullWidth
+                    required
                     variant="filled"
                     size="small"
                     {...register("email")}
@@ -71,8 +74,9 @@ const InputsForm = ({register,errors, control}: InputsFormProps) => {
             </Grid>
             <Grid size={{sm: 12, md: 6}}>
                 <TextField
-                    label="Password *"
+                    label="Password"
                     fullWidth
+                    required
                     type="password"
                     variant="filled"
                     size="small"
@@ -82,10 +86,54 @@ const InputsForm = ({register,errors, control}: InputsFormProps) => {
                 />
             </Grid>
             <Grid size={{sm: 12, md: 6}}>
+                <TextField
+                    label="Numero de Telefono"
+                    fullWidth
+                    variant="standard"
+                    size="small"
+                    {...register("numeroTel")}
+                    error={!!errors.numeroTel}
+                    helperText={errors.numeroTel?.message}
+                />
+            </Grid>
+            <Grid size={{sm: 12, md: 6}}>
+                <TextField
+                    label="Numero de Telefono (Auxiliar)"
+                    fullWidth
+                    variant="standard"
+                    size="small"
+                    {...register("numeroAuxTel")}
+                    error={!!errors.numeroAuxTel}
+                    helperText={errors.numeroAuxTel?.message}
+                />
+            </Grid>
+            <Grid size={{sm: 12, md: 6}}>
+                <TextField
+                    label="Dpi"
+                    fullWidth
+                    variant="standard"
+                    size="small"
+                    {...register("dpi")}
+                    error={!!errors.dpi}
+                    helperText={errors.dpi?.message}
+                />
+            </Grid>
+            <Grid size={{sm: 12, md: 6}}>
+                <TextField
+                    label="Nit"
+                    fullWidth
+                    variant="standard"
+                    size="small"
+                    {...register("nit")}
+                    error={!!errors.nit}
+                    helperText={errors.nit?.message}
+                />
+            </Grid>
+            {/*<Grid size={{sm: 12, md: 6}}>
                 <FormControl fullWidth size="small" error={!!errors.rol}>
                     <InputLabel id="role-label">Rol</InputLabel>
                     <Controller
-                        name="role"
+                        name="roles"
                         control={control}
                         render={({ field }) => (
                             <Select
@@ -105,18 +153,19 @@ const InputsForm = ({register,errors, control}: InputsFormProps) => {
                         {errors.rol.message}
                     </p>
                 )}
-            </Grid>
+            </Grid>*/}
             <Grid size={{sm: 12, md: 12}}>
                 <TextField
-                    label="DateBirthday *"
+                    label="Fecha de Nacimiento"
+                    required
                     fullWidth
                     type="date"
                     variant="standard"
                     size="small"
                     focused={true}
-                    {...register("dateBirthday")}
-                    error={!!errors.dateBirthday}
-                    helperText={errors.dateBirthday?.message}
+                    {...register("fechaNac")}
+                    error={!!errors.fechaNac}
+                    helperText={errors.fechaNac?.message}
                 />
             </Grid>
         </>
