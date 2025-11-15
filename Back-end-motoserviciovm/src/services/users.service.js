@@ -106,9 +106,9 @@ const putUser = async (id, data) => {
 		return newUser.email
 }
 
-/*
+
 const patchUserActive = async (id) => {
-    const user = await User.findOne({ _id: id });
+    const user = await prisma.user.findUnique({ where: { id: id } });
 
     if (!user) {
         const error = new Error('DATA_NOT_FOUND');
@@ -116,26 +116,24 @@ const patchUserActive = async (id) => {
         throw error;
     }
 
-    const newActiveState = !user.active;
+    const newActiveState = !user.activo;
 
-    const updatedUser = await User.findByIdAndUpdate(
-        id,
-        { active: newActiveState },
-        { new: true }
-    );
+    const updatedUser = await prisma.user.update({
+        where: { id: id },
+        data: { activo: newActiveState }
+    });
 
     return {
         email: updatedUser.email,
-        active: updatedUser.active
+        activo: updatedUser.activo
     };
 }
 
-*/
 
 export {
 	getUSers,
 	getUSer,
 	postUser,
 	putUser,
-	// patchUserActive,
+	patchUserActive,
 }

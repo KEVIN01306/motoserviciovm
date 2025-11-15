@@ -1,6 +1,6 @@
 import { responseError, responseSucces, responseSuccesAll } from "../helpers/response.helper.js";
 import { userSchema } from "../zod/user.schema.js";
-import { getUSer, getUSers, postUser, putUser /*, patchUserActive*/ } from "../services/users.service.js";
+import { getUSer, getUSers, patchUserActive, postUser, putUser /*, patchUserActive*/ } from "../services/users.service.js";
 
 
 const getUsersHandler = async (req, res) => {
@@ -31,7 +31,7 @@ const getUserHandler = async (req, res) => {
         const { id } = req.params
         const user = await getUSer(parseInt(id));
 
-        res.status(200).json(responseSucces("user successfully obtained", user))
+        res.status(200).json(responseSucces("usuario obtenido exitosamente", user))
 
     } catch (error) {
         console.error(error);
@@ -83,7 +83,6 @@ const postUserHandler = async (req,res) => {
 
         return res.status(errorCode).json(responseError(errorMessage));
     }
-   
 }
 
 const putUserHandler = async (req,res) => {
@@ -115,7 +114,7 @@ const putUserHandler = async (req,res) => {
                 errorMessage = error.code;
                 break;
         }
-
+        
         console.log(error)
 
         return res.status(errorCode).json(responseError(errorMessage));
@@ -123,14 +122,14 @@ const putUserHandler = async (req,res) => {
    
 }
 
-/*
+
 const patchUserActiveHandler = async (req, res) => {
     try {
 
         const { id } = req.params; 
 
-        const result = await patchUserActive(id); 
-        res.status(200).json(responseSucces("User active state successfully toggled", result));
+        const result = await patchUserActive(parseInt(id)); 
+        res.status(200).json(responseSucces("usuario actualizado exitosamente", result));
 
     } catch (error) {
         let errorCode = 500;
@@ -147,12 +146,11 @@ const patchUserActiveHandler = async (req, res) => {
     }
 }
 
-*/
 
 export {
     getUsersHandler,
     getUserHandler,
     postUserHandler,
     putUserHandler,
-    //patchUserActiveHandler,
+    patchUserActiveHandler,
 }

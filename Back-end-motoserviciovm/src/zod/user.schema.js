@@ -10,7 +10,7 @@ export const userSchema = z.object({
     dpi:                z.string().optional(),
     nit:                z.string().optional(),      
     tipo:               z.string().optional(),
-    estado:             z.boolean().default(false),
+    activo:             z.boolean().default(false),
     numeroTel:          z.string().min(8).max(8),
     numeroAuxTel :      z.string().optional(),
     email:              z.email().optional(),

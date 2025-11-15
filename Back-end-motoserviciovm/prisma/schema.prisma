@@ -26,7 +26,7 @@ model User {
   dpi             String?
   nit             String?        
   tipo            String?
-  estado          Boolean @default(true)
+  activo          Boolean @default(true)
   numeroTel       String  
   numeroAuxTel    String?
   email           String  @unique
