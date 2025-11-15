@@ -9,7 +9,7 @@ export type AuthType = z.infer<typeof authSchema>;
 
 export const AuthInitialState = {
     email: "",
-    Password: ""
+    password: ""
 }
 
 export type AuthResponse = {

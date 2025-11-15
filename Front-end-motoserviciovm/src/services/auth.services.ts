@@ -15,7 +15,7 @@ const postLogin = async (auth: AuthType): Promise<AuthResponse> => {
             throw new Error("INVALID RESPONSE FROM THE API");
         }
         const { user, token } = response.data.data
-
+        console.log("USER LOGIN:", user)
 
         return { user, token }
 

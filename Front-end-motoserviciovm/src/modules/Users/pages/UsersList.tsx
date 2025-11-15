@@ -40,7 +40,7 @@ const UsersList = () => {
         getUsersList()
     }, [])
 
-    const changeChip = (value: UserType['active']) => {
+    const changeChip = (value: UserType['activo']) => {
         let color: ChipColor
         let label: string
 
@@ -56,10 +56,10 @@ const UsersList = () => {
 
     }
 
-    const changeActive = async (id: UserType['_id']) => {
+    const changeActive = async (id: UserType['id']) => {
         try {
             const response = await patchUserActive(id)
-            successToast(`change Status: ${response?.active ? "Activo" : "Inactivo"} - User: ${response?.email}`)
+            successToast(`change Status: ${response?.activo ? "Activo" : "Inactivo"} - User: ${response?.email}`)
             getUsersList()
         } catch (err: any) {
 
@@ -67,18 +67,18 @@ const UsersList = () => {
     }
 
     const columns: Column<UserType>[] = [
-        { id: "firstName", label: "First Name", minWidth: 150 },
-        { id: "secondName", label: "second Name", minWidth: 100 },
-        { id: "role", label: "Rol", minWidth: 100 },
+        { id: "primerNombre", label: "First Name", minWidth: 150 },
+        { id: "segundoNombre", label: "second Name", minWidth: 100 },
+        { id: "roles", label: "Rol", minWidth: 100 },
         { id: "email", label: "Email", minWidth: 100 },
-        { id: "active", label: "Estado", minWidth: 100, format: (value: any) => changeChip(value) },
+        { id: "activo", label: "Estado", minWidth: 100, format: (value: any) => changeChip(value) },
         {
             id: "actions",
             label: "Acciones",
             actions: [
-                { label: (<><RiEdit2Line /> <span className="ml-1.5">edit</span> </>), onClick: (row: UserType) => goTo(String(row._id + '/edit')) },
-                { label: (<><PiUserCheckBold /> <span className="ml-1.5">Profile</span> </>), onClick: (row: UserType) => goTo(String(row._id)) },
-                { label: (<><HiOutlineLockClosed /> <span className="ml-1.5">Disable / Enable</span></>), onClick: (row: UserType) => changeActive(row._id) },
+                { label: (<><RiEdit2Line /> <span className="ml-1.5">edit</span> </>), onClick: (row: UserType) => goTo(String(row.id + '/edit')) },
+                { label: (<><PiUserCheckBold /> <span className="ml-1.5">Profile</span> </>), onClick: (row: UserType) => goTo(String(row.id)) },
+                { label: (<><HiOutlineLockClosed /> <span className="ml-1.5">Disable / Enable</span></>), onClick: (row: UserType) => changeActive(row.id) },
             ],
         },
     ];

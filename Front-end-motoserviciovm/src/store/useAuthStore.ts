@@ -2,7 +2,6 @@ import { create } from "zustand";
 import type { AuthType } from "../types/authType";
 import { persist } from "zustand/middleware";
 import { postLogin } from "../services/auth.services";
-import type { GameType } from "../types/gameType";
 
 interface AuthState {
     user: any;
@@ -11,7 +10,6 @@ interface AuthState {
 
     login: (data: AuthType) => Promise<void>;
     logout: () => void;
-    refreshGames: (gameIds: GameType['_id'][]) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -36,19 +34,6 @@ export const useAuthStore = create<AuthState>()(
                 set({ user: null, token: null });
             },
 
-            refreshGames: (gameIds) => {
-                const { user } = get();
-                if (!user) return;
-
-                const updatedGames = Array.from(new Set([...user.games, ...gameIds]));
-
-                set({
-                    user: {
-                        ...user,
-                        games: updatedGames,
-                    },
-                });
-            },
         }),
         {
             name: "auth-storage",

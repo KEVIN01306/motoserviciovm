@@ -44,7 +44,7 @@ const Login = () => {
         try {
             await login(data)
             const user =  useAuthStore.getState().user
-            successToast("Auth Succes: Hello " + user?.firstName)
+            successToast("Auth Succes: Hello " + user?.primerNombre)
             reset()
             goTo('/admin/users')
         } catch (err: any) {

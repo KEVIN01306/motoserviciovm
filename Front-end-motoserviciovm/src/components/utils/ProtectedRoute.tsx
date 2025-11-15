@@ -4,15 +4,15 @@ import { useAuthStore } from "../../store/useAuthStore";
 
 interface ProtectedRouteProps{
     children: React.ReactNode;
-    allowedRoles: string[];
+    allowedPermisos: string[];
 }
 
-const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
+const ProtectedRoute = ({ children, allowedPermisos }: ProtectedRouteProps) => {
     const user = useAuthStore.getState().user
 
-    if (!user?.role) return <Navigate to={'/public/auth/login'} replace />
+    if (user?.roles < 0) return <Navigate to={'/public/auth/login'} replace />
 
-    if (!allowedRoles.includes(user.role)) return <Navigate to={'/public/auth/login'} replace/>
+    if (!allowedPermisos.some(permiso => user.permisos.includes(permiso))) return <Navigate to={'/public/auth/login'} replace/>
 
     return children;
 

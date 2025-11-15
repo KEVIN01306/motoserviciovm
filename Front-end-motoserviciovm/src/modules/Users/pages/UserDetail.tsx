@@ -41,7 +41,7 @@ const UserDetail = () => {
     }
     const breadcrumbsData = [
         { label: "User", icon: <PiUsersFill fontSize="inherit" />, href: "/admin/users" },
-        { label: user?.firstName ? user?.firstName : "", icon: <PiUserCheck fontSize="inherit" />, href: `/${id}` },
+        { label: user?.primerNombre ? user?.primerNombre : "", icon: <PiUserCheck fontSize="inherit" />, href: `/${id}` },
     ];
 
     useEffect(() => {
@@ -55,15 +55,14 @@ const UserDetail = () => {
     if (!user) return <ErrorCard errorText="Usuario no encontrado." restart={getUserOne} />;
 
     const {
-        firstName,
-        secondName,
-        firstLastName,
-        secondLastName,
-        role,
+        primerNombre,
+        segundoNombre,
+        primerApellido,
+        segundoApellido,
+        tipo
     } = user;
 
-    const fullName = `${firstName || ''} ${secondName || ''} ${firstLastName || ''} ${secondLastName || ''}`.trim();
-
+    const fullName = `${primerNombre || ''} ${segundoNombre || ''} ${primerApellido || ''} ${segundoApellido || ''}`.trim();
     return (
         <>
             <BreadcrumbsRoutes items={breadcrumbsData} />
@@ -81,7 +80,7 @@ const UserDetail = () => {
                                     mx: 'auto'
                                 }}
                             >
-                                {firstName ? firstName[0].toUpperCase() : 'U'}
+                                {primerNombre ? primerNombre[0].toUpperCase() : 'U'}
                             </Avatar>
 
                             <Typography variant="h5" component="div" fontWeight="bold">
@@ -89,9 +88,9 @@ const UserDetail = () => {
                             </Typography>
 
                             <Chip
-                                label={role?.toUpperCase() || 'USUARIO'}
+                                label={tipo?.toUpperCase() == null ? "EMPLEADO" : tipo?.toUpperCase()}
                                 size="small"
-                                color={role === 'admin' ? 'secondary' : 'default'}
+                                color={tipo === 'admin' ? 'secondary' : 'default'}
                                 sx={{ mt: 0.5 }}
                             />
                         </Box>

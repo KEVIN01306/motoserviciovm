@@ -12,18 +12,21 @@ export const UsersRoutes: RouteObject[] = [
         path: 'Users',
         children: [
             {index: true, element: 
-                <ProtectedRoute allowedRoles={['admin']}>
+                <ProtectedRoute allowedPermisos={['usuarios:view']}>
                     <UsersList/>
                 </ProtectedRoute>
             },
-            { path: ':id', element: <UserDetail/> },
+            { path: ':id', element:                 
+                <ProtectedRoute allowedPermisos={['usuarios:detail']}>
+                    <UserDetail/>
+                </ProtectedRoute> },
             { path: 'create', element: 
-                <ProtectedRoute allowedRoles={['admin']}>
+                <ProtectedRoute allowedPermisos={['usuarios:create']}>
                     <UserCreate/>
                 </ProtectedRoute>
             },
             { path: ':id/edit', element: 
-                <ProtectedRoute allowedRoles={['admin']}>
+                <ProtectedRoute allowedPermisos={['usuarios:update']}>
                     <UserEdit/>
                 </ProtectedRoute>
             }

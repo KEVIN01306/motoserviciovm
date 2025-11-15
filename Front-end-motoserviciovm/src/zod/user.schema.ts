@@ -1,26 +1,19 @@
 import z from "zod";
 
-
 export const userSchema = z.object({
-    _id: z
-        .string()
-        .optional(),
-    firstName: z.string().min(2).max(20),
-    secondName: z.string().max(20).optional(),
-    firstLastName: z.string().min(2).max(20),
-    secondLastName: z.string().max(20).optional(),
-    email: z.string().email().refine(
-        (val) => {
-            const correctDomains = ['gmail.com','umes.org']
-            const domain = val.split('@')[1]
-            return correctDomains.includes(domain);
-        },
-        {
-            message: "The email not is: 'gmail.com' o 'umes.org'"
-        }
-    ),
-    role: z.string(),
-    password: z.string().min(8),
-    dateBirthday: z.string().min(1,'The dateBirthday is requered'),
-    active: z.boolean()
+    id:                 z.string().optional(),
+    primerNombre:       z.string(),
+    segundoNombre:      z.string().optional(),
+    primerApellido:     z.string(),
+    segundoApellido:    z.string().optional(),
+    fechaNac:           z.coerce.date(),
+    dpi:                z.string().optional(),
+    nit:                z.string().optional(),      
+    tipo:               z.string().optional(),
+    activo:             z.boolean().default(true),
+    numeroTel:          z.string().min(8).max(8),
+    numeroAuxTel :      z.string().optional(),
+    email:              z.email().optional(),
+    password:           z.string().optional(),
+    roles:              z.array(z.number().int()).optional(),
 })
