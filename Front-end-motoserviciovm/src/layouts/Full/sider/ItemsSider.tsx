@@ -14,12 +14,12 @@ import { useAuthStore } from "../../../store/useAuthStore";
 const ItemsSider = () => {
     const user = useAuthStore.getState().user
     const goTo = useGoTo()
-    const filteredMenu = MenuItems.filter(item => item.roles.includes(user?.role ? user?.role : "" ));
-
+    const filteredMenu = MenuItems.filter(item => user?.permisos.includes(item.permiso));
+    
 return (
     <Box>
       <Toolbar className="aspect-3/1 p-1.5 flex justify-center items-center" >
-            <Avatar variant="rounded" src="/public/icons/logo_mediano.png" sx={{width: "100px", boxShadow: "-2px 2px 10px rgba(0, 0, 0, 0.1)"}}/>
+            <Avatar variant="rounded" src="/public/icons/logo_mediano.png" sx={{width: "100px", padding: "1px"}}/>
       </Toolbar>
       <List>
         {filteredMenu.map((item) => (

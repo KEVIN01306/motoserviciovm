@@ -76,7 +76,7 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
                 <IconButton onClick={handleMenuOpen} sx={{ p: 0 }}>
                     {user ? (
                         <Avatar variant="rounded" sx={{ backgroundColor: "#6060f3" }}>
-                            {user?.firstName?.[0]?.toUpperCase() || "U"}
+                            {user?.primerNombre?.[0]?.toUpperCase() || "U"}
                         </Avatar>
                     ) : (
                         <Avatar variant="rounded" sx={{ backgroundColor: "gray" }} />

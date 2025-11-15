@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { getUser } from "../../../services/users.services";
 import Loading from "../../../components/utils/Loading";
 import ErrorCard from "../../../components/utils/ErrorCard";
-import type { UserType } from "../../../types/userType";
+import type { UserGetType, UserType } from "../../../types/userType";
 
 import {
     Container,
@@ -24,7 +24,7 @@ import { useGoTo } from "../../../hooks/useGoTo";
 const UserDetail = () => {
     const goTo = useGoTo()
     const { id } = useParams()
-    const [user, setUser] = useState<UserType>()
+    const [user, setUser] = useState<UserGetType>()
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string | null>(null)
 
@@ -86,11 +86,11 @@ const UserDetail = () => {
                             <Typography variant="h5" component="div" fontWeight="bold">
                                 {fullName || 'Usuario Desconocido'}
                             </Typography>
-
+                            
                             <Chip
-                                label={tipo?.toUpperCase() == null ? "EMPLEADO" : tipo?.toUpperCase()}
+                                label={tipo?.toUpperCase() == null ? "MOTOSERVICIOVM" : tipo?.toUpperCase()}
                                 size="small"
-                                color={tipo === 'admin' ? 'secondary' : 'default'}
+                                color={tipo === '' ? 'secondary' : 'default'}
                                 sx={{ mt: 0.5 }}
                             />
                         </Box>

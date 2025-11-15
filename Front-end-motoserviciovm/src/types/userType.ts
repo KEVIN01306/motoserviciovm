@@ -1,7 +1,14 @@
 import type{ userSchema } from '../zod/user.schema'
 import z from 'zod'
+import type { RolType } from './rolType'
 
 export type UserType = z.infer<typeof userSchema>
+
+export type UserGetType = Omit<UserType, 'roles'> & {
+    roles: RolType[]
+}
+
+
 
 export const UserInitialState = {
     primerNombre: "",
@@ -13,5 +20,4 @@ export const UserInitialState = {
     roles:[],
     fechaNac: new Date().toISOString().split("T")[0],
     activo: true
-    
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getUsers, patchUserActive } from "../../../services/users.services";
-import type { UserType } from "../../../types/userType";
+import type { UserGetType, UserType } from "../../../types/userType";
 import Loading from "../../../components/utils/Loading";
 import ErrorCard from "../../../components/utils/ErrorCard";
 import TableCustom from "../../../components/Table/Table";
@@ -18,7 +18,7 @@ import Search from "../../../components/utils/Search";
 type ChipColor = ChipProps['color'];
 
 const UsersList = () => {
-    const [users, setUsers] = useState<UserType[]>([])
+    const [users, setUsers] = useState<UserGetType[]>([])
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string | null>(null)
     const goTo = useGoTo()
@@ -66,19 +66,18 @@ const UsersList = () => {
         }
     }
 
-    const columns: Column<UserType>[] = [
+    const columns: Column<UserGetType>[] = [
         { id: "primerNombre", label: "First Name", minWidth: 150 },
         { id: "segundoNombre", label: "second Name", minWidth: 100 },
-        { id: "roles", label: "Rol", minWidth: 100 },
         { id: "email", label: "Email", minWidth: 100 },
         { id: "activo", label: "Estado", minWidth: 100, format: (value: any) => changeChip(value) },
         {
             id: "actions",
             label: "Acciones",
             actions: [
-                { label: (<><RiEdit2Line /> <span className="ml-1.5">edit</span> </>), onClick: (row: UserType) => goTo(String(row.id + '/edit')) },
-                { label: (<><PiUserCheckBold /> <span className="ml-1.5">Profile</span> </>), onClick: (row: UserType) => goTo(String(row.id)) },
-                { label: (<><HiOutlineLockClosed /> <span className="ml-1.5">Disable / Enable</span></>), onClick: (row: UserType) => changeActive(row.id) },
+                { label: (<><RiEdit2Line /> <span className="ml-1.5">edit</span> </>), onClick: (row: UserGetType) => goTo(String(row.id + '/edit')) },
+                { label: (<><PiUserCheckBold /> <span className="ml-1.5">Profile</span> </>), onClick: (row: UserGetType) => goTo(String(row.id)) },
+                { label: (<><HiOutlineLockClosed /> <span className="ml-1.5">Disable / Enable</span></>), onClick: (row: UserGetType) => changeActive(row.id) },
             ],
         },
     ];
@@ -105,7 +104,7 @@ const UsersList = () => {
                     </Grid>
                 </Grid>
                 <Grid size={12}>
-                    <TableCustom<UserType> columns={columns} rows={users} />
+                    <TableCustom<UserGetType> columns={columns} rows={users} />
                 </Grid>
             </Grid>
 

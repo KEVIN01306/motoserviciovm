@@ -1,13 +1,13 @@
 import axios from "axios";
 import { api } from "../axios/axios";
-import type { UserType } from "../types/userType";
+import type { UserGetType, UserType } from "../types/userType";
 import type { apiResponse } from "../types/apiResponse";
 const API_URL = import.meta.env.VITE_DOMAIN
 const API_USERS = API_URL + "users"
 
-const getUsers = async (): Promise<UserType[]> => {
+const getUsers = async (): Promise<UserGetType[]> => {
     try {
-        const response = await api.get<apiResponse<UserType[]>>(API_USERS)
+        const response = await api.get<apiResponse<UserGetType[]>>(API_USERS)
         const users = response.data.data
 
         if (!Array.isArray(users)) {
@@ -40,9 +40,9 @@ const getUsers = async (): Promise<UserType[]> => {
     }
 }
 
-const getUser = async (id: UserType['_id']): Promise<UserType> => {
+const getUser = async (id: UserGetType['id']): Promise<UserGetType> => {
     try {
-        const response = await api.get<apiResponse<UserType>>(API_USERS + "/" + id)
+        const response = await api.get<apiResponse<UserGetType>>(API_USERS + "/" + id)
         const user = response.data.data
 
         if (!user) {
@@ -115,7 +115,7 @@ const postUser = async (user: UserType) => {
 }
 
 
-const putUser = async (id: UserType['_id'], user: UserType) => {
+const putUser = async (id: UserType['id'], user: UserType) => {
     try {
 
         const response = await api.put<apiResponse<UserType>>(API_USERS + "/" + id, user)
@@ -155,7 +155,7 @@ const putUser = async (id: UserType['_id'], user: UserType) => {
 
 
 
-const patchUserActive = async (id: UserType['_id']) => {
+const patchUserActive = async (id: UserType['id']) => {
     try {
 
         const response = await api.patch<apiResponse<UserType>>(API_USERS + "/" + id+"/active")

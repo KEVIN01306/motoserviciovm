@@ -12,7 +12,7 @@ const MenuItems = [
         name: "Usuarios",
         link: "/admin/users",
         icon: PiUserCheckDuotone,
-        roles: ['admin']
+        permiso: 'usuarios:view'
     }
 ]
 

@@ -7,7 +7,7 @@ import Toolbar from '@mui/material/Toolbar';
 import { useState } from 'react';
 import Footer from './sider/Footer';
 
-const drawerWidth = 240
+const drawerWidth = 200
 
 const FullLayout = () => {
     const [mobileOpen, setMobileOpen] = useState(false);

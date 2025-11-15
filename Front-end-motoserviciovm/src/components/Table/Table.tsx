@@ -45,7 +45,7 @@ export default function TableCustom<T>({
   };
 
   return (
-    <Paper sx={{ width: "100%", overflow: "auto" }}>
+    <Paper sx={{ width: "100%", overflow: "auto",boxShadow:'0px 0px 3px rgb(0,0,0,0.1)' }} >
       <TableContainer sx={{ maxHeight: 600 }}>
         <Table stickyHeader>
           <TableHead>
