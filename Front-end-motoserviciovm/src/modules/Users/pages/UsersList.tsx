@@ -12,32 +12,33 @@ import { RiEdit2Line } from "react-icons/ri";
 import { PiUserCheckBold } from "react-icons/pi";
 import { HiOutlineLockClosed } from "react-icons/hi2";
 import { successToast } from "../../../utils/toast";
+import Search from "../../../components/utils/Search";
 
 
 type ChipColor = ChipProps['color'];
 
 const UsersList = () => {
-    const [users,setUsers] = useState<UserType[]>([])
+    const [users, setUsers] = useState<UserType[]>([])
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string | null>(null)
     const goTo = useGoTo()
 
     const getUsersList = async () => {
-        try{    
+        try {
             setLoading(true)
             const response = await getUsers()
             setUsers(response)
 
-        }catch (err: any) {
+        } catch (err: any) {
             setError(err.message)
         } finally {
-                setLoading(false)
+            setLoading(false)
         }
     }
 
     useEffect(() => {
         getUsersList()
-    },[])
+    }, [])
 
     const changeChip = (value: UserType['active']) => {
         let color: ChipColor
@@ -51,39 +52,39 @@ const UsersList = () => {
             label = 'Inactivo';
         }
 
-        return  <Chip  label={label} color={color} variant="outlined" />
+        return <Chip label={label} color={color} variant="outlined" />
 
     }
 
-    const changeActive = async(id: UserType['_id']) => {
+    const changeActive = async (id: UserType['_id']) => {
         try {
             const response = await patchUserActive(id)
-            successToast(`change Status: ${ response?.active ? "Activo" : "Inactivo"} - User: ${response?.email}` )
+            successToast(`change Status: ${response?.active ? "Activo" : "Inactivo"} - User: ${response?.email}`)
             getUsersList()
-        }catch (err: any) {
+        } catch (err: any) {
 
         }
     }
 
     const columns: Column<UserType>[] = [
-    { id: "firstName", label: "First Name", minWidth: 150 },
-    { id: "secondName", label: "second Name", minWidth: 100 },
-    { id: "role", label: "Rol", minWidth: 100 },
-    { id: "email", label: "Email", minWidth: 100 },
-    { id: "active", label: "Estado", minWidth: 100, format: (value: any) => changeChip(value)},
-    {
-        id: "actions",
-        label: "Acciones",
-        actions: [
-        { label:(<><RiEdit2Line /> <span className="ml-1.5">edit</span> </> ), onClick: (row: UserType) => goTo(String(row._id+'/edit')) },
-        { label: (<><PiUserCheckBold /> <span className="ml-1.5">Profile</span> </> ), onClick: (row: UserType) => goTo(String(row._id)) },
-        { label: (<><HiOutlineLockClosed /> <span className="ml-1.5">Disable / Enable</span></>),onClick: (row: UserType) => changeActive(row._id)},
-        ],
-    },
+        { id: "firstName", label: "First Name", minWidth: 150 },
+        { id: "secondName", label: "second Name", minWidth: 100 },
+        { id: "role", label: "Rol", minWidth: 100 },
+        { id: "email", label: "Email", minWidth: 100 },
+        { id: "active", label: "Estado", minWidth: 100, format: (value: any) => changeChip(value) },
+        {
+            id: "actions",
+            label: "Acciones",
+            actions: [
+                { label: (<><RiEdit2Line /> <span className="ml-1.5">edit</span> </>), onClick: (row: UserType) => goTo(String(row._id + '/edit')) },
+                { label: (<><PiUserCheckBold /> <span className="ml-1.5">Profile</span> </>), onClick: (row: UserType) => goTo(String(row._id)) },
+                { label: (<><HiOutlineLockClosed /> <span className="ml-1.5">Disable / Enable</span></>), onClick: (row: UserType) => changeActive(row._id) },
+            ],
+        },
     ];
 
 
-    
+
 
     if (loading) return <Loading />
 
@@ -92,19 +93,22 @@ const UsersList = () => {
 
     return (
         <>
-            <Grid  container spacing={2} flexGrow={1}>
-            <Grid flexGrow={1} container p={1} gap={2} justifyContent={{sm: "center",md: "flex-end"}}>
-                <Grid size={{xs: 10, md: 1}} display={"flex"} flexGrow={1} alignItems={"center"} justifyContent={"end"} >
-                    <Fab size="small" color="primary" aria-label="add" onClick={() => goTo('create')} >
-                        <AddIcon />
-                    </Fab>
+            <Grid container spacing={2} flexGrow={1} size={12} width={"100%"}>
+                <Grid flexGrow={1} container p={1} gap={2} justifyContent={{ sm: "center", md: "flex-end" }}>
+                    <Grid size={{ xs: 8, md: 8 }} display={"flex"} flexGrow={1} alignItems={"center"} justifyContent={"end"} >
+                        <Search />
+                    </Grid>
+                    <Grid size={{ xs: 1, md: 1 }} display={"flex"} flexGrow={1} alignItems={"center"} justifyContent={"end"} >
+                        <Fab size="small" color="primary" aria-label="add" onClick={() => goTo('create')} >
+                            <AddIcon />
+                        </Fab>
+                    </Grid>
                 </Grid>
-            </Grid>
                 <Grid size={12}>
-                    <TableCustom<UserType> columns={columns} rows={users}/>
+                    <TableCustom<UserType> columns={columns} rows={users} />
                 </Grid>
             </Grid>
-                
+
         </>
     )
 }

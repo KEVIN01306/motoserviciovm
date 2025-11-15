@@ -56,9 +56,9 @@ const UserEdit = () => {
     }
 
     const breadcrumbsData = [
-        { label: "Users", icon: <PiUsersFill fontSize="inherit" />, href: "/users" },
+        { label: "Users", icon: <PiUsersFill fontSize="inherit" />, href: "/admin/users" },
         { label: user?.firstName ? user?.firstName : "", icon: <PiUserCheck fontSize="inherit" />, href: `/users/${id}` },
-        { label: "Edit User", icon: <PiUserCheck fontSize="inherit" />, href: "/users/"+id },
+        { label: "Edit User", icon: <PiUserCheck fontSize="inherit" />, href: "/admin/users/"+id },
     ];
 
         const getUserOne = async () => {

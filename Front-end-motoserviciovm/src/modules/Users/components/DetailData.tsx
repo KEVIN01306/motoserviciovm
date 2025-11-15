@@ -1,6 +1,6 @@
 import { Chip, Grid } from "@mui/material";
 import DetailItem from "./DetailItem";
-import { EventNote, MailOutline, PersonOutline, SportsEsports, VpnKey } from "@mui/icons-material";
+import { EventNote, MailOutline, PersonOutline, VpnKey } from "@mui/icons-material";
 import type { UserType } from "../../../types/userType";
 import { formatDate } from "../../../utils/formatDate";
 
@@ -16,7 +16,6 @@ const DataDetail = ({ user }: DataDetail) => {
         secondLastName,
         email,
         role,
-        games,
         dateBirthday,
         active,
         _id,
@@ -56,11 +55,6 @@ const DataDetail = ({ user }: DataDetail) => {
                                 label="Rol"
                                 value={role || 'N/A'}
                                 icon={<VpnKey fontSize="small" />}
-                            />
-                            <DetailItem
-                                label="Juegos Comprados"
-                                value={<Chip label={games ? games.length.toString() : '0'} size="small" color="primary" />}
-                                icon={<SportsEsports fontSize="small" />}
                             />
                             <DetailItem
                                 label="Estado"

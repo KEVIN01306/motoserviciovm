@@ -5,8 +5,6 @@ import Toolbar from "@mui/material/Toolbar";
 import MenuIcon from "@mui/icons-material/Menu";
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
-
-import ShoppingCard from "../../../components/ShoppingCar/ShoppingCart";
 import { useAuthStore } from "../../../store/useAuthStore";
 import MenuActions from "./MenuActions";
 
@@ -74,7 +72,6 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
                     alignItems: "center",
                 }}
             >
-                <ShoppingCard />    
 
                 <IconButton onClick={handleMenuOpen} sx={{ p: 0 }}>
                     {user ? (

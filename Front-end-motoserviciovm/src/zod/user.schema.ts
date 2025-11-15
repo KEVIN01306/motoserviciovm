@@ -21,7 +21,6 @@ export const userSchema = z.object({
     ),
     role: z.string(),
     password: z.string().min(8),
-    games: z.array(z.string()),
     dateBirthday: z.string().min(1,'The dateBirthday is requered'),
     active: z.boolean()
 })

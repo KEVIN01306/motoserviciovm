@@ -1,9 +1,12 @@
-import { User } from "../models/users.model.js"
-
+import prisma from "../configs/db.config.js";
 
 const getUSers = async () => {
 
-	const users = await User.find();
+	const users = await prisma.user.findMany({
+		include:{
+			roles: true,
+		}
+	});
 
 	if (!users){
 		const error = new Error("DATA_NOT_FOUND");
@@ -14,9 +17,15 @@ const getUSers = async () => {
 	return users;
 }
 
+
 const getUSer = async (id) => {
 
-	const user = await User.findOne({ _id: id });
+	const user = await prisma.user.findUnique({
+		where: { id: id },
+		include:{
+			roles: true,
+		}
+	});
 
 	if (!user){
 		const error = new Error("DATA_NOT_FOUND");
@@ -30,25 +39,44 @@ const getUSer = async (id) => {
 
 const postUser = async (data) => {
 	
-		const user = await User.findOne({ email: data.email })
+		const user = await prisma.user.findUnique({
+			where: { email: data.email }
+		});
 
 		if (user) {
 			const error = new Error('CONFLICT');
 			error.code = 'CONFLICT';
 			throw error;
 		}
+		const { roles: rolIds, ...userData } = data;
 
-		const newUSer = await User.create(data);
-		console.log(newUSer.email)
+		const rolesConnect = (rolIds || []).map(rolId => ({
+			id: rolId
+		}))
 
-		return newUSer.email
+		const newUser = await prisma.user.create({
+			data: {
+				...userData,
+				roles:{
+					connect: rolesConnect
+				}
+			},
+			include:{
+				roles: true,
+			}
+		});
+		//console.log(newUSer.email)
+
+		return newUser.email
 }
 
 
 
 const putUser = async (id, data) => {
 
-		const user = await User.findOne({ _id: id })
+		const user = await prisma.user.findUnique({
+			where: { id: id}
+		});
 
 		if (!user) {
 			const error = new Error('DATA_NOT_FOUND');
@@ -56,12 +84,29 @@ const putUser = async (id, data) => {
 			throw error;
 		}
 
-		const newUser = await User.findByIdAndUpdate(id, data);
-		console.log(newUser.email)
+		const { roles: rolIds, ...userData } = data;
+
+		const rolesConnect = (rolIds || []).map(rolId => ({
+			id: rolId
+		}))
+
+		const newUser = await prisma.user.update({
+			where: { id: id },
+			data: {
+				...userData,
+				roles:{
+					connect: rolesConnect
+				}
+			},
+			include:{
+				roles: true,
+			}
+		});
 
 		return newUser.email
 }
 
+/*
 const patchUserActive = async (id) => {
     const user = await User.findOne({ _id: id });
 
@@ -85,62 +130,12 @@ const patchUserActive = async (id) => {
     };
 }
 
-
-const patchUserGame = async(userId, gameId) => {
-
-	const user = await User.findOne({_id: userId}) 
-
-    if (!user) {
-        const error = new Error('DATA_NOT_FOUND');
-        error.code = 'DATA_NOT_FOUND';
-        throw error;
-    }
-
-	const updateUser = await User.findByIdAndUpdate(
-		userId,
-		{ $addToSet: { games: gameId }},
-		{ new: true}
-	)
-
-	return {
-		email: updateUser.email,
-		games: updateUser.games
-	}
-
-}
-
-
-
-const patchUserGameMultiple = async(userId, gameIds) => {
-
-	const user = await User.findOne({_id: userId}) 
-
-    if (!user) {
-        const error = new Error('DATA_NOT_FOUND');
-        error.code = 'DATA_NOT_FOUND';
-        throw error;
-    }
-
-	const updateUser = await User.findByIdAndUpdate(
-		userId,
-		{ $addToSet: { games: { $each: gameIds } }},
-		{ new: true}
-	)
-
-	return {
-		email: updateUser.email,
-		games: updateUser.games
-	}
-
-}
-
+*/
 
 export {
 	getUSers,
 	getUSer,
 	postUser,
 	putUser,
-	patchUserActive,
-	patchUserGame,
-	patchUserGameMultiple
+	// patchUserActive,
 }

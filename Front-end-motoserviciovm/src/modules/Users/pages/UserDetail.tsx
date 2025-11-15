@@ -40,7 +40,7 @@ const UserDetail = () => {
         }
     }
     const breadcrumbsData = [
-        { label: "User", icon: <PiUsersFill fontSize="inherit" />, href: "/users" },
+        { label: "User", icon: <PiUsersFill fontSize="inherit" />, href: "/admin/users" },
         { label: user?.firstName ? user?.firstName : "", icon: <PiUserCheck fontSize="inherit" />, href: `/${id}` },
     ];
 

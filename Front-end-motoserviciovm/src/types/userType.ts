@@ -10,7 +10,6 @@ export const UserInitialState = {
     secondLastName: "",
     email: "",
     password: "",
-    games: [],
     role: "user",
     dateBirthday: new Date().toISOString().split("T")[0],
     active: true

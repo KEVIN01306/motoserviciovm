@@ -14,8 +14,8 @@ import { InputsForm } from "../components/index";
 
 const UserCreate = () => {
     const breadcrumbsData = [
-        { label: "Users", icon: <PiUsersFill fontSize="inherit" />, href: "/users" },
-        { label: "Create User", icon: <PiUserCheck fontSize="inherit" />, href: "/users/create" },
+        { label: "Users", icon: <PiUsersFill fontSize="inherit" />, href: "/admin/users" },
+        { label: "Create User", icon: <PiUserCheck fontSize="inherit" />, href: "/admin/users/create" },
     ];
      const {
             register,

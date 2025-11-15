@@ -2,7 +2,6 @@ import { ListItemIcon, Menu, MenuItem } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import LoginIcon from "@mui/icons-material/Login";
-import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import Divider from "@mui/material/Divider";
 import { useGoTo } from "../../../hooks/useGoTo";
 import { useAuthStore } from "../../../store/useAuthStore";
@@ -42,7 +41,7 @@ const MenuActions = ({open,anchorEl,handleMenuClose}:MenuActionsProps) => {
                     <>
                         <MenuItem
                             onClick={() => {
-                                goTo(`/users/${user._id}`);
+                                goTo(`/admin/users/${user._id}`);
                                 handleMenuClose();
                             }}
                         >
@@ -73,18 +72,6 @@ const MenuActions = ({open,anchorEl,handleMenuClose}:MenuActionsProps) => {
                                 <LoginIcon fontSize="small" />
                             </ListItemIcon>
                             Sign In
-                        </MenuItem>
-
-                        <MenuItem
-                            onClick={() => {
-                                goTo("/public/auth/register");
-                                handleMenuClose();
-                            }}
-                        >
-                            <ListItemIcon>
-                                <PersonAddAltIcon fontSize="small" />
-                            </ListItemIcon>
-                            Create Account
                         </MenuItem>
                     </>
                 )}

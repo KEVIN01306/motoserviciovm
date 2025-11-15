@@ -6,7 +6,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
 import MenuItems from "./MenuItems";
-import { Typography } from "@mui/material";
+import { Avatar } from "@mui/material";
 import { useGoTo } from "../../../hooks/useGoTo";
 import { useAuthStore } from "../../../store/useAuthStore";
 
@@ -19,10 +19,7 @@ const ItemsSider = () => {
 return (
     <Box>
       <Toolbar className="aspect-3/1 p-1.5 flex justify-center items-center" >
-            <Typography variant="h5" sx={{ 
-              color: '#596d80',
-              fontWeight: 'bold'
-             }}>MOTO SERVICIO VM</Typography>
+            <Avatar variant="rounded" src="/public/icons/logo_mediano.png" sx={{width: "100px", boxShadow: "-2px 2px 10px rgba(0, 0, 0, 0.1)"}}/>
       </Toolbar>
       <List>
         {filteredMenu.map((item) => (

@@ -30,7 +30,8 @@ const FullLayout = () => {
     
     return (
         <>
-            <Box sx={{ display: 'flex', bgcolor: "rgb(251, 251, 252)",minHeight: "100vh" }}>
+            <Box sx={{ display: 'flex', bgcolor: "rgb(251, 251, 252)",minHeight: "100vh"
+             }}>
                 <CssBaseline />
                 <Header drawerWidth={drawerWidth} handleDrawerToggle={handleDrawerToggle} />
                 <Box
@@ -47,10 +48,10 @@ const FullLayout = () => {
                 </Box>
                 <Box
                     component="main"
-                    sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
+                    sx={{ flexGrow: 1, p: 3, width: {xs: '100%', sm: `calc(100% - ${drawerWidth}px)`} }}
                 >
                     <Toolbar />
-                    <Box display={"flex"} flexWrap={"wrap"} justifyContent={"center"} flexDirection={'column'} alignContent={"center"}position={"relative"}>
+                    <Box display={"flex"} width={"100%"} flexWrap={"wrap"} justifyContent={"center"} flexDirection={'column'} alignContent={"center"}position={"relative"}>
                         <Outlet />
                     </Box>
                     <Footer/>
