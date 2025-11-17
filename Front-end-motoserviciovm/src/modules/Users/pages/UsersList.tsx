@@ -61,7 +61,9 @@ const UsersList = () => {
                 (user.email ?? "").toLowerCase().includes(lowerSearchTerm) ||
                 user.numeroTel.toLowerCase().includes(lowerSearchTerm) ||
                 (user.numeroAuxTel ?? "").toLowerCase().includes(lowerSearchTerm) ||
-                (user.tipo ?? "").toLowerCase().includes(lowerSearchTerm)
+                (user.tipo ?? "").toLowerCase().includes(lowerSearchTerm) ||
+                (user.dpi ?? "").toLowerCase().includes(lowerSearchTerm) ||
+                (user.nit ?? "").toLowerCase().includes(lowerSearchTerm)
             );
         });
 

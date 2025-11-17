@@ -6,6 +6,7 @@ import { UsersRoutes } from "../modules/Users/routes";
 import { authRoutes } from "../modules/Auth/routes";
 import { RolesRoutes } from "../modules/Roles/routes";
 import { PermisosRoutes } from "../modules/Permisos/routes";
+import { SucursalesRoutes } from "../modules/Sucursales/routes";
 
 const Home = lazy(() => import('../modules/LandingPages/index'))
 
@@ -23,6 +24,7 @@ const Router = [
             ...UsersRoutes,
             ...RolesRoutes,
             ...PermisosRoutes,
+            ...SucursalesRoutes,
 
             { path: '*',  element: <h1>Pagina no encontrada</h1> }
         ]

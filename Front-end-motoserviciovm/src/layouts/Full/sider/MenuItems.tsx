@@ -1,13 +1,20 @@
 import { PiUserCheckDuotone } from "react-icons/pi";
 import { PiUsersDuotone } from "react-icons/pi";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
-import { AutoFixHighOutlined } from "@mui/icons-material";
+import { AutoFixHighOutlined, StoreMallDirectoryOutlined } from "@mui/icons-material";
 
 const MenuItems = [
     {
         type: "divider",
         Text: "Administración",
         icon: MdOutlineAdminPanelSettings
+    },
+    {
+        type: "modulo",
+        name: "Sucursales",
+        link: "/admin/sucursales",
+        icon: StoreMallDirectoryOutlined,
+        permiso: 'sucursales:view'
     },
     {
         type: "modulo",
@@ -29,6 +36,6 @@ const MenuItems = [
         link: "/admin/permisos",
         icon: AutoFixHighOutlined,
         permiso: 'permisos:view'
-    }
+    },
 ]
 export default MenuItems

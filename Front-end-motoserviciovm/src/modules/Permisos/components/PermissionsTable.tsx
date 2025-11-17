@@ -12,7 +12,7 @@ type Props = {
 
 const PermissionsTable = ({ groupedModules, roles, rolePermSets, isEditing, onCheckboxChange }: Props) => {
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} sx={{boxShadow:'0px 0px 3px rgb(0,0,0,0.1)'}}>
       <Table>
         <TableHead>
           <TableRow>
