@@ -1,6 +1,6 @@
 import { Chip, Grid } from "@mui/material";
 import DetailItem from "./DetailItem";
-import { MailOutline, PersonOutline, PhoneAndroidOutlined, PhoneEnabledSharp, VpnKey } from "@mui/icons-material";
+import { Celebration, DateRangeOutlined, DateRangeTwoTone, MailOutline, PersonOutline, PhoneAndroidOutlined, PhoneEnabledSharp, VpnKey } from "@mui/icons-material";
 import type { UserGetType } from "../../../types/userType";
 import { PiTarget } from "react-icons/pi";
 
@@ -16,7 +16,7 @@ const DataDetail = ({ user }: DataDetail) => {
         segundoApellido,
         email,
         roles,
-        //fechaNac,
+        fechaNac,
         activo,
         numeroTel,
         numeroAuxTel,
@@ -25,6 +25,8 @@ const DataDetail = ({ user }: DataDetail) => {
         nit,
         //id,
         //password,
+        createdAt,
+        updatedAt
     } = user;
 
     const rolesString = roles.map(role => role.rol).join(',');
@@ -64,9 +66,9 @@ const DataDetail = ({ user }: DataDetail) => {
                                 )
                             }
                             <DetailItem
-                                label="Correo Electrónico"
-                                value={email || 'N/A'}
-                                icon={<MailOutline fontSize="small" />}
+                                label="Fecha de Nacimiento"
+                                value={new Date(fechaNac).toLocaleDateString() || 'N/A'}
+                                icon={<Celebration fontSize="small" />}
                             />
                             <DetailItem
                                 label="Número de Teléfono"
@@ -78,11 +80,6 @@ const DataDetail = ({ user }: DataDetail) => {
                                 value={numeroAuxTel || 'N/A'}
                                 icon={<PhoneEnabledSharp fontSize="small" />}
                             />
-                            {/*<DetailItem
-                                label="Fecha de Nacimiento"
-                                value={formatDate(fechaNac)}
-                                icon={<EventNote fontSize="small" />}
-                            />*/}
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6}}>
@@ -103,6 +100,25 @@ const DataDetail = ({ user }: DataDetail) => {
                                     />
                                 }
                                 icon={<VpnKey fontSize="small" />}
+                            />
+
+                            <DetailItem
+                                label="Creado el"
+                                value={
+                                    createdAt
+                                    ? new Date(createdAt).toLocaleDateString()
+                                    : 'N/A'
+                                }
+                                icon={<DateRangeOutlined fontSize="small" />}
+                            />
+                            <DetailItem
+                                label="Actualizado el"
+                                value={
+                                    updatedAt
+                                    ? new Date(updatedAt).toLocaleDateString()
+                                    : 'N/A'
+                                }
+                                icon={<DateRangeTwoTone fontSize="small" />}
                             />
                         </Grid>
                     </Grid>

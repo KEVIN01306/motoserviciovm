@@ -4,6 +4,8 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import BlankLayout from "../layouts/Blanck/BlankLayout";
 import { UsersRoutes } from "../modules/Users/routes";
 import { authRoutes } from "../modules/Auth/routes";
+import { RolesRoutes } from "../modules/Roles/routes";
+import { PermisosRoutes } from "../modules/Permisos/routes";
 
 const Home = lazy(() => import('../modules/LandingPages/index'))
 
@@ -19,6 +21,8 @@ const Router = [
             { index: true, element: <Home /> },
 
             ...UsersRoutes,
+            ...RolesRoutes,
+            ...PermisosRoutes,
 
             { path: '*',  element: <h1>Pagina no encontrada</h1> }
         ]

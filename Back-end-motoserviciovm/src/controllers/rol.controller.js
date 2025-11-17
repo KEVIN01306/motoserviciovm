@@ -79,8 +79,8 @@ const postRolHandler = async (req, res) => {
 const putRolHandler = async (req, res) => {
     try{
         const { id } = req.params;
-        const data = req.body;
-        
+        const {rol, descripcion, permisos} = req.body;
+        const data = {rol, descripcion, permisos};
         const validationResult = rolSchema.safeParse(data);
 
         if (!validationResult.success) {

@@ -9,6 +9,7 @@ const jwtIIS = process.env.JWT_ISS;
 const jwtAUD = process.env.JWT_AUD;
 const jwtAccessTTL = process.env.JWT_ACCESS_TTL;
 const jwtSecret = process.env.JWT_SECRET
+const jwtRefreshTTL = process.env.JWT_REFRESH_TTL
 
 const secretKey = createSecretKey(Buffer.from(jwtSecret, 'utf8'))
 
@@ -20,6 +21,7 @@ export const issueAccessToken = async({ sub, role, extra = {}}) => {
         .setSubject(String(sub))
         .setIssuedAt()
         .setExpirationTime(jwtAccessTTL)
+        .setExpirationTime(jwtRefreshTTL)
         .sign(secretKey)
 }
 

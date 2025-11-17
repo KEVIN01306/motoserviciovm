@@ -15,13 +15,14 @@ import Loading from "../../../components/utils/Loading";
 import ErrorCard from "../../../components/utils/ErrorCard";
 import { useGoTo } from "../../../hooks/useGoTo";
 import { getRoles } from "../../../services/rol.services";
-import type { RolType } from "../../../types/rolType";
+import type { RolGetType } from "../../../types/rolType";
 
 
 
 const UserEdit = () => {
 
-    const [roles, setRoles] = useState<RolType[]>([])
+    const [roles, setRoles] = useState<RolGetType[]>([])
+    const [tipoUser, setTipoUser] = useState<boolean>(true);
 
     const getRolesList = async () => {
         try {
@@ -85,6 +86,7 @@ const UserEdit = () => {
             setLoading(true)
             const response = await getUser(id);
             setUser(response);
+            setTipoUser(response.tipo == "" || response.tipo == undefined);
             console.log(response)
 
             const dataFormat = mergeUserDataWithDefaults(response);
@@ -111,7 +113,7 @@ const UserEdit = () => {
         <>
             <BreadcrumbsRoutes items={breadcrumbsData} />
             <FormEstructure handleSubmit={handleSubmit(handlerSubmitUser)}>
-                <InputsForm register={register} errors={errors} control={control} watch={watch} setValue={setValue} roles={roles} />
+                <InputsForm register={register} errors={errors} control={control} watch={watch} setValue={setValue} roles={roles} tipoUser={tipoUser} />
                 <Grid size={12}>
                     <Divider sx={{ my: 2 }} />
                 </Grid>

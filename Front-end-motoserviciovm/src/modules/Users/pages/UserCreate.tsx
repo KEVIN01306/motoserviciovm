@@ -11,12 +11,12 @@ import { Button, Divider, Grid } from "@mui/material";
 import { InputsForm } from "../components/index";
 import { useEffect, useState } from "react";
 import { getRoles } from "../../../services/rol.services";
-import type { RolType } from "../../../types/rolType";
+import type { RolGetType } from "../../../types/rolType";
 
 
 
 const UserCreate = () => {
-    const [roles, setRoles] = useState<RolType[]>([])
+    const [roles, setRoles] = useState<RolGetType[]>([])
 
 
     const getRolesList = async () => {

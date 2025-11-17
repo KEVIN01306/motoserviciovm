@@ -26,7 +26,7 @@ export const UsersRoutes: RouteObject[] = [
                 </ProtectedRoute>
             },
             { path: ':id/edit', element: 
-                <ProtectedRoute allowedPermisos={['usuarios:update']}>
+                <ProtectedRoute allowedPermisos={['usuarios:edit']}>
                     <UserEdit/>
                 </ProtectedRoute>
             }

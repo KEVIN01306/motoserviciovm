@@ -20,10 +20,12 @@ import { DetailData } from "../components/index";
 import { PiUserCheck, PiUsersFill } from "react-icons/pi";
 import BreadcrumbsRoutes from "../../../components/utils/Breadcrumbs";
 import { useGoTo } from "../../../hooks/useGoTo";
+import { useAuthStore } from "../../../store/useAuthStore";
 
 const UserDetail = () => {
     const goTo = useGoTo()
     const { id } = useParams()
+    const userlogged = useAuthStore(state => state.user)
     const [user, setUser] = useState<UserGetType>()
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string | null>(null)
@@ -86,7 +88,7 @@ const UserDetail = () => {
                             <Typography variant="h5" component="div" fontWeight="bold">
                                 {fullName || 'Usuario Desconocido'}
                             </Typography>
-                            
+
                             <Chip
                                 label={tipo?.toUpperCase() == null || tipo?.toUpperCase() == "" ? "MOTOSERVICIOVM" : tipo?.toUpperCase()}
                                 size="small"
@@ -104,15 +106,19 @@ const UserDetail = () => {
                         <DetailData user={user} />
 
                         <Divider sx={{ my: 3 }} />
+                        {
+                            userlogged?.permisos.includes('usuarios:edit') && (
+                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                                    <Button variant="outlined" color="primary" onClick={() => goTo(String('edit'))}>
+                                        Editar Perfil
+                                    </Button>
+                                    <Button variant="contained" color="secondary" onClick={() => console.log('Cambiar Contraseña')}>
+                                        Cambiar Contraseña
+                                    </Button>
+                                </Box>
+                            )
+                        }
 
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                            <Button variant="outlined" color="primary" onClick={() => goTo(String('edit'))}>
-                                Editar Perfil
-                            </Button>
-                            <Button variant="contained" color="secondary" onClick={() => console.log('Cambiar Contraseña')}>
-                                Cambiar Contraseña
-                            </Button>
-                        </Box>
                     </CardContent>
                 </Card>
             </Container>

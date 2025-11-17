@@ -41,7 +41,7 @@ const MenuActions = ({open,anchorEl,handleMenuClose}:MenuActionsProps) => {
                     <>
                         <MenuItem
                             onClick={() => {
-                                goTo(`/admin/users/${user._id}`);
+                                goTo(`/admin/users/${user.id}`);
                                 handleMenuClose();
                             }}
                         >

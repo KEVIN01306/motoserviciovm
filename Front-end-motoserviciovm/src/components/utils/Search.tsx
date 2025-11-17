@@ -1,7 +1,12 @@
 import { Paper, InputBase, IconButton } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
-export default function Search() {
+interface SearchProps {
+  onSearch?: (value: string) => void;
+  placeholder?: string;
+}
+
+export default function Search({ onSearch, placeholder = "Buscar..." }: SearchProps) {
   return (
     <Paper
       elevation={0}
@@ -26,7 +31,8 @@ export default function Search() {
       </IconButton>
 
       <InputBase
-        placeholder="Buscar juegos..."
+        placeholder={placeholder}
+        onChange={(e) => onSearch?.(e.target.value)}
         sx={{
           flex: 1,
           fontSize: 14,

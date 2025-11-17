@@ -13,14 +13,18 @@ import { PiUserCheckBold } from "react-icons/pi";
 import { HiOutlineLockClosed } from "react-icons/hi2";
 import { successToast } from "../../../utils/toast";
 import Search from "../../../components/utils/Search";
+import { useAuthStore } from "../../../store/useAuthStore";
 
 
 type ChipColor = ChipProps['color'];
 
 const UsersList = () => {
+    const user = useAuthStore(state => state.user)
     const [users, setUsers] = useState<UserGetType[]>([])
+    const [filteredUsers, setFilteredUsers] = useState<UserGetType[]>([])
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string | null>(null)
+    const [searchTerm, setSearchTerm] = useState<string>("")
     const goTo = useGoTo()
 
     const getUsersList = async () => {
@@ -39,6 +43,30 @@ const UsersList = () => {
     useEffect(() => {
         getUsersList()
     }, [])
+
+    useEffect(() => {
+        if (!searchTerm.trim()) {
+            setFilteredUsers(users);
+            return;
+        }
+
+        const lowerSearchTerm = searchTerm.toLowerCase();
+        const filtered = users.filter((user) => {
+            return (
+                String(user.id).toLowerCase().includes(lowerSearchTerm) ||
+                user.primerNombre.toLowerCase().includes(lowerSearchTerm) ||
+                (user.segundoNombre ?? "").toLowerCase().includes(lowerSearchTerm) ||
+                user.primerApellido.toLowerCase().includes(lowerSearchTerm) ||
+                (user.segundoApellido ?? "").toLowerCase().includes(lowerSearchTerm) ||
+                (user.email ?? "").toLowerCase().includes(lowerSearchTerm) ||
+                user.numeroTel.toLowerCase().includes(lowerSearchTerm) ||
+                (user.numeroAuxTel ?? "").toLowerCase().includes(lowerSearchTerm) ||
+                (user.tipo ?? "").toLowerCase().includes(lowerSearchTerm)
+            );
+        });
+
+        setFilteredUsers(filtered);
+    }, [searchTerm, users]);
 
     const changeChip = (value: UserType['activo']) => {
         let color: ChipColor
@@ -66,23 +94,49 @@ const UsersList = () => {
         }
     }
 
-    const columns: Column<UserGetType>[] = [
-        { id: "primerNombre", label: "First Name", minWidth: 150 },
-        { id: "segundoNombre", label: "second Name", minWidth: 100 },
-        { id: "email", label: "Email", minWidth: 100 },
-        { id: "activo", label: "Estado", minWidth: 100, format: (value: any) => changeChip(value) },
-        {
-            id: "actions",
-            label: "Acciones",
-            actions: [
-                { label: (<><RiEdit2Line /> <span className="ml-1.5">edit</span> </>), onClick: (row: UserGetType) => goTo(String(row.id + '/edit')) },
-                { label: (<><PiUserCheckBold /> <span className="ml-1.5">Profile</span> </>), onClick: (row: UserGetType) => goTo(String(row.id)) },
-                { label: (<><HiOutlineLockClosed /> <span className="ml-1.5">Disable / Enable</span></>), onClick: (row: UserGetType) => changeActive(row.id) },
-            ],
-        },
-    ];
+    const getTableActions = () => {
+        const allActions = [
+            { 
+                label: (<><RiEdit2Line /> <span className="ml-1.5">Editar</span> </>), 
+                onClick: (row: UserGetType) => goTo(String(row.id + '/edit')),
+                permiso: 'usuarios:edit'
+            },
+            { 
+                label: (<><PiUserCheckBold /> <span className="ml-1.5">Perfil</span> </>), 
+                onClick: (row: UserGetType) => goTo(String(row.id)),
+                permiso: 'usuarios:detail'
+            },
+            { 
+                label: (<><HiOutlineLockClosed /> <span className="ml-1.5">Desactivar / Activar</span></>), 
+                onClick: (row: UserGetType) => changeActive(row.id),
+                permiso: 'usuarios:delete'
+            },
+        ];
+        return allActions.filter(action => user?.permisos.includes(action.permiso));
+    };
 
+    const getTableColumns = (): Column<UserGetType>[] => {
+        const baseColumns: Column<UserGetType>[] = [
+            { id: "primerNombre", label: "First Name", minWidth: 150 },
+            { id: "numeroTel", label: "Numero de Teléfono", minWidth: 100 },
+            { id: "email", label: "Email", minWidth: 100 },
+            { id: "activo", label: "Estado", minWidth: 100, format: (value: any) => changeChip(value) },
+        ];
 
+        const actions = getTableActions();
+        
+        if (actions.length > 0) {
+            baseColumns.push({
+                id: "actions",
+                label: "Acciones",
+                actions: actions,
+            });
+        }
+
+        return baseColumns;
+    };
+
+    const columns = getTableColumns();
 
 
     if (loading) return <Loading />
@@ -95,16 +149,20 @@ const UsersList = () => {
             <Grid container spacing={2} flexGrow={1} size={12} width={"100%"}>
                 <Grid flexGrow={1} container p={1} gap={2} justifyContent={{ sm: "center", md: "flex-end" }}>
                     <Grid size={{ xs: 8, md: 8 }} display={"flex"} flexGrow={1} alignItems={"center"} justifyContent={"end"} >
-                        <Search />
+                        <Search onSearch={setSearchTerm} placeholder="Buscar usuarios..." />
                     </Grid>
-                    <Grid size={{ xs: 1, md: 1 }} display={"flex"} flexGrow={1} alignItems={"center"} justifyContent={"end"} >
-                        <Fab size="small" color="primary" aria-label="add" onClick={() => goTo('create')} >
-                            <AddIcon />
-                        </Fab>
-                    </Grid>
+                    {
+                        user.permisos.includes('usuarios:create') && (
+                            <Grid size={{ xs: 1, md: 1 }} display={"flex"} flexGrow={1} alignItems={"center"} justifyContent={"end"} >
+                                <Fab size="small" color="primary" aria-label="add" onClick={() => goTo('create')} >
+                                    <AddIcon />
+                                </Fab>
+                            </Grid>
+                        )
+                    }
                 </Grid>
                 <Grid size={12}>
-                    <TableCustom<UserGetType> columns={columns} rows={users} />
+                    <TableCustom<UserGetType> columns={columns} rows={filteredUsers} />
                 </Grid>
             </Grid>
 
