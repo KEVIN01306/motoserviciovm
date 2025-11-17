@@ -32,6 +32,7 @@ model User {
   email           String  @unique
   password        String?
 
+
   roles           Rol[] @relation("UserRoles")
 
   createdAt       DateTime @default(now())

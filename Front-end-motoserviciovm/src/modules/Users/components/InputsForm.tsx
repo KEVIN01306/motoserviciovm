@@ -1,16 +1,39 @@
-import { FormControl, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material"
+import { Autocomplete, Checkbox, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material"
 import { Controller, type Control, type FieldErrors, type UseFormRegister, type UseFormSetValue, type UseFormWatch } from "react-hook-form"
 import type { UserType } from "../../../types/userType";
+import { useEffect, useState } from "react";
+import type { RolType } from "../../../types/rolType";
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
 
 interface InputsFormProps {
     register: UseFormRegister<UserType>;
     errors: FieldErrors<UserType>;
-    control: Control<UserType>;
+    control: Control<UserType , any>;
     watch: UseFormWatch<UserType>;
     setValue: UseFormSetValue<UserType>;
+    roles: RolType[];
 }
-const InputsForm = ({register,errors, control}: InputsFormProps) => {
+
+const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+const checkedIcon = <CheckBoxIcon fontSize="small" />;
+const InputsForm = ({ register, errors, control, watch, setValue, roles }: InputsFormProps) => {
+    
+    const [TipoUser, setTipoUser] = useState(true);
+
+    const tipo = watch("tipo");
+    const rolesList = watch("roles");
+
+    useEffect(() => {
+        if (TipoUser) {
+            setValue("tipo", "");
+        }
+    }, [TipoUser, setValue]);
+
+    useEffect(() => {
+        console.log(rolesList)
+    }, [rolesList])
 
     return (
         <>
@@ -60,7 +83,93 @@ const InputsForm = ({register,errors, control}: InputsFormProps) => {
                     helperText={errors.segundoApellido?.message}
                 />
             </Grid>
-            <Grid size={{sm: 12, md: 12}}>
+            <Grid size={{ sm: 12, md: 6 }}>
+                <TextField
+                    label="Numero de Telefono"
+                    fullWidth
+                    variant="standard"
+                    size="small"
+                    {...register("numeroTel")}
+                    error={!!errors.numeroTel}
+                    helperText={errors.numeroTel?.message}
+                />
+            </Grid>
+            <Grid size={{ sm: 12, md: 6 }}>
+                <TextField
+                    label="Numero de Telefono (Auxiliar)"
+                    fullWidth
+                    variant="standard"
+                    size="small"
+                    {...register("numeroAuxTel")}
+                    error={!!errors.numeroAuxTel}
+                    helperText={errors.numeroAuxTel?.message}
+                />
+            </Grid>
+            <Grid size={{ sm: 12, md: 12 }}>
+
+                <FormControlLabel
+                    control={
+                        <Checkbox checked={TipoUser} onChange={(e) => setTipoUser(e.target.checked)} name="tipoUser" />
+                    }
+                    label="Usuario Empleado (MOTOSERVICIOVM)"
+                />
+
+            </Grid>
+            {
+                !TipoUser && (
+                    <Grid size={{ sm: 12, md: 6 }}>
+                        <FormControl fullWidth size="small" error={!!errors.tipo}>
+                            <InputLabel id="tipo-label">Tipo de Usuario</InputLabel>
+                            <Controller
+                                name="tipo"
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        labelId="tipo-label"
+                                        label="Tipo de Usuario"
+                                        variant="standard"
+                                        {...field}
+                                    >
+                                        <MenuItem value="Usuario Regular">Empleado Regular</MenuItem>
+                                        <MenuItem value="Empresa">Empresa</MenuItem>
+                                    </Select>
+                                )}
+                            />
+                        </FormControl>
+                        {errors.tipo && (
+                            <p style={{ color: "#d32f2f", fontSize: "0.8rem", marginTop: "4px" }}>
+                                {errors.tipo.message}
+                            </p>
+                        )}
+                    </Grid>
+                )
+            }
+            {
+                tipo === "Usuario Regular" || TipoUser ? (
+                    <Grid size={{ sm: 12, md: 6 }}>
+                        <TextField
+                            label="Dpi"
+                            fullWidth
+                            variant="standard"
+                            size="small"
+                            {...register("dpi")}
+                            error={!!errors.dpi}
+                            helperText={errors.dpi?.message}
+                        />
+                    </Grid>
+                ) : (<Grid size={{ sm: 12, md: 6 }}>
+                    <TextField
+                        label="Nit"
+                        fullWidth
+                        variant="standard"
+                        size="small"
+                        {...register("nit")}
+                        error={!!errors.nit}
+                        helperText={errors.nit?.message}
+                    />
+                </Grid>)
+            }
+            <Grid size={{ sm: 12, md: 12 }}>
                 <TextField
                     label="Email"
                     fullWidth
@@ -72,89 +181,24 @@ const InputsForm = ({register,errors, control}: InputsFormProps) => {
                     helperText={errors.email?.message}
                 />
             </Grid>
-            <Grid size={{sm: 12, md: 6}}>
-                <TextField
-                    label="Password"
-                    fullWidth
-                    required
-                    type="password"
-                    variant="filled"
-                    size="small"
-                    {...register("password")}
-                    error={!!errors.password}
-                    helperText={errors.password?.message}
-                />
-            </Grid>
-            <Grid size={{sm: 12, md: 6}}>
-                <TextField
-                    label="Numero de Telefono"
-                    fullWidth
-                    variant="standard"
-                    size="small"
-                    {...register("numeroTel")}
-                    error={!!errors.numeroTel}
-                    helperText={errors.numeroTel?.message}
-                />
-            </Grid>
-            <Grid size={{sm: 12, md: 6}}>
-                <TextField
-                    label="Numero de Telefono (Auxiliar)"
-                    fullWidth
-                    variant="standard"
-                    size="small"
-                    {...register("numeroAuxTel")}
-                    error={!!errors.numeroAuxTel}
-                    helperText={errors.numeroAuxTel?.message}
-                />
-            </Grid>
-            <Grid size={{sm: 12, md: 6}}>
-                <TextField
-                    label="Dpi"
-                    fullWidth
-                    variant="standard"
-                    size="small"
-                    {...register("dpi")}
-                    error={!!errors.dpi}
-                    helperText={errors.dpi?.message}
-                />
-            </Grid>
-            <Grid size={{sm: 12, md: 6}}>
-                <TextField
-                    label="Nit"
-                    fullWidth
-                    variant="standard"
-                    size="small"
-                    {...register("nit")}
-                    error={!!errors.nit}
-                    helperText={errors.nit?.message}
-                />
-            </Grid>
-            {/*<Grid size={{sm: 12, md: 6}}>
-                <FormControl fullWidth size="small" error={!!errors.rol}>
-                    <InputLabel id="role-label">Rol</InputLabel>
-                    <Controller
-                        name="roles"
-                        control={control}
-                        render={({ field }) => (
-                            <Select
-                                labelId="role-label"
-                                label="Rol"
-                                variant="standard"
-                                {...field}
-                            >
-                                <MenuItem value="admin">Admin</MenuItem>
-                                <MenuItem value="user">User</MenuItem>
-                            </Select>
-                        )}
-                    />
-                </FormControl>
-                {errors.rol && (
-                    <p style={{ color: "#d32f2f", fontSize: "0.8rem", marginTop: "4px" }}>
-                        {errors.rol.message}
-                    </p>
-                )}
-            </Grid>*/}
-            <Grid size={{sm: 12, md: 12}}>
+            {
+                TipoUser && (
+                    <Grid size={{ sm: 12, md: 6 }}>
+                        <TextField
+                            label="Password"
+                            fullWidth
+                            required
+                            type="password"
+                            variant="filled"
+                            size="small"
+                            {...register("password")}
+                            error={!!errors.password}
+                            helperText={errors.password?.message}
+                        />
+                    </Grid>
+                )
+            }
+            <Grid size={{ sm: 12, md: 12 }}>
                 <TextField
                     label="Fecha de Nacimiento"
                     required
@@ -168,6 +212,63 @@ const InputsForm = ({register,errors, control}: InputsFormProps) => {
                     helperText={errors.fechaNac?.message}
                 />
             </Grid>
+
+            <Grid size={{ sm: 12, md: 12 }}>
+                <Controller
+            name="roles"
+            control={control}
+            render={({ field }) => {
+                
+                const selectedRoleObjects = (field.value as number[] || []).map(id => 
+                    roles.find((rol: RolType) => String(rol.id) === String(id))
+                ).filter((role): role is RolType => !!role);
+
+                return (
+                    <Autocomplete
+                        multiple
+                        id="checkboxes-roles-tags"
+                        options={roles}
+                        disableCloseOnSelect
+
+                        getOptionLabel={(role) => role.rol}
+                    
+                        value={selectedRoleObjects} 
+                        
+                        onChange={(event, newValue: RolType[]) => {
+                            const roleIds = newValue.map(role => role.id);
+                            
+                            field.onChange(roleIds); 
+                        }}
+
+                        renderOption={(props, option, { selected }) => {
+                            return (
+                                <li {...props}>
+                                    <Checkbox
+                                        icon={icon}
+                                        checkedIcon={checkedIcon}
+                                        style={{ marginRight: 8 }}
+                                        checked={selected}
+                                    />
+                                    {option.rol}
+                                </li>
+                            );
+                        }}
+                        style={{ width: 500 }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                variant="standard"
+                                label="Roles del Usuario"
+                                placeholder="Seleccionar roles"
+                                error={!!errors.roles} 
+                            />
+                        )}
+                    />
+                );
+            }}
+        />
+            </Grid>
+
         </>
     )
 }

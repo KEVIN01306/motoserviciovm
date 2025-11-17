@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { getUser } from "../../../services/users.services";
 import Loading from "../../../components/utils/Loading";
 import ErrorCard from "../../../components/utils/ErrorCard";
-import type { UserGetType, UserType } from "../../../types/userType";
+import type { UserGetType } from "../../../types/userType";
 
 import {
     Container,
@@ -88,9 +88,9 @@ const UserDetail = () => {
                             </Typography>
                             
                             <Chip
-                                label={tipo?.toUpperCase() == null ? "MOTOSERVICIOVM" : tipo?.toUpperCase()}
+                                label={tipo?.toUpperCase() == null || tipo?.toUpperCase() == "" ? "MOTOSERVICIOVM" : tipo?.toUpperCase()}
                                 size="small"
-                                color={tipo === '' ? 'secondary' : 'default'}
+                                color={tipo === '' || tipo == null ? 'primary' : 'info'}
                                 sx={{ mt: 0.5 }}
                             />
                         </Box>

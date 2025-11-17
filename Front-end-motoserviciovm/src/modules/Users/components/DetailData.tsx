@@ -1,8 +1,8 @@
 import { Chip, Grid } from "@mui/material";
 import DetailItem from "./DetailItem";
-import { EventNote, MailOutline, PersonOutline, VpnKey } from "@mui/icons-material";
-import type { UserGetType, UserType } from "../../../types/userType";
-import { formatDate } from "../../../utils/formatDate";
+import { MailOutline, PersonOutline, PhoneAndroidOutlined, PhoneEnabledSharp, VpnKey } from "@mui/icons-material";
+import type { UserGetType } from "../../../types/userType";
+import { PiTarget } from "react-icons/pi";
 
 interface DataDetail{
     user: UserGetType;
@@ -16,9 +16,14 @@ const DataDetail = ({ user }: DataDetail) => {
         segundoApellido,
         email,
         roles,
-        fechaNac,
+        //fechaNac,
         activo,
-        id,
+        numeroTel,
+        numeroAuxTel,
+        //tipo,
+        dpi,
+        nit,
+        //id,
         //password,
     } = user;
 
@@ -39,6 +44,40 @@ const DataDetail = ({ user }: DataDetail) => {
                                 value={email || 'N/A'}
                                 icon={<MailOutline fontSize="small" />}
                             />
+                            {
+                                dpi && (
+                                    <DetailItem
+                                        label="DPI"
+                                        value={dpi || 'N/A'}
+                                        icon={<PiTarget fontSize="small" />}
+                                    />
+                                )
+                            }
+                            {       
+
+                                nit && (
+                                    <DetailItem
+                                        label="Nit"
+                                        value={nit || 'N/A'}
+                                        icon={<PiTarget fontSize="small" />}
+                                    />
+                                )
+                            }
+                            <DetailItem
+                                label="Correo Electrónico"
+                                value={email || 'N/A'}
+                                icon={<MailOutline fontSize="small" />}
+                            />
+                            <DetailItem
+                                label="Número de Teléfono"
+                                value={numeroTel || 'N/A'}
+                                icon={<PhoneAndroidOutlined fontSize="small" />}
+                            />
+                            <DetailItem
+                                label="Número de Teléfono Auxiliar"
+                                value={numeroAuxTel || 'N/A'}
+                                icon={<PhoneEnabledSharp fontSize="small" />}
+                            />
                             {/*<DetailItem
                                 label="Fecha de Nacimiento"
                                 value={formatDate(fechaNac)}
@@ -47,11 +86,7 @@ const DataDetail = ({ user }: DataDetail) => {
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6}}>
-                            <DetailItem
-                                label="ID de Usuario"
-                                value={id || 'N/A'}
-                                icon={<VpnKey fontSize="small" />}
-                            />
+                           
 
                             <DetailItem
                                 label="Roles"

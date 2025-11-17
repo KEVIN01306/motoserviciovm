@@ -1,7 +1,7 @@
 import { PiUserCheck, PiUsersFill } from "react-icons/pi";
 import BreadcrumbsRoutes from "../../../components/utils/Breadcrumbs";
-import {  UserInitialState, type UserType } from "../../../types/userType";
-import { useForm } from "react-hook-form";
+import {  UserInitialState, type UserGetType, type UserType, mergeUserDataWithDefaults } from "../../../types/userType";
+import { useForm, type SubmitHandler, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { userSchema } from "../../../zod/user.schema";
 import { errorToast, successToast } from "../../../utils/toast";
@@ -14,16 +14,35 @@ import { useParams } from "react-router-dom";
 import Loading from "../../../components/utils/Loading";
 import ErrorCard from "../../../components/utils/ErrorCard";
 import { useGoTo } from "../../../hooks/useGoTo";
+import { getRoles } from "../../../services/rol.services";
+import type { RolType } from "../../../types/rolType";
 
 
 
 const UserEdit = () => {
 
+    const [roles, setRoles] = useState<RolType[]>([])
+
+    const getRolesList = async () => {
+        try {
+            const response = await getRoles()
+            setRoles(response)
+            console.log(response)
+
+        } catch (err: any) {
+            console.log(err)
+        }
+    }
+
+    useEffect(() => {
+        getRolesList()
+    }, [])
+
     const { id } = useParams()
 
     const goTo = useGoTo()
 
-    const [user,setUser] = useState<UserType>()
+    const [user,setUser] = useState<UserGetType>()
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string | null>(null)
      const {
@@ -36,17 +55,17 @@ const UserEdit = () => {
             setValue,
         } =
             useForm<UserType>({
-                resolver: zodResolver(userSchema),
+                resolver: zodResolver(userSchema) as unknown as Resolver<UserType>,
                 mode: "onSubmit",
                 defaultValues: UserInitialState
             })
 
 
-    const handlerSubmitUser = async (data: UserType) => {
+    const handlerSubmitUser: SubmitHandler<UserType> = async (data) => {
         try {
             const response = await putUser(id,data)
             successToast("User Update: " + response)
-            goTo("/users/"+id)
+            goTo("/admin/users/"+id)
         }
         catch (err: any) {
             console.log(err)
@@ -57,7 +76,7 @@ const UserEdit = () => {
 
     const breadcrumbsData = [
         { label: "Users", icon: <PiUsersFill fontSize="inherit" />, href: "/admin/users" },
-        { label: user?.firstName ? user?.firstName : "", icon: <PiUserCheck fontSize="inherit" />, href: `/users/${id}` },
+        { label: user?.primerNombre ? user?.primerNombre : "", icon: <PiUserCheck fontSize="inherit" />, href: `/users/${id}` },
         { label: "Edit User", icon: <PiUserCheck fontSize="inherit" />, href: "/admin/users/"+id },
     ];
 
@@ -66,13 +85,10 @@ const UserEdit = () => {
             setLoading(true)
             const response = await getUser(id);
             setUser(response);
+            console.log(response)
 
-            const dataFormat = {
-                ...response,
-                dateBirthday: response.dateBirthday
-                ? new Date(response.dateBirthday).toISOString().split("T")[0]
-                : ""
-            }
+            const dataFormat = mergeUserDataWithDefaults(response);
+
             reset(dataFormat);
 
         } catch (err: any) {
@@ -95,7 +111,7 @@ const UserEdit = () => {
         <>
             <BreadcrumbsRoutes items={breadcrumbsData} />
             <FormEstructure handleSubmit={handleSubmit(handlerSubmitUser)}>
-                <InputsForm register={register} errors={errors} control={control} watch={watch} setValue={setValue} />
+                <InputsForm register={register} errors={errors} control={control} watch={watch} setValue={setValue} roles={roles} />
                 <Grid size={12}>
                     <Divider sx={{ my: 2 }} />
                 </Grid>
@@ -107,7 +123,7 @@ const UserEdit = () => {
                         fullWidth
                     >
 
-                        {isSubmitting ? "Loading..." : "Create User"}
+                        {isSubmitting ? "Cargando..." : "Guardar Usuario"}
                     </Button>
                 </Grid>
             </FormEstructure>
