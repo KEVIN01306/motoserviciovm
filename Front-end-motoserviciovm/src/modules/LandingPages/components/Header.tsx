@@ -21,7 +21,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, PhoneIcon, PlayCircleIcon } from '@heroicons/react/20/solid'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useGoTo } from '../../../hooks/useGoTo'
 
 
 const products = [
@@ -38,6 +38,7 @@ const callsToAction = [
 
 
 const Header = () => {
+const goTo = useGoTo()
 const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     return(
         <>
@@ -127,9 +128,9 @@ const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
                   </a>
                 </PopoverGroup>
                 <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-                  <a href="#" className="text-sm/6 font-semibold text-gray-900 dark:text-white">
+                  <button onClick={() => goTo('/public/auth/login')} className="text-sm/6 font-semibold text-gray-900 dark:text-white">
                     Log in <span aria-hidden="true">&rarr;</span>
-                  </a>
+                    </button>
                 </div>
               </nav>
               <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
@@ -199,12 +200,12 @@ const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
                         </a>
                       </div>
                       <div className="py-6">
-                        <Link
-                          to="/public/auth/login"
+                        <p
+                          onClick={() => goTo('/public/auth/login')}
                           className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
                         >
                           Log in
-                        </Link>
+                        </p>
                       </div>
                     </div>
                   </div>
