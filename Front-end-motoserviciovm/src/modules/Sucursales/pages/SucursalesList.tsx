@@ -12,7 +12,6 @@ import { RiEdit2Line } from "react-icons/ri";
 import Search from "../../../components/utils/Search";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { PiDeviceTabletFill, PiUserCheckBold } from "react-icons/pi";
-import { DetailsOutlined } from "@mui/icons-material";
 
 const SucursalesList = () => {
     const user = useAuthStore(state => state.user)

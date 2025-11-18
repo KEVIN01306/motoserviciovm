@@ -16,6 +16,7 @@ export const userSchema = z.object({
   email: z.email().optional(),
   password: z.string().optional(),
   roles: z.array(z.number().int()).optional(),
+  sucursales: z.array(z.number().int()).optional(),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
 });

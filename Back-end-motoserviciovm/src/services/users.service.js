@@ -5,6 +5,7 @@ const getUSers = async () => {
 	const users = await prisma.user.findMany({
 		include:{
 			roles: true,
+			sucursales: true,
 		}
 	});
 
@@ -24,6 +25,7 @@ const getUSer = async (id) => {
 		where: { id: id },
 		include:{
 			roles: true,
+			sucursales: true,
 		}
 	});
 
@@ -48,21 +50,28 @@ const postUser = async (data) => {
 			error.code = 'CONFLICT';
 			throw error;
 		}
-		const { roles: rolIds, ...userData } = data;
+		const { roles: rolIds, sucursales: sucursalIds, ...userData } = data;
 
 		const rolesConnect = (rolIds || []).map(rolId => ({
 			id: rolId
 		}))
 
+		const sucursalesConnect = (sucursalIds || []).map(sucursalId => ({
+			id: sucursalId
+		}))
 		const newUser = await prisma.user.create({
 			data: {
 				...userData,
 				roles:{
 					connect: rolesConnect
+				},
+				sucursales:{
+					connect: sucursalesConnect
 				}
 			},
 			include:{
 				roles: true,
+				sucursales: true,	
 			}
 		});
 		//console.log(newUSer.email)
@@ -84,22 +93,29 @@ const putUser = async (id, data) => {
 			throw error;
 		}
 
-		const { roles: rolIds, ...userData } = data;
+		const { roles: rolIds, sucursales: sucursalIds, ...userData } = data;
 
 		const rolesConnect = (rolIds || []).map(rolId => ({
 			id: rolId
 		}))
 
+		const sucursalesConnect = (sucursalIds || []).map(sucursalId => ({
+			id: sucursalId
+		}))
 		const newUser = await prisma.user.update({
 			where: { id: id },
 			data: {
 				...userData,
 				roles:{
 					set: rolesConnect
+				},
+				sucursales:{
+					set: sucursalesConnect
 				}
 			},
 			include:{
 				roles: true,
+				sucursales: true,
 			}
 		});
 

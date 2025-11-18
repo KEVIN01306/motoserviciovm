@@ -1,6 +1,6 @@
 import { Chip, Grid } from "@mui/material";
 import DetailItem from "./DetailItem";
-import { Celebration, DateRangeOutlined, DateRangeTwoTone, MailOutline, PersonOutline, PhoneAndroidOutlined, PhoneEnabledSharp, VpnKey } from "@mui/icons-material";
+import { Celebration, DateRangeOutlined, DateRangeTwoTone, MailOutline, PersonOutline, PhoneAndroidOutlined, PhoneEnabledSharp, StoreMallDirectoryRounded, VpnKey } from "@mui/icons-material";
 import type { UserGetType } from "../../../types/userType";
 import { PiTarget } from "react-icons/pi";
 
@@ -16,6 +16,7 @@ const DataDetail = ({ user }: DataDetail) => {
         segundoApellido,
         email,
         roles,
+        sucursales,
         fechaNac,
         activo,
         numeroTel,
@@ -30,7 +31,8 @@ const DataDetail = ({ user }: DataDetail) => {
     } = user;
 
     const rolesString = roles.map(role => role.rol).join(',');
-
+    const sucursalesString = sucursales.map(sucursal => sucursal.nombre).join(' / ');
+    console.log(sucursalesString);
      const fullName = `${primerNombre || ''} ${segundoNombre || ''} ${primerApellido || ''} ${segundoApellido || ''}`.trim();
     return (
         <>
@@ -119,6 +121,11 @@ const DataDetail = ({ user }: DataDetail) => {
                                     : 'N/A'
                                 }
                                 icon={<DateRangeTwoTone fontSize="small" />}
+                            />
+                            <DetailItem
+                                label="Sucursales"
+                                value={sucursalesString || 'N/A'}
+                                icon={<StoreMallDirectoryRounded fontSize="small" />}
                             />
                         </Grid>
                     </Grid>

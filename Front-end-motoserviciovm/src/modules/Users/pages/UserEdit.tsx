@@ -16,12 +16,15 @@ import ErrorCard from "../../../components/utils/ErrorCard";
 import { useGoTo } from "../../../hooks/useGoTo";
 import { getRoles } from "../../../services/rol.services";
 import type { RolGetType } from "../../../types/rolType";
+import type { SucursalType } from "../../../types/sucursalType";
+import { getSucursales } from "../../../services/sucursal.services";
 
 
 
 const UserEdit = () => {
 
     const [roles, setRoles] = useState<RolGetType[]>([])
+    const [sucursales, setSucursales] = useState<SucursalType[]>([])
     const [tipoUser, setTipoUser] = useState<boolean>(true);
 
     const getRolesList = async () => {
@@ -35,8 +38,20 @@ const UserEdit = () => {
         }
     }
 
+    const getSucursalesList = async () => {
+        try {
+            const response = await getSucursales()
+            setSucursales(response)
+            console.log(response)
+
+        } catch (err: any) {
+            console.log(err)
+        }
+    }
+
     useEffect(() => {
         getRolesList()
+        getSucursalesList()
     }, [])
 
     const { id } = useParams()
@@ -66,6 +81,7 @@ const UserEdit = () => {
         try {
             const response = await putUser(id,data)
             successToast("User Update: " + response)
+            console.log(data)
             goTo("/admin/users/"+id)
         }
         catch (err: any) {
@@ -113,7 +129,7 @@ const UserEdit = () => {
         <>
             <BreadcrumbsRoutes items={breadcrumbsData} />
             <FormEstructure handleSubmit={handleSubmit(handlerSubmitUser)}>
-                <InputsForm register={register} errors={errors} control={control} watch={watch} setValue={setValue} roles={roles} tipoUser={tipoUser} />
+                <InputsForm register={register} errors={errors} control={control} watch={watch} setValue={setValue} roles={roles} tipoUser={tipoUser} sucursales={sucursales} />
                 <Grid size={12}>
                     <Divider sx={{ my: 2 }} />
                 </Grid>

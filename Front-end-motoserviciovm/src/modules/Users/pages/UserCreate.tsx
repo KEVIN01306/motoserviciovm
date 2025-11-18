@@ -12,11 +12,14 @@ import { InputsForm } from "../components/index";
 import { useEffect, useState } from "react";
 import { getRoles } from "../../../services/rol.services";
 import type { RolGetType } from "../../../types/rolType";
+import type { SucursalType } from "../../../types/sucursalType";
+import { getSucursales } from "../../../services/sucursal.services";
 
 
 
 const UserCreate = () => {
     const [roles, setRoles] = useState<RolGetType[]>([])
+    const [sucursales, setSucursales] = useState<SucursalType[]>([])
 
 
     const getRolesList = async () => {
@@ -30,8 +33,20 @@ const UserCreate = () => {
         }
     }
 
+    const getSucursalesList = async () => {
+        try {
+            const response = await getSucursales()
+            setSucursales(response)
+            console.log(response)
+
+        } catch (err: any) {
+            console.log(err)
+        }
+    }
+
     useEffect(() => {
         getRolesList()
+        getSucursalesList()
     }, [])
 
     const breadcrumbsData = [
@@ -71,7 +86,7 @@ const UserCreate = () => {
         <>
             <BreadcrumbsRoutes items={breadcrumbsData} />
             <FormEstructure handleSubmit={handleSubmit(handlerSubmitUser)}>
-                <InputsForm register={register} errors={errors} control={control} watch={watch} setValue={setValue} roles={roles} />
+                <InputsForm register={register} errors={errors} control={control} watch={watch} setValue={setValue} roles={roles}sucursales={sucursales} />
                 <Grid size={12}>
                     <Divider sx={{ my: 2 }} />
                 </Grid>

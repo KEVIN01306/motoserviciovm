@@ -5,36 +5,32 @@ import { useEffect, useState } from "react";
 import type { RolGetType, RolType } from "../../../types/rolType";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import type { SucursalType } from "../../../types/sucursalType";
 
 
 interface InputsFormProps {
     register: UseFormRegister<UserType>;
     errors: FieldErrors<UserType>;
-    control: Control<UserType , any>;
+    control: Control<UserType, any>;
     watch: UseFormWatch<UserType>;
     setValue: UseFormSetValue<UserType>;
     roles: RolGetType[];
+    sucursales: SucursalType[];
     tipoUser?: boolean
 }
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
-const InputsForm = ({ register, errors, control, watch, setValue, roles, tipoUser = true }: InputsFormProps) => {
-    
+const InputsForm = ({ register, errors, control, watch, setValue, roles, tipoUser = true, sucursales }: InputsFormProps) => {
+
     const [TipoUser, setTipoUser] = useState(tipoUser);
 
     const tipo = watch("tipo");
-    const rolesList = watch("roles");
-
     useEffect(() => {
         if (TipoUser) {
             setValue("tipo", "");
         }
     }, [TipoUser, setValue]);
-
-    useEffect(() => {
-        console.log(rolesList)
-    }, [rolesList])
 
     return (
         <>
@@ -131,7 +127,7 @@ const InputsForm = ({ register, errors, control, watch, setValue, roles, tipoUse
                                         variant="standard"
                                         {...field}
                                     >
-                                        <MenuItem value="Usuario Regular">Empleado Regular</MenuItem>
+                                        <MenuItem value="Usuario Regular">Usuario Regular</MenuItem>
                                         <MenuItem value="Empresa">Empresa</MenuItem>
                                     </Select>
                                 )}
@@ -216,58 +212,114 @@ const InputsForm = ({ register, errors, control, watch, setValue, roles, tipoUse
 
             <Grid size={{ xs: 12, md: 12 }}>
                 <Controller
-            name="roles"
-            control={control}
-            render={({ field }) => {
-                
-                const selectedRoleObjects = (field.value as number[] || []).map(id => 
-                    roles.find((rol: RolGetType) => String(rol.id) === String(id))
-                ).filter((role): role is RolGetType => !!role);
+                    name="roles"
+                    control={control}
+                    render={({ field }) => {
 
-                return (
-                    <Autocomplete
-                        multiple
-                        id="checkboxes-roles-tags"
-                        options={roles}
-                        disableCloseOnSelect
+                        const selectedRoleObjects = (field.value as number[] || []).map(id =>
+                            roles.find((rol: RolGetType) => String(rol.id) === String(id))
+                        ).filter((role): role is RolGetType => !!role);
 
-                        getOptionLabel={(role) => role.rol}
-                    
-                        value={selectedRoleObjects} 
-                        
-                        onChange={(event, newValue: RolGetType[]) => {
-                            const roleIds = newValue.map(role => role.id);
-                            
-                            field.onChange(roleIds); 
-                        }}
+                        return (
+                            <Autocomplete
+                                multiple
+                                id="checkboxes-roles-tags"
+                                options={roles}
+                                disableCloseOnSelect
 
-                        renderOption={(props, option, { selected }) => {
-                            return (
-                                <li {...props}>
-                                    <Checkbox
-                                        icon={icon}
-                                        checkedIcon={checkedIcon}
-                                        style={{ marginRight: 8 }}
-                                        checked={selected}
+                                getOptionLabel={(role) => role.rol}
+
+                                value={selectedRoleObjects}
+
+                                onChange={(event, newValue: RolGetType[]) => {
+                                    const roleIds = newValue.map(role => role.id);
+
+                                    field.onChange(roleIds);
+                                }}
+
+                                renderOption={(props, option, { selected }) => {
+                                    return (
+                                        <li {...props}>
+                                            <Checkbox
+                                                icon={icon}
+                                                checkedIcon={checkedIcon}
+                                                style={{ marginRight: 8 }}
+                                                checked={selected}
+                                            />
+                                            {option.rol}
+                                        </li>
+                                    );
+                                }}
+
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        variant="standard"
+                                        label="Roles del Usuario"
+                                        placeholder="Seleccionar roles"
+                                        error={!!errors.roles}
                                     />
-                                    {option.rol}
-                                </li>
-                            );
-                        }}
-
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                variant="standard"
-                                label="Roles del Usuario"
-                                placeholder="Seleccionar roles"
-                                error={!!errors.roles} 
+                                )}
                             />
-                        )}
-                    />
-                );
-            }}
-        />
+                        );
+                    }}
+                />
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 12 }}>
+                <Controller
+                    name="sucursales"
+                    control={control}
+                    render={({ field }) => {
+
+                        const selectedSucursalObjects = (field.value as number[] || []).map(id =>
+                            sucursales.find((sucursal: SucursalType) => String(sucursal.id) === String(id))
+                        ).filter((sucursal): sucursal is SucursalType => !!sucursal);
+
+                        return (
+                            <Autocomplete
+                                multiple
+                                id="checkboxes-sucursales-tags"
+                                options={sucursales}
+                                disableCloseOnSelect
+
+                                getOptionLabel={(sucursal) => sucursal.nombre}
+
+                                value={selectedSucursalObjects}
+
+                                onChange={(event, newValue: SucursalType[]) => {
+                                    const sucursalIds = newValue.map(sucursal => sucursal.id);
+
+                                    field.onChange(sucursalIds);
+                                }}
+
+                                renderOption={(props, option, { selected }) => {
+                                    return (
+                                        <li {...props}>
+                                            <Checkbox
+                                                icon={icon}
+                                                checkedIcon={checkedIcon}
+                                                style={{ marginRight: 8 }}
+                                                checked={selected}
+                                            />
+                                            {option.nombre}
+                                        </li>
+                                    );
+                                }}
+
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        variant="standard"
+                                        label="Sucursales del Usuario"
+                                        placeholder="Seleccionar sucursales"
+                                        error={!!errors.sucursales}
+                                    />
+                                )}
+                            />
+                        );
+                    }}
+                />
             </Grid>
 
         </>

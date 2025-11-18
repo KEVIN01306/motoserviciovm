@@ -1,11 +1,13 @@
 import { userSchema } from '../zod/user.schema';
 import z from 'zod';
 import type { RolType } from './rolType';
+import type { SucursalType } from './sucursalType';
 
 export type UserType = z.infer<typeof userSchema>;
 
-export type UserGetType = Omit<UserType, 'roles'> & {
+export type UserGetType = Omit<UserType, 'roles' | 'sucursales'> & {
   roles: RolType[];
+  sucursales: SucursalType[];
 };
 
 
@@ -22,6 +24,7 @@ export const UserInitialState = {
     numeroTel: "",
     numeroAuxTel: "",
     roles:[],
+    sucursales:[],
     fechaNac: new Date(),
     activo: true
 }
@@ -48,5 +51,8 @@ export const mergeUserDataWithDefaults = (apiData: Partial<UserGetType>): Partia
         roles: (apiData.roles || [])
             .map((role: RolType) => (role.id !== undefined ? Number(role.id) : undefined))
             .filter((id): id is number => typeof id === 'number' && !Number.isNaN(id)),
+        sucursales: (apiData.sucursales || [])
+            .map((sucursal: SucursalType) => (sucursal.id !== undefined ? Number(sucursal.id) : undefined))
+            .filter((id): id is number => typeof id === 'number' && !Number.isNaN(id)),
     };
-};
+};              
