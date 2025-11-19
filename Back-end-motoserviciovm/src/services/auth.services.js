@@ -44,6 +44,44 @@ const login = async (data) => {
     }
 }
 
+const getMe = async (userId) => {
+    const user = await prisma.user.findUnique({
+        where: { id: Number(userId) },
+        include: { roles: true }
+    })
+
+    if (!user) {
+        const error = new Error('DATA_NOT_FOUND')
+        error.code = 'DATA_NOT_FOUND'
+        throw error
+    }
+
+    if (!user.activo) {
+        const error = new Error('LOCKED')
+        error.code = 'LOCKED'
+        throw error
+    }
+
+
+    const permisos = await prisma.permiso.findMany({
+        where: {
+            roles: { some: { id: { in: user.roles.map(role => role.id) } } }
+        }
+    })
+
+    const roleNames = user.roles.map(role => role.rol)
+    const permisoNames = permisos.map(p => p.permiso)
+
+    return {
+        id: user.id,
+        primerNombre: user.primerNombre,
+        email: user.email,
+        roles: roleNames,
+        permisos: permisoNames,
+    }
+}
+
 export {
-    login
+    login,
+    getMe
 }

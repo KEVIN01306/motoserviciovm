@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { AuthType } from "../types/authType";
 import { persist } from "zustand/middleware";
-import { postLogin } from "../services/auth.services";
+import { getMe, postLogin } from "../services/auth.services";
 
 interface AuthState {
     user: any;
@@ -10,6 +10,11 @@ interface AuthState {
 
     login: (data: AuthType) => Promise<void>;
     logout: () => void;
+    refreshMe: () => Promise<void>;
+
+    isAuthReady: boolean;
+
+     _hasHydrated?: boolean;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -18,6 +23,8 @@ export const useAuthStore = create<AuthState>()(
             user: null,
             token: null,
             error: null,
+            _hasHydrated: false,
+            isAuthReady: false,
 
             login: async (data: AuthType) => {
                 try {
@@ -34,11 +41,42 @@ export const useAuthStore = create<AuthState>()(
                 set({ user: null, token: null });
             },
 
+            refreshMe: async() => {
+                const token = get().token;
+
+                if (!token) return
+
+                try {
+                    const response = await getMe();
+                    console.log("✅ REFRESH ME - Usuario obtenido:", response.user);
+                    // Si getMe() retorna un nuevo token, actualízalo
+                    const updatedToken = response.token || token;
+                    
+                    set({ user: response.user, token: updatedToken, error: null, isAuthReady: true })
+                    console.log("✅ REFRESH ME - Estado actualizado. User:", response.user);
+                }catch (error){
+                    console.error("❌ REFRESH ME - Error:", error);
+                    set({ token: null, user: null, error: "Token Expirado o no Valido",isAuthReady: true })
+                    throw error;
+                }
+            }
+
         }),
         {
             name: "auth-storage",
+            onRehydrateStorage: () => (state) => {
+                if (!state) return;
+
+                state._hasHydrated  = true
+
+                if (state.token) {
+                    state.isAuthReady = false; 
+                } else {
+                    // Si no hay token, la autenticación ya está "lista" (no hay sesión)
+                    state.isAuthReady = true;
+                }
+            },
             partialize: (state) => ({
-                user: state.user,
                 token: state.token,
             }),
         }

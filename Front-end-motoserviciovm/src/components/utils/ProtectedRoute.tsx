@@ -1,6 +1,6 @@
 import type React from "react";
 import { Navigate } from "react-router-dom";
-import { useAuthStore } from "../../store/useAuthStore";
+import { useAuthStore } from "../../store/useAuthStore"; // 1. Usar el hook correctamente
 
 interface ProtectedRouteProps{
     children: React.ReactNode;
@@ -8,15 +8,24 @@ interface ProtectedRouteProps{
 }
 
 const ProtectedRoute = ({ children, allowedPermisos }: ProtectedRouteProps) => {
-    const user = useAuthStore.getState().user
+    
+    const user = useAuthStore(state => state.user);
 
-    if (user?.roles < 0) return <Navigate to={'/public/auth/login'} replace />
+    if (!user) {
+        return <Navigate to={'/public/auth/login'} replace />;
+    }
 
-    if (!allowedPermisos.some(permiso => user.permisos.includes(permiso))) return <Navigate to={'/public/auth/login'} replace/>
+    const userPermisos = user.permisos || [];
 
-    return children;
+    const hasPermission = allowedPermisos.some(permisoRequerido => 
+        userPermisos.includes(permisoRequerido)
+    );
 
+    if (!hasPermission) {
+        return <Navigate to={'/public/acceso-denegado'} replace />;
+    }
+
+    return <>{children}</>;
 }
-
 
 export default ProtectedRoute;

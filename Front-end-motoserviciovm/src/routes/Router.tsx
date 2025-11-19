@@ -7,6 +7,7 @@ import { authRoutes } from "../modules/Auth/routes";
 import { RolesRoutes } from "../modules/Roles/routes";
 import { PermisosRoutes } from "../modules/Permisos/routes";
 import { SucursalesRoutes } from "../modules/Sucursales/routes";
+import AuthRouteGuard from "../modules/Auth/components/AuthRouteGuard";
 
 const Home = lazy(() => import('../modules/LandingPages/index'))
 
@@ -14,29 +15,37 @@ const Home = lazy(() => import('../modules/LandingPages/index'))
 const Router = [
     { index: true, element: <Home /> },
     {
-        path: "/admin",
-        element: (
-            <FullLayout/>
-        ),
-        children: [
-            { index: true, element: <Home /> },
-
-            ...UsersRoutes,
-            ...RolesRoutes,
-            ...PermisosRoutes,
-            ...SucursalesRoutes,
-
-            { path: '*',  element: <h1>Pagina no encontrada</h1> }
-        ]
-    },
-    {
         path: "/public",
-        element: <BlankLayout/>,
+        element: <BlankLayout />,
         children: [
             ...authRoutes,
-            { path: '*',  element: <h1>Pagina no encontrada</h1> }
+            { path: '*', element: <h1>Pagina no encontrada</h1> }
         ]
     },
+
+    {   
+        path: "/admin",
+        element: <AuthRouteGuard />,
+        children: [
+            {
+                element: (
+                    <FullLayout />
+                ),
+                children: [
+                    { index: true, element: <Home /> },
+
+                    ...UsersRoutes,
+                    ...RolesRoutes,
+                    ...PermisosRoutes,
+                    ...SucursalesRoutes,
+
+                    { path: '*', element: <h1>Pagina no encontrada</h1> }
+                ]
+            },
+
+        ]
+    },
+
     {
         path: '*', element: <Navigate to="/public/auth/login" replace />
     }

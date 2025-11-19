@@ -55,8 +55,6 @@ const postUserHandler = async (req,res) => {
     try{
         const data = req.body
 
-        
-
         const validationResult = userSchema.safeParse(data);
 
         if (!validationResult.success) {

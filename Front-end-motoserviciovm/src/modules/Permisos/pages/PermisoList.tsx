@@ -9,6 +9,7 @@ import type { RolGetType, RolType } from "../../../types/rolType";
 import { errorToast, successToast } from "../../../utils/toast";
 import PermissionsTable from "../components/PermissionsTable";
 import EditControls from "../components/EditControls";
+import { useAuthStore } from "../../../store/useAuthStore";
 
 const groupByModulo = (permisos: PermisoType[]) => {
     const map = new Map<string, PermisoType[]>();
@@ -28,6 +29,7 @@ const PermisoList = () => {
     const [isEditing, setIsEditing] = useState(false)
     const [editRolePerms, setEditRolePerms] = useState<Map<string, Set<number>>>(new Map())
     const [isSaving, setIsSaving] = useState(false)
+    const userlogged = useAuthStore(state => state.user)
 
     useEffect(() => {
         const fetchAll = async () => {
@@ -125,13 +127,17 @@ const PermisoList = () => {
                 onCheckboxChange={handleCheckboxChange}
             />
 
-            <EditControls
-                isEditing={isEditing}
-                initializeEditMode={initializeEditMode}
-                handleCancel={handleCancel}
-                handleSave={handleSave}
-                isSaving={isSaving}
-            />
+            {
+                userlogged.permisos.includes("permisos:edit") && (
+                    <EditControls
+                        isEditing={isEditing}
+                        initializeEditMode={initializeEditMode}
+                        handleCancel={handleCancel}
+                        handleSave={handleSave}
+                        isSaving={isSaving}
+                    />
+                )
+            }
         </Box>
     )
 }

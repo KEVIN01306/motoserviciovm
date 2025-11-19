@@ -12,16 +12,20 @@ import { useAuthStore } from "../../../store/useAuthStore";
 
 
 const ItemsSider = () => {
-    const user = useAuthStore.getState().user
+    const user = useAuthStore(state => state.user);
     const goTo = useGoTo()
+    const userPermisos = user?.permisos || [];
     const filteredMenu = MenuItems.filter((item, index) => {
         if (item.type === "modulo") {
-            return user?.permisos.includes(item.permiso);
+
+            return userPermisos.includes(item.permiso);
         }
+        
         if (item.type === "divider") {
             const nextItem = MenuItems[index + 1];
-            return nextItem && nextItem.type === "modulo" && user?.permisos.includes(nextItem.permiso);
+            return nextItem && nextItem.type === "modulo" && userPermisos.includes(nextItem.permiso);
         }
+        
         return false;
     });
     
