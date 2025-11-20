@@ -1,6 +1,6 @@
 import { lazy } from "react";
 import FullLayout from "../layouts/Full/FullLayout";
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import BlankLayout from "../layouts/Blanck/BlankLayout";
 import { UsersRoutes } from "../modules/Users/routes";
 import { authRoutes } from "../modules/Auth/routes";
@@ -10,6 +10,8 @@ import { SucursalesRoutes } from "../modules/Sucursales/routes";
 import AuthRouteGuard from "../modules/Auth/components/AuthRouteGuard";
 
 const Home = lazy(() => import('../modules/LandingPages/index'))
+const HomePages = lazy(() => import('../modules/Home/pages/HomePages'))
+const NotFound = lazy(() => import('../components/PagesNotFound'))
 
 
 const Router = [
@@ -19,7 +21,6 @@ const Router = [
         element: <BlankLayout />,
         children: [
             ...authRoutes,
-            { path: '*', element: <h1>Pagina no encontrada</h1> }
         ]
     },
 
@@ -32,22 +33,21 @@ const Router = [
                     <FullLayout />
                 ),
                 children: [
-                    { index: true, element: <Home /> },
+                    { index: true, element: <HomePages/> },
 
                     ...UsersRoutes,
                     ...RolesRoutes,
                     ...PermisosRoutes,
                     ...SucursalesRoutes,
 
-                    { path: '*', element: <h1>Pagina no encontrada</h1> }
                 ]
             },
 
         ]
     },
 
-    {
-        path: '*', element: <Navigate to="/public/auth/login" replace />
+    { 
+        path: '*', element: <NotFound/> 
     }
 ]
 

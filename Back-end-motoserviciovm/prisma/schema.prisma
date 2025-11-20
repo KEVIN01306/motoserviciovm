@@ -28,6 +28,9 @@ model Sucursal {
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  estadoId        Int
+  estado          Estado @relation(fields: [estadoId], references: [id])
 }
 
 model User {
@@ -50,6 +53,11 @@ model User {
 
   sucursales      Sucursal[] @relation("UserSucursales")
 
+  motos           Moto[] @relation("UserMotos")
+
+  estadoId        Int
+  estado          Estado @relation(fields: [estadoId], references: [id])
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -62,9 +70,13 @@ model Rol {
   usuarios        User[] @relation("UserRoles")
   permisos        Permiso[] @relation("RolPermisos")
 
+  estadoId        Int
+  estado          Estado @relation(fields: [estadoId], references: [id])
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
+
 
 model Permiso {
   id              Int @id @default(autoincrement())
@@ -72,6 +84,109 @@ model Permiso {
   modulo          String?
   roles           Rol[] @relation("RolPermisos")
 
+  estadoId        Int
+  estado          Estado @relation(fields: [estadoId], references: [id])
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
+
+
+
+model Marca {
+  id              Int @id @default(autoincrement())
+  marca           String @unique
+
+  estadoId        Int
+  estado          Estado @relation(fields: [estadoId], references: [id])
+
+  modelos         Modelo[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Linea {
+  id              Int @id @default(autoincrement())
+  linea           String @unique
+
+  estadoId        Int
+  estado          Estado @relation(fields: [estadoId], references: [id])
+
+  modelos         Modelo[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Cilindrada {
+  id              Int @id @default(autoincrement())
+  cilindrada      Int @unique
+
+  estadoId        Int
+  estado          Estado @relation(fields: [estadoId], references: [id])
+
+  modelos         Modelo[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Modelo {
+  id              Int @id @default(autoincrement())
+  año             Int
+
+  marcaId         Int
+  marca           Marca @relation(fields: [marcaId], references: [id])
+
+  lineaId         Int
+  linea           Linea @relation(fields: [lineaId], references: [id])
+
+  cilindradaId    Int
+  cilindrada      Cilindrada @relation(fields: [cilindradaId], references: [id])    
+
+  estadoId        Int
+  estado          Estado @relation(fields: [estadoId], references: [id])
+
+  motos           Moto[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Estado {
+  id              Int @id @default(autoincrement())
+  estado          String @unique
+
+  motos           Moto[]
+  users           User[]
+  sucursales      Sucursal[]
+  roles           Rol[]
+  permisos        Permiso[]
+  marcas          Marca[]
+  lineas          Linea[]
+  cilindradas     Cilindrada[]
+  modelos         Modelo[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Moto {
+  id              Int @id @default(autoincrement())
+
+  placa           String @unique
+  avatar          String?
+  
+  modeloId        Int
+  modelo          Modelo @relation(fields: [modeloId], references: [id])
+
+  users           User[] @relation("UserMotos")
+
+  estadoId        Int
+  estado          Estado @relation(fields: [estadoId], references: [id])
+
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+} 

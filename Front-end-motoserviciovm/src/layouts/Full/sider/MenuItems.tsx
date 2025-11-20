@@ -1,9 +1,21 @@
 import { PiUserCheckDuotone } from "react-icons/pi";
 import { PiUsersDuotone } from "react-icons/pi";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
-import { AutoFixHighOutlined, StoreMallDirectoryOutlined } from "@mui/icons-material";
+import { AdminPanelSettings, AutoFixHighOutlined, HomeMaxOutlined, StoreMallDirectoryOutlined } from "@mui/icons-material";
 
 const MenuItems = [
+    {
+        type: "divider",
+        Text: "Panel",
+        icon: AdminPanelSettings
+    },
+    {
+        type: "modulo",
+        name: "Home",
+        link: "/admin",
+        icon: HomeMaxOutlined,
+        permiso: 'home:view'
+    },
     {
         type: "divider",
         Text: "Administración",

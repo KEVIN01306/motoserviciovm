@@ -26,6 +26,19 @@ const getUSer = async (id) => {
 		include:{
 			roles: true,
 			sucursales: true,
+			estado: true,
+			motos: {
+				include: {
+					modelo: {
+						include: {
+							marca: true,
+							linea: true,
+							cilindrada: true,
+							estado: true,
+						}
+					},
+				}
+			},
 		}
 	});
 

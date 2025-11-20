@@ -66,8 +66,11 @@ const UserDetail = () => {
 
     const fullName = `${primerNombre || ''} ${segundoNombre || ''} ${primerApellido || ''} ${segundoApellido || ''}`.trim();
     return (
-        <>
-            <BreadcrumbsRoutes items={breadcrumbsData} />
+        <>  {
+                 userlogged?.permisos.includes('usuarios:view') && (
+                    <BreadcrumbsRoutes items={breadcrumbsData} />
+                 )
+            }
             <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
                 <Card elevation={2} sx={{ borderRadius: 2 }}>
                     <CardContent>

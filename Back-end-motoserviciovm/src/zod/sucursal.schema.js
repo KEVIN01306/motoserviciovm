@@ -7,4 +7,5 @@ export const sucursalSchema = z.object({
     direccion:      z.string().min(5).max(100),
     telefono:       z.string().min(7).max(15),
     email:          z.string().email().max(50),
+    estadoId:       z.number().int(),
 })

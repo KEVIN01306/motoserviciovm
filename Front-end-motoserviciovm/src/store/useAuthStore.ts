@@ -30,9 +30,9 @@ export const useAuthStore = create<AuthState>()(
                 try {
                     set({ error: null });
                     const { user, token } = await postLogin(data);
-                    set({ user, token });
+                    set({ user, token, isAuthReady: true });
                 } catch (error: any) {
-                    set({ error: error.message });
+                    set({ error: error.message, isAuthReady: true });
                     throw error;
                 }
             },
@@ -48,14 +48,10 @@ export const useAuthStore = create<AuthState>()(
 
                 try {
                     const response = await getMe();
-                    console.log("✅ REFRESH ME - Usuario obtenido:", response.user);
-                    // Si getMe() retorna un nuevo token, actualízalo
                     const updatedToken = response.token || token;
                     
                     set({ user: response.user, token: updatedToken, error: null, isAuthReady: true })
-                    console.log("✅ REFRESH ME - Estado actualizado. User:", response.user);
                 }catch (error){
-                    console.error("❌ REFRESH ME - Error:", error);
                     set({ token: null, user: null, error: "Token Expirado o no Valido",isAuthReady: true })
                     throw error;
                 }
