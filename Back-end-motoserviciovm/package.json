@@ -10,6 +10,9 @@
     "start": "node src/server.js",
     "migration": "npx prisma migrate dev"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "author": "Kevin Sanchez",
   "license": "ISC",
   "dependencies": {

@@ -36,6 +36,7 @@ const RolesEdit = () => {
     })
 
     const handlerSubmitRol: SubmitHandler<RolType> = async (data) => {
+        console.log(data)
         try {
             const response = await putRol(id, data)
             successToast("Rol actualizado: " + response)
@@ -61,6 +62,7 @@ const RolesEdit = () => {
             console.log(response)
 
             const dataFormat = mergeRolDataWithDefaults(response);
+            console.log(dataFormat)
 
             reset(dataFormat);
 

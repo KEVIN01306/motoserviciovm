@@ -10,6 +10,7 @@ import { errorToast, successToast } from "../../../utils/toast";
 import PermissionsTable from "../components/PermissionsTable";
 import EditControls from "../components/EditControls";
 import { useAuthStore } from "../../../store/useAuthStore";
+import { estados } from "../../../utils/estados";
 
 const groupByModulo = (permisos: PermisoType[]) => {
     const map = new Map<string, PermisoType[]>();
@@ -86,7 +87,8 @@ const PermisoList = () => {
                     rol: role.rol,
                     descripcion: role.descripcion,
                     permisos: permisoIds,
-                    ...(role.id && { id: String(role.id) })
+                    ...(role.id && { id: String(role.id) }),
+                    estadoId: estados().activo,
                 }
                 return putRol(role.id, rolData)
             })

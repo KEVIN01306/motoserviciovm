@@ -1,6 +1,7 @@
 import type{ rolSchema } from '../zod/rol.schema'
 import z from 'zod'
 import type { PermisoType } from './permisoType'
+import { estados } from '../utils/estados'
 
 export type RolType = z.infer<typeof rolSchema>
 
@@ -11,7 +12,8 @@ export type RolGetType = Omit<RolType, 'permisos'> & {
 export const RolInitialState = {
     rol: "",
     descripcion: "",
-    permisos: []
+    permisos: [],
+    estadoId: estados().activo
 }
 
 /**
@@ -24,5 +26,6 @@ export const mergeRolDataWithDefaults = (apiData: Partial<RolGetType>): Partial<
         permisos: (apiData.permisos || [])
             .map((permiso: PermisoType) => (permiso.id !== undefined ? Number(permiso.id) : undefined))
             .filter((id): id is number => typeof id === 'number' && !Number.isNaN(id)),
+        estadoId: apiData.estadoId ?? RolInitialState.estadoId
     };
 };

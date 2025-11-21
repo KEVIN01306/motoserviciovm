@@ -1,7 +1,11 @@
 import prisma from "../configs/db.config.js";
+import { estados } from "../utils/estados.js";
 
 const getLineas = async () => {
     const lineas = await prisma.linea.findMany({
+        where: {
+            estadoId: estados().activo 
+        },
         include: {
             estado: true,
         },
@@ -19,7 +23,8 @@ const getLineas = async () => {
 
 const getLinea = async (id) => {
     const linea = await prisma.linea.findUnique({
-        where: { id: id },
+        where: { id: id,estadoId: estados().activo },
+        
         include: {
             estado: true,
         },

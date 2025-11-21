@@ -2,6 +2,7 @@ import { userSchema } from '../zod/user.schema';
 import z from 'zod';
 import type { RolType } from './rolType';
 import type { SucursalType } from './sucursalType';
+import { estados } from '../utils/estados';
 
 export type UserType = z.infer<typeof userSchema>;
 
@@ -26,7 +27,8 @@ export const UserInitialState = {
     roles:[],
     sucursales:[],
     fechaNac: new Date(),
-    activo: true
+    activo: true,
+    estadoId: estados().activo
 }
 
 /**
@@ -48,6 +50,7 @@ export const mergeUserDataWithDefaults = (apiData: Partial<UserGetType>): Partia
         numeroAuxTel: apiData.numeroAuxTel ?? UserInitialState.numeroAuxTel,
         fechaNac: apiData.fechaNac ? new Date(apiData.fechaNac) : UserInitialState.fechaNac,
         activo: apiData.activo ?? UserInitialState.activo,
+        estadoId: apiData.estadoId ?? UserInitialState.estadoId,
         roles: (apiData.roles || [])
             .map((role: RolType) => (role.id !== undefined ? Number(role.id) : undefined))
             .filter((id): id is number => typeof id === 'number' && !Number.isNaN(id)),

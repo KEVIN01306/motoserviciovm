@@ -136,6 +136,8 @@ model Modelo {
   id              Int @id @default(autoincrement())
   año             Int
 
+  modelo          String @unique
+
   marcaId         Int
   marca           Marca @relation(fields: [marcaId], references: [id])
 

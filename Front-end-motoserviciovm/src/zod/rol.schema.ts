@@ -6,5 +6,6 @@ export const rolSchema = z.object({
     descripcion:      z.string().min(5).max(100).optional(),
     permisos:        z.array(z.number()).optional(),
     createdAt:        z.date().optional(),
-    updatedAt:        z.date().optional(),        
+    updatedAt:        z.date().optional(),  
+    estadoId:          z.number().int(), 
 })

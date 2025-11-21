@@ -1,7 +1,7 @@
-import { PiUserCheckDuotone } from "react-icons/pi";
-import { PiUsersDuotone } from "react-icons/pi";
+import { PiUserCheckDuotone, PiUsersDuotone, PiListNumbersBold, PiTrademarkRegisteredBold } from "react-icons/pi";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import { AdminPanelSettings, AutoFixHighOutlined, HomeMaxOutlined, StoreMallDirectoryOutlined } from "@mui/icons-material";
+import { RiBikeFill } from "react-icons/ri";
 
 const MenuItems = [
     {
@@ -15,6 +15,25 @@ const MenuItems = [
         link: "/admin",
         icon: HomeMaxOutlined,
         permiso: 'home:view'
+    },
+    {
+        type: "divider",
+        Text: "Motos",
+        icon: RiBikeFill
+    },
+    {
+        type: "modulo",
+        name: "Líneas",
+        link: "/admin/lineas",
+        icon: PiListNumbersBold,
+        permiso: 'lineas:view'
+    },
+    {
+        type: "modulo",
+        name: "Marcas",
+        link: "/admin/marcas",
+        icon: PiTrademarkRegisteredBold,
+        permiso: 'marcas:view'
     },
     {
         type: "divider",

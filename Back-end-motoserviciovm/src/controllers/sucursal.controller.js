@@ -45,6 +45,8 @@ const postSucursalHandler = async (req, res) => {
     try{
         const data = req.body;
 
+        console.log(data)
+
         const validationResult = sucursalSchema.safeParse(data);
 
         if (!validationResult.success) {

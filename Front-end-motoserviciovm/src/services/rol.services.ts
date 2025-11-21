@@ -103,9 +103,11 @@ const getRol = async (id: RolType['id']): Promise<RolGetType> => {
 }
 
 const putRol = async (id: RolType['id'], rol: RolType) => {
+    console.log(rol)
     try {
 
         const response = await api.put<apiResponse<RolType>>(API_ROLES + "/" + id, rol)
+
 
         return String(response.data.data?.rol)
 
