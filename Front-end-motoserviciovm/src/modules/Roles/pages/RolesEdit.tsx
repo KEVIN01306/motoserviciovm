@@ -19,7 +19,7 @@ const RolesEdit = () => {
     const { id } = useParams()
     const goTo = useGoTo()
 
-    const [rol, setRol] = useState<RolGetType | undefined>()
+    const [, setRol] = useState<RolGetType | undefined>()
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string | null>(null)
 

@@ -9,7 +9,7 @@ import FormEstructure from "../../../components/utils/FormEstructure";
 import Loading from "../../../components/utils/Loading";
 import ErrorCard from "../../../components/utils/ErrorCard";
 import { InputsForm } from "../components";
-import { MarcaInitialState, type MarcaType } from "../../../types/marcaType";
+import { MarcaInitialState, mergeMarcaDataWithDefaults, type MarcaType } from "../../../types/marcaType";
 import { marcaSchema } from "../../../zod/marca.schema";
 import { errorToast, successToast } from "../../../utils/toast";
 import { getMarca, putMarca } from "../../../services/marca.services";
@@ -43,8 +43,9 @@ const MarcaEdit = () => {
         try {
             setLoading(true);
             const response = await getMarca(id);
+            const mergedData = mergeMarcaDataWithDefaults(response);
             setMarca(response);
-            reset(response);
+            reset(mergedData);
         } catch (err: any) {
             setError(err.message);
         } finally {

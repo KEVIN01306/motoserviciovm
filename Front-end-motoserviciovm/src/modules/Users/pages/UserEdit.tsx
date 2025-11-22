@@ -78,6 +78,7 @@ const UserEdit = () => {
 
 
     const handlerSubmitUser: SubmitHandler<UserType> = async (data) => {
+        console.log("users: dara: ", data)
         try {
             const response = await putUser(id,data)
             successToast("User Update: " + response)

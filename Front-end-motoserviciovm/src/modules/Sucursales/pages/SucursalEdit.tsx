@@ -1,6 +1,6 @@
 import { PiStorefrontBold } from "react-icons/pi";
 import BreadcrumbsRoutes from "../../../components/utils/Breadcrumbs";
-import { SucursalInitialState, type SucursalType } from "../../../types/sucursalType";
+import { mergeSucursalDataWithDefaults, SucursalInitialState, type SucursalType } from "../../../types/sucursalType";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { sucursalSchema } from "../../../zod/sucursal.schema";
@@ -56,8 +56,9 @@ const SucursalEdit = () => {
         try {
             setLoading(true)
             const response = await getSucursal(id);
+            const mergedData = mergeSucursalDataWithDefaults(response);
             setSucursal(response);
-            reset(response);
+            reset(mergedData);
         } catch (err: any) {
             setError(err.message)
         } finally {

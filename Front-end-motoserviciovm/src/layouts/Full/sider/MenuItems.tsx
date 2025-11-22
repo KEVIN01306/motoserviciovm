@@ -30,6 +30,13 @@ const MenuItems = [
     },
     {
         type: "modulo",
+        name: "Cilindradas",
+        link: "/admin/cilindrada",
+        icon: AutoFixHighOutlined,
+        permiso: 'cilindradas:view'
+    },
+    {
+        type: "modulo",
         name: "Marcas",
         link: "/admin/marcas",
         icon: PiTrademarkRegisteredBold,

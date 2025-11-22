@@ -9,7 +9,7 @@ import FormEstructure from "../../../components/utils/FormEstructure";
 import Loading from "../../../components/utils/Loading";
 import ErrorCard from "../../../components/utils/ErrorCard";
 import { InputsForm } from "../components";
-import { LineaInitialState, type LineaType } from "../../../types/lineaType";
+import { LineaInitialState, mergeLineaDataWithDefaults, type LineaType } from "../../../types/lineaType";
 import { lineaSchema } from "../../../zod/linea.schema";
 import { errorToast, successToast } from "../../../utils/toast";
 import { getLinea, putLinea } from "../../../services/linea.services";
@@ -43,8 +43,9 @@ const LineaEdit = () => {
         try {
             setLoading(true);
             const response = await getLinea(id);
+            const mergedData = mergeLineaDataWithDefaults(response);
             setLinea(response);
-            reset(response);
+            reset(mergedData);
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -55,6 +56,7 @@ const LineaEdit = () => {
     const handlerSubmitLinea = async (data: LineaType) => {
         try {
             const response = await putLinea(id, data);
+            console.log("Linea updated:", data);
             successToast(`Línea actualizada: ${response || data.linea}`);
             goTo("/admin/lineas");
         } catch (err: any) {
