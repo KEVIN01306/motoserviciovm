@@ -1,7 +1,14 @@
 import prisma from "../configs/db.config.js";
+import { estados } from "../utils/estados.js";
 
 const getCilindradas = async () => {
-    const cilindradas = await prisma.cilindrada.findMany();
+    const cilindradas = await prisma.cilindrada.findMany({
+        where: {
+            estadoId: {
+                not: estados().inactivo
+            }
+        }
+    });
 
     if (!cilindradas) {
         const error = new Error('DATA_NOT_FOUND');
@@ -14,7 +21,9 @@ const getCilindradas = async () => {
 
 const getCilindrada = async (id) => {
     const cilindrada = await prisma.cilindrada.findUnique({
-        where: { id: id }
+        where: { id: id, estadoId: {
+            not: estados().inactivo
+        } }
     });
 
     if (!cilindrada) {

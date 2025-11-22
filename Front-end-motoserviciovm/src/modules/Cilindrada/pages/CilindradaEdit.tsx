@@ -13,6 +13,8 @@ import { cilindradaSchema } from "../../../zod/cilindrada.schema";
 import { errorToast, successToast } from "../../../utils/toast";
 import { getCilindrada, putCilindrada } from "../../../services/cilindrada.services";
 import { useGoTo } from "../../../hooks/useGoTo";
+import { PiCylinderBold, PiPencilBold } from "react-icons/pi";
+
 
 const CilindradaEdit = () => {
     const { id } = useParams();
@@ -54,9 +56,9 @@ const CilindradaEdit = () => {
 
 
     const breadcrumbsData = [
-        { label: "Cilindradas", href: "/admin/cilindrada" },
-        { label: `${cilindrada?.cilindrada ?? ""}`, href: `/admin/cilindrada/${id}` },
-        { label: "Editar", href: `/admin/cilindrada/${id}/edit` },
+        { label: "Cilindradas", icon: <PiCylinderBold />, href: "/admin/cilindrada" },
+        { label: `${cilindrada?.cilindrada ?? ""}`, icon: <PiCylinderBold />, href: `/admin/cilindrada/${id}` },
+        { label: "Editar", icon: <PiPencilBold />, href: `/admin/cilindrada/${id}/edit` },
     ];
 
     const handlerSubmitCilindrada: SubmitHandler<CilindradaType> = async (data) => {

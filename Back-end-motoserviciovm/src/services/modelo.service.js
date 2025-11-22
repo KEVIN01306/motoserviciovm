@@ -19,7 +19,9 @@ const buildModeloNombre = async ({ marcaId, lineaId, año }) => {
 const getModelos = async () => {
     const modelos = await prisma.modelo.findMany({
         where: {
-            estadoId: estados().activo 
+            estadoId: {
+                not: estados().inactivo
+            }
         },
         include: {
             marca: true,
@@ -41,7 +43,9 @@ const getModelos = async () => {
 const getModelo = async (id) => {
 
     const modelo = await prisma.modelo.findUnique({
-        where: { id: id },
+        where: { id: id, estadoId: {
+            not: estados().inactivo
+        } },
         include: {
             marca: true,
             linea: true,

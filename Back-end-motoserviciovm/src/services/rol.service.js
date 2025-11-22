@@ -1,7 +1,13 @@
 import prisma from "../configs/db.config.js";
+import { estados } from "../utils/estados.js";
 
 const getRoles = async () => {
     const roles = await prisma.rol.findMany({
+        where: {
+            estadoId: {
+                not: estados().inactivo
+            }
+        },
         include: { permisos: true }
     });
     
@@ -18,7 +24,9 @@ const getRoles = async () => {
 
 const getRol = async (id) => {
     const rol = await prisma.rol.findUnique({
-        where: { id: id },
+        where: { id: id, estadoId: {
+            not: estados().inactivo
+        } },
         include: { permisos: true }
     });
     if (!rol) {

@@ -1,5 +1,5 @@
 
-import { PiListNumbersBold, PiPlus } from "react-icons/pi";
+import { PiCylinderBold } from "react-icons/pi";
 import { Button, Divider, Grid } from "@mui/material";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,11 +11,12 @@ import { cilindradaSchema } from "../../../zod/cilindrada.schema";
 import { postCilindrada } from "../../../services/cilindrada.services";
 import { errorToast, successToast } from "../../../utils/toast";
 import { useGoTo } from "../../../hooks/useGoTo";
+import { TbCylinderPlus } from "react-icons/tb";
 
 const CilindradaCreate = () => {
     const breadcrumbsData = [
-        { label: "Cilindradas", icon: <PiListNumbersBold fontSize="inherit" />, href: "/admin/cilindrada" },
-        { label: "Crear Cilindrada", icon: <PiPlus fontSize="inherit" />, href: "/admin/cilindrada/create" },
+        { label: "Cilindradas", icon: <PiCylinderBold fontSize="inherit" />, href: "/admin/cilindrada" },
+        { label: "Crear Cilindrada", icon: <TbCylinderPlus fontSize="inherit" />, href: "/admin/cilindrada/create" },
     ];
 
     const {

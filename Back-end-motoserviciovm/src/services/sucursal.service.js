@@ -1,7 +1,14 @@
 import prisma from "../configs/db.config.js";
+import { estados } from "../utils/estados.js";
 
 const getSucursales = async () => {
-    const sucursales = await prisma.sucursal.findMany();
+    const sucursales = await prisma.sucursal.findMany({
+        where: {
+            estadoId: {
+                not: estados().inactivo
+            }
+        }
+    });
     if (!sucursales) {
         const error = new Error('DATA_NOT_FOUND');
         error.code = 'DATA_NOT_FOUND';
@@ -12,7 +19,9 @@ const getSucursales = async () => {
 
 const getSucursal = async (id) => {
     const sucursal = await prisma.sucursal.findUnique({
-        where: { id: id },
+        where: { id: id, estadoId: {
+            not: estados().inactivo
+        } },
     });
     if (!sucursal) {
         const error = new Error('DATA_NOT_FOUND');

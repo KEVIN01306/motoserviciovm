@@ -11,5 +11,6 @@ router.use('/lineas', (await import('./linea.routes.js')).default);
 router.use('/marcas', (await import('./marca.routes.js')).default);
 router.use('/cilindradas', (await import('./cilindrada.routes.js')).default);
 router.use('/modelos', (await import('./modelo.routes.js')).default);
+router.use('/motos', (await import('./moto.routes.js')).default);
 
 export default router;

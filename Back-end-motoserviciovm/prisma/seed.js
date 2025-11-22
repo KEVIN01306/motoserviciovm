@@ -32,6 +32,13 @@ const PERMISOS_SEED = [
   { permiso: "cilindradas:edit", modulo: "CILINDRADAS", estadoId: 1 },
   { permiso: "cilindradas:detail", modulo: "CILINDRADAS", estadoId: 1 },
   { permiso: "cilindradas:delete", modulo: "CILINDRADAS", estadoId: 1 },
+
+  { permiso: "modelos:view", modulo: "MODELOS", estadoId: 1 },
+  { permiso: "modelos:create", modulo: "MODELOS", estadoId: 1 },
+  { permiso: "modelos:edit", modulo: "MODELOS", estadoId: 1 },
+  { permiso: "modelos:detail", modulo: "MODELOS", estadoId: 1 },
+  { permiso: "modelos:delete", modulo: "MODELOS", estadoId: 1 },
+  
   { permiso: "home:view", modulo: "HOME", estadoId: 1 },
 ];
 

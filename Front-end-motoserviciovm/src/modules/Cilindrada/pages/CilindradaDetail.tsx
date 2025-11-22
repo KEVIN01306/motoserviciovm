@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Button, Grid } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { RiEdit2Line } from "react-icons/ri";
-import { PiListNumbersBold } from "react-icons/pi";
+import { PiCylinderBold } from "react-icons/pi";
 import BreadcrumbsRoutes from "../../../components/utils/Breadcrumbs";
 import Loading from "../../../components/utils/Loading";
 import ErrorCard from "../../../components/utils/ErrorCard";
@@ -36,8 +36,8 @@ const CilindradaDetail = () => {
     }, []);
 
     const breadcrumbsData = [
-        { label: "Cilindradas", icon: <PiListNumbersBold fontSize="inherit" />, href: "/admin/cilindrada" },
-        { label: `${cilindrada?.cilindrada ?? ""}`, icon: <PiListNumbersBold fontSize="inherit" />, href: `/admin/cilindrada/${id}` },
+        { label: "Cilindradas", icon: <PiCylinderBold fontSize="inherit" />, href: "/admin/cilindrada" },
+        { label: `${cilindrada?.cilindrada ?? ""}`, icon: <PiCylinderBold fontSize="inherit" />, href: `/admin/cilindrada/${id}` },
     ];
 
     if (loading) return <Loading />;

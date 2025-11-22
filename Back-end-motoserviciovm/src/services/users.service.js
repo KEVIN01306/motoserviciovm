@@ -1,8 +1,12 @@
 import prisma from "../configs/db.config.js";
+import { estados } from "../utils/estados.js";
 
 const getUSers = async () => {
 
 	const users = await prisma.user.findMany({
+		where: {estadoId: {
+			not: estados().inactivo
+		}},
 		include:{
 			roles: true,
 			sucursales: true,
@@ -22,7 +26,9 @@ const getUSers = async () => {
 const getUSer = async (id) => {
 
 	const user = await prisma.user.findUnique({
-		where: { id: id },
+		where: { id: id, estadoId: {
+			not: estados().inactivo
+		} },
 		include:{
 			roles: true,
 			sucursales: true,

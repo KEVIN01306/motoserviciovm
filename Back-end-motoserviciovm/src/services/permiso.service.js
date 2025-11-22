@@ -1,8 +1,15 @@
 import prisma from "../configs/db.config.js";
+import { estados } from "../utils/estados.js";
 
 
 const getPermisos = async () => {
-    const permisos =  await prisma.permiso.findMany();  
+    const permisos =  await prisma.permiso.findMany({
+        where: {
+            estadoId: {
+                not: estados().inactivo
+            }
+        },
+    });  
     if (!permisos) {
         const error = new Error('DATA_NOT_FOUND');
         error.code = 'DATA_NOT_FOUND';
@@ -13,7 +20,9 @@ const getPermisos = async () => {
 
 const getPermiso = async (id) => {
     const permiso = await prisma.permiso.findUnique({
-        where: { id: id },
+        where: { id: id ,estadoId: {
+            not: estados().inactivo
+        } },
     });
     if (!permiso) {
         const error = new Error('DATA_NOT_FOUND');

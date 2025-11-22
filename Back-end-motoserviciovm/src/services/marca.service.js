@@ -4,7 +4,9 @@ import { estados } from "../utils/estados.js";
 const getMarcas = async () => {
     const marcas = await prisma.marca.findMany({
         where: {
-            estadoId: estados().activo
+            estadoId: {
+                not: estados().inactivo
+            }
         },
         include: {
             estado: true,
@@ -21,7 +23,9 @@ const getMarcas = async () => {
 const getMarca = async (id) => {
     const marca = await prisma.marca.findUnique({
         where: { 
-            id: id,estadoId: estados().activo 
+            id: id,estadoId: {
+                not: estados().inactivo
+            }
         },
         include: {
             estado: true,
