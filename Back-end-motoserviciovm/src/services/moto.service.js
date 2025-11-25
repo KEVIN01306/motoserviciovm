@@ -63,11 +63,8 @@ const getMotos = async () => {
         },
      },
     });
-    // Convert avatar filename to data URL (base64) for each moto
-    const motosWithAvatars = await Promise.all(motos.map(async (m) => {
-        const avatarData = m.avatar ? await readImageAsDataURL(m.avatar) : null;
-        return { ...m, avatar: avatarData };
-    }));
+
+        const motosWithAvatars = motos.map((m) => ({ ...m, avatar: null }));
     if (!motos) {
         const error = new Error('DATA_NOT_FOUND');
         error.code = 'DATA_NOT_FOUND';
