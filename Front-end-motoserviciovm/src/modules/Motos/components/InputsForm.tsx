@@ -23,7 +23,6 @@ const InputsForm = ({ control, register, errors }: Props) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [cameraModalOpen, setCameraModalOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const currentFieldRef = useRef<any>(null);
 
@@ -56,23 +55,82 @@ const InputsForm = ({ control, register, errors }: Props) => {
       }
       if (videoRef.current) {
         try { videoRef.current.pause(); } catch (e) {}
+        // @ts-ignore
         videoRef.current.srcObject = null;
       }
     };
   }, [cameraModalOpen]);
 
-  const handleTakePhoto = () => {
+  const resizeImageDataUrl = (dataUrl: string, maxWidth = 1024, quality = 0.8) =>
+    new Promise<string>((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let { width: w, height: h } = img;
+        if (w > maxWidth) {
+          const ratio = maxWidth / w;
+          w = Math.round(w * ratio);
+          h = Math.round(h * ratio);
+        }
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return resolve(dataUrl.replace(/^data:.*;base64,/, ''));
+        ctx.drawImage(img, 0, 0, w, h);
+        const compressed = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressed.replace(/^data:.*;base64,/, ''));
+      };
+      img.onerror = () => resolve(dataUrl.replace(/^data:.*;base64,/, ''));
+      img.src = dataUrl;
+    });
+
+  const fileToBase64 = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const result = String(reader.result || "");
+          const base64Only = await resizeImageDataUrl(result, 1024, 0.8);
+          resolve(base64Only);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      reader.onerror = (e) => reject(e);
+      reader.readAsDataURL(file);
+    });
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const base64 = await fileToBase64(file);
+      field.onChange(base64);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleTakePhoto = async () => {
     const video = videoRef.current;
     if (!video) return;
     const canvas = document.createElement('canvas');
     const w = video.videoWidth || 640;
     const h = video.videoHeight || 480;
-    canvas.width = w;
-    canvas.height = h;
+    const maxWidth = 1024;
+    let drawW = w;
+    let drawH = h;
+    if (w > maxWidth) {
+      const ratio = maxWidth / w;
+      drawW = Math.round(w * ratio);
+      drawH = Math.round(h * ratio);
+    }
+    canvas.width = drawW;
+    canvas.height = drawH;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    ctx.drawImage(video, 0, 0, w, h);
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    ctx.drawImage(video, 0, 0, drawW, drawH);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
     const base64Only = dataUrl.replace(/^data:.*;base64,/, '');
     if (currentFieldRef.current) currentFieldRef.current.onChange(base64Only);
     setCameraModalOpen(false);
@@ -89,7 +147,6 @@ const InputsForm = ({ control, register, errors }: Props) => {
       streamRef.current = null;
     }
   };
-  // nothing else at component level; per-field camera modal state lives inside Controller render
 
   useEffect(() => {
     const load = async () => {
@@ -118,47 +175,23 @@ const InputsForm = ({ control, register, errors }: Props) => {
         />
       </Grid>
 
-        <Dialog open={cameraModalOpen} onClose={handleCloseCameraModal} fullWidth maxWidth="sm">
-          <DialogTitle>Tomar foto</DialogTitle>
-          <DialogContent>
-            <video ref={videoRef} style={{ width: '100%' }} playsInline />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseCameraModal}>Cancelar</Button>
-            <Button variant="contained" onClick={handleTakePhoto}>Capturar</Button>
-          </DialogActions>
-        </Dialog>
+      <Dialog open={cameraModalOpen} onClose={handleCloseCameraModal} fullWidth maxWidth="sm">
+        <DialogTitle>Tomar foto</DialogTitle>
+        <DialogContent>
+          <video ref={videoRef} style={{ width: '100%' }} playsInline />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseCameraModal}>Cancelar</Button>
+          <Button variant="contained" onClick={handleTakePhoto}>Capturar</Button>
+        </DialogActions>
+      </Dialog>
 
       <Grid size={12}>
         <Controller
           name="avatar"
           control={control}
           render={({ field }) => {
-            // keep a reference to the current field so modal handlers can set the value
             currentFieldRef.current = field;
-            const fileToBase64 = (file: File) =>
-              new Promise<string>((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                  const result = String(reader.result || "");
-                  const base64Only = result.replace(/^data:.*;base64,/, "");
-                  resolve(base64Only);
-                };
-                reader.onerror = (e) => reject(e);
-                reader.readAsDataURL(file);
-              });
-
-            const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-              const file = e.target.files?.[0];
-              if (!file) return;
-              try {
-                const base64 = await fileToBase64(file);
-                field.onChange(base64);
-              } catch (err) {
-                console.error(err);
-              }
-            };
-
             const srcToShow = field.value
               ? (String(field.value).trim().startsWith('data:') ? String(field.value).trim() : `data:image/jpeg;base64,${String(field.value).trim()}`)
               : undefined;
@@ -191,61 +224,56 @@ const InputsForm = ({ control, register, errors }: Props) => {
                   </Box>
                 ) : (
                   <>
-                    <>
-                      <input
-                        accept="image/*"
-                        capture="environment"
-                        id="moto-avatar-input-camera"
-                        ref={cameraInputRef}
-                        type="file"
-                        style={{ display: 'none' }}
-                        onChange={handleFileChange}
-                      />
-                      <input
-                        accept="image/*"
-                        id="moto-avatar-input-file"
-                        ref={fileInputRef}
-                        type="file"
-                        style={{ display: 'none' }}
-                        onChange={handleFileChange}
-                      />
+                    <input
+                      accept="image/*"
+                      capture="environment"
+                      id="moto-avatar-input-camera"
+                      ref={cameraInputRef}
+                      type="file"
+                      style={{ display: 'none' }}
+                      onChange={(e) => handleFileChange(e, field)}
+                    />
+                    <input
+                      accept="image/*"
+                      id="moto-avatar-input-file"
+                      ref={fileInputRef}
+                      type="file"
+                      style={{ display: 'none' }}
+                      onChange={(e) => handleFileChange(e, field)}
+                    />
 
-                      <Button
-                        variant="outlined"
-                        component="button"
-                        startIcon={<CloudUploadIcon />}
-                        onClick={(e) => setAnchorEl(e.currentTarget)}
+                    <Button
+                      variant="outlined"
+                      component="button"
+                      startIcon={<CloudUploadIcon />}
+                      onClick={(e) => setAnchorEl(e.currentTarget)}
+                    >
+                      Cargar imagen
+                    </Button>
+
+                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
+                      <MenuItem
+                        onClick={() => {
+                          setAnchorEl(null);
+                          const isMobile = /Mobi|Android/i.test(navigator.userAgent || '');
+                          if (isMobile) {
+                            cameraInputRef.current?.click();
+                          } else {
+                            setCameraModalOpen(true);
+                          }
+                        }}
                       >
-                        Cargar imagen
-                      </Button>
-
-                      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
-                        <MenuItem
-                          onClick={() => {
-                            setAnchorEl(null);
-                            const isMobile = /Mobi|Android/i.test(navigator.userAgent || '');
-                            if (isMobile) {
-                              // on mobile, trigger the input with capture; browser will usually open camera
-                              cameraInputRef.current?.click();
-                            } else {
-                              // on desktop, open an in-page camera dialog
-                              setCameraModalOpen(true);
-                            }
-                          }}
-                        >
-                          Tomar foto
-                        </MenuItem>
-                        <MenuItem
-                          onClick={() => {
-                            setAnchorEl(null);
-                            // open file picker
-                            fileInputRef.current?.click();
-                          }}
-                        >
-                          Elegir archivo
-                        </MenuItem>
-                      </Menu>
-                    </>
+                        Tomar foto
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          setAnchorEl(null);
+                          fileInputRef.current?.click();
+                        }}
+                      >
+                        Elegir archivo
+                      </MenuItem>
+                    </Menu>
                   </>
                 )}
                 {errors.avatar && (
