@@ -38,6 +38,12 @@ const PERMISOS_SEED = [
   { permiso: "modelos:edit", modulo: "MODELOS", estadoId: 1 },
   { permiso: "modelos:detail", modulo: "MODELOS", estadoId: 1 },
   { permiso: "modelos:delete", modulo: "MODELOS", estadoId: 1 },
+
+  { permiso: "motos:view", modulo: "MOTOS", estadoId: 1 },
+  { permiso: "motos:create", modulo: "MOTOS", estadoId: 1 },
+  { permiso: "motos:edit", modulo: "MOTOS", estadoId: 1 },
+  { permiso: "motos:detail", modulo: "MOTOS", estadoId: 1 },
+  { permiso: "motos:delete", modulo: "MOTOS", estadoId: 1 },
   
   { permiso: "home:view", modulo: "HOME", estadoId: 1 },
 ];

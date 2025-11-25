@@ -191,4 +191,76 @@ model Moto {
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-} 
+}
+
+model TipoServicio {
+  id              Int @id @default(autoincrement())
+  tipo            String @unique
+  descripcion     String?
+
+  OpcionServicios OpcionServicio[] @relation("TipoOpcionServicios")
+
+  estadoId        Int
+  estado          Estado @relation(fields: [estadoId], references: [id])
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model OpcionServicio {
+  id              Int @id @default(autoincrement())
+  opcion          String @unique
+  descripcion     String?
+
+  TipoServicios TipoServicio[] @relation("TipoOpcionServicios")
+
+  estadoId        Int
+  estado          Estado @relation(fields: [estadoId], references: [id])
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Servicio {
+  id              Int @id @default(autoincrement())
+  descripcion     String
+
+  fechaEntrada    DateTime
+
+  fechaSalida     DateTime
+
+  total           Float
+
+  motoId          Int
+  moto            Moto @relation(fields: [motoId], references: [id])
+
+  clienteId      Int?
+  cliente        User? @relation("ServicioCliente", fields: [clienteId], references: [id])
+
+  mecanicoId     Int
+  mecanico       User @relation("ServicioMecanico", fields: [mecanicoId], references: [id])
+
+  tipoServicioId  Int
+  tipoServicio    TipoServicio @relation(fields: [tipoServicioId], references: [id])
+
+  estadoId        Int
+  estado          Estado @relation(fields: [estadoId], references: [id])
+
+  imagen          Imagen[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Imagen {
+  id              Int @id @default(autoincrement())
+  imagen          String
+
+  descripcion     String
+
+  servicioId      Int
+  servicio        Servicio @relation(fields: [servicioId], references: [id])
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

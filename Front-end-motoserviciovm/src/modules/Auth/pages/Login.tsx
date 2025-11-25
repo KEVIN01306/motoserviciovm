@@ -60,7 +60,7 @@ const Login = () => {
                         <Box sx={{ textAlign: 'center', mb: 3 }}>
                             <LoginIcon sx={{ fontSize: 40, color: 'primary.main' }} />
                             <Typography variant="h5" component="h1" fontWeight="bold" sx={{ mt: 1 }}>
-                                Log in
+                                Iniciar Sesión
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
                                 MOTOSERVICIOVM

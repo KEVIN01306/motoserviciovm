@@ -7,4 +7,6 @@ export const motoSchema = z.object({
     modeloId:       z.number().int(),
     estadoId:       z.number().int(),
     users:          z.array(z.number().int()).optional(),
+    createdAt:      z.date().optional(),
+    updatedAt:      z.date().optional(),
 })

@@ -11,6 +11,7 @@ import { LineasRoutes } from "../modules/Lineas/routes";
 import { MarcasRoutes } from "../modules/Marcas/routes";
 import { ModelosRoutes } from "../modules/Modelos/routes";
 import { CilindradaRoutes } from "../modules/Cilindrada/routes";
+import { MotosRoutes } from "../modules/Motos/routes";
 import AuthRouteGuard from "../modules/Auth/components/AuthRouteGuard";
 
 const Home = lazy(() => import('../modules/LandingPages/index'))
@@ -47,6 +48,7 @@ const Router = [
                     ...CilindradaRoutes,
                     ...MarcasRoutes,
                     ...ModelosRoutes,
+                    ...MotosRoutes,
 
                 ]
             },

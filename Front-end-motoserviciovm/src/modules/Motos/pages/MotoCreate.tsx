@@ -1,20 +1,20 @@
-import { PiPlus } from "react-icons/pi";
 import { Button, Divider, Grid } from "@mui/material";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import BreadcrumbsRoutes from "../../../components/utils/Breadcrumbs";
 import FormEstructure from "../../../components/utils/FormEstructure";
 import { InputsForm } from "../components";
-import { modeloInitialState, type modeloType } from "../../../types/modeloType";
-import { modeloSchema } from "../../../zod/modelo.schema";
-import { postModelo } from "../../../services/modelo.services";
+import { MotoInitialState, type motoType } from "../../../types/motoType";
+import { motoSchema } from "../../../zod/moto.schema";
+import { postMoto } from "../../../services/moto.services";
 import { errorToast, successToast } from "../../../utils/toast";
-import { RiEBikeLine } from "react-icons/ri";
+import { RiBikeFill } from "react-icons/ri";
+import { PiPlus } from "react-icons/pi";
 
-const ModeloCreate = () => {
+const MotoCreate = () => {
     const breadcrumbsData = [
-        { label: "Modelos", icon: <RiEBikeLine fontSize="inherit" />, href: "/admin/modelos" },
-        { label: "Crear Modelo", icon: <PiPlus fontSize="inherit" />, href: "/admin/modelos/create" },
+        { label: "Motos", icon: <RiBikeFill fontSize="inherit" />, href: "/admin/motos" },
+        { label: "Crear Moto", icon: <PiPlus fontSize="inherit" />, href: "/admin/motos/create" },
     ];
 
     const {
@@ -23,18 +23,18 @@ const ModeloCreate = () => {
         handleSubmit,
         formState: { errors, isSubmitting },
         reset,
-    } = useForm<modeloType>({
-        resolver: zodResolver(modeloSchema) as unknown as Resolver<modeloType>,
+    } = useForm<motoType>({
+        resolver: zodResolver(motoSchema) as unknown as Resolver<motoType>,
         mode: "onSubmit",
-        defaultValues: modeloInitialState,
+        defaultValues: MotoInitialState,
     });
 
-    const handlerSubmit = async (data: modeloType) => {
+    const handlerSubmit = async (data: motoType) => {
         try {
-            const payload = { ...data, estadoId: 1 } as modeloType;
-            const response = await postModelo(payload);
-            successToast(`Modelo creado: ${response || `${payload.año}`}`);
-            reset(modeloInitialState);
+            const payload = { ...data, estadoId: 1 } as motoType;
+            const response = await postMoto(payload);
+            successToast(`Moto creada: ${response || payload.placa}`);
+            reset(MotoInitialState);
         } catch (err: any) {
             errorToast(err.message);
         }
@@ -50,7 +50,7 @@ const ModeloCreate = () => {
                 </Grid>
                 <Grid size={12}>
                     <Button type="submit" variant="contained" disabled={isSubmitting} fullWidth>
-                        {isSubmitting ? "Guardando..." : "Crear Modelo"}
+                        {isSubmitting ? "Guardando..." : "Crear Moto"}
                     </Button>
                 </Grid>
             </FormEstructure>
@@ -58,4 +58,4 @@ const ModeloCreate = () => {
     );
 };
 
-export default ModeloCreate;
+export default MotoCreate;
