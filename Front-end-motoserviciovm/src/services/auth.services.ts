@@ -105,3 +105,23 @@ export {
     postLogin,
     getMe
 }
+
+export { postRegister };
+
+const postRegister = async (user: any) => {
+    try {
+        const response = await axios.post(API_AUTH + '/register', user);
+        // Return whatever the API returns; keep it generic for now
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        if (axios.isAxiosError(error)) {
+            const status = error.response?.status;
+            const serverMessage = error.response?.data?.message;
+            if (serverMessage) throw new Error(serverMessage);
+            if (status === 400) throw new Error('Bad request');
+            throw new Error('Connection error');
+        }
+        throw new Error((error as Error).message);
+    }
+}

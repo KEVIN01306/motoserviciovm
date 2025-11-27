@@ -35,7 +35,7 @@ const LineasList = () => {
             const response = await getLineas();
             const normalized = response.map((linea) => ({
                 ...linea,
-                estadoLabel: linea.estado?.estado ?? `Estado #${linea.estadoId}`,
+                estadoLabel: (linea as any).estado?.estado ?? `Estado #${linea.estadoId}`,
             }));
             setLineas(normalized);
         } catch (err: any) {

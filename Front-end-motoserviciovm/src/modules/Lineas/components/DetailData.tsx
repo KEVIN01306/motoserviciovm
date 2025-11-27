@@ -12,7 +12,7 @@ const DetailData = ({ linea }: Props) => {
                 <CardContent>
                     <Grid container spacing={2}>
                         <DetailItem label="Línea" value={linea.linea} />
-                        <DetailItem label="Estado" value={linea.estado?.estado ?? `Estado #${linea.estadoId}`} />
+                        <DetailItem label="Estado" value={(linea as any).estado?.estado ?? `Estado #${linea.estadoId}`} />
                         <DetailItem
                             label="Creado el"
                             value={linea.createdAt ? new Date(linea.createdAt).toLocaleString() : "-"}

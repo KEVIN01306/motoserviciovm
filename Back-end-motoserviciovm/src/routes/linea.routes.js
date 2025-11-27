@@ -4,10 +4,9 @@ import { verifyTokenHandler } from "../controllers/auth.controller.js";
 
 const router = Router();
 
-router.get('/', getLineasHandler);
-router.get('/:id', getLineaHandler);
-router.post('/', postLineaHandler);
-router.put('/:id', putLineaHandler);
-router.delete('/:id', deleteLineaHandler);
-
+router.get('/',verifyTokenHandler(), getLineasHandler);
+router.get('/:id', verifyTokenHandler(), getLineaHandler);
+router.post('/', verifyTokenHandler(), postLineaHandler);
+router.put('/:id', verifyTokenHandler(), putLineaHandler);
+router.delete('/:id', verifyTokenHandler(), deleteLineaHandler);
 export default router;

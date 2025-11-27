@@ -35,7 +35,7 @@ const MarcasList = () => {
             const response = await getMarcas();
             const normalized = response.map((marca) => ({
                 ...marca,
-                estadoLabel: marca.estado?.estado ?? `Estado #${marca.estadoId}`,
+                estadoLabel: (marca as any).estado?.estado ?? `Estado #${marca.estadoId}`,
             }));
             setMarcas(normalized);
             setFilteredMarcas(normalized);

@@ -34,7 +34,8 @@ const Register = () => {
         control,
         setValue,
     } = useForm<UserType>({
-        resolver: zodResolver(userSchema),
+        // zodResolver may produce stricter generics; cast to any to satisfy TS for now
+        resolver: zodResolver(userSchema) as any,
         mode: "onSubmit",
         defaultValues: UserInitialState,
     });
@@ -55,7 +56,7 @@ const Register = () => {
         try {
             const response = await postRegister(data);
             successToast("User created: " + response);
-            await handleLogin({ email: data.email, password: data.password });
+            await handleLogin({ email: data.email!, password: data.password! });
             reset();
         } catch (err: any) {
             errorToast(err.message);
