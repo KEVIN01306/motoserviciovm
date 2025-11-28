@@ -5,6 +5,7 @@ import DiagnosticAI from './components/DiagnosticAI';
 import NosotrosSection from './components/NosotrosSection';
 import BookingForm from './components/BookingForm';
 import LandingFooter from './components/LandingFooter';
+import WhatsAppFloatingButton from './components/WhatsAppFloatingButton';
 
 // --- Configuración de Colores de Tailwind (MUI Palette Simulation) ---
 // Primary: #1c1c1c (primary-dark), Secondary/Accent: #ff6600 (accent-orange), Background: #f7f7f7 (light-gray)
@@ -131,6 +132,9 @@ const App = () => {
             <BookingForm />
 
             <LandingFooter />
+            {/* WhatsApp quick-contact button: replace phone prop with your actual number (country code + number, without + or with) */}
+                {/* WhatsApp quick-contact button: number and message read from env vars `VITE_WHATSAPP_NUMBER` and `VITE_WHATSAPP_MESSAGE`. */}
+                <WhatsAppFloatingButton />
         </div>
     );
 };
