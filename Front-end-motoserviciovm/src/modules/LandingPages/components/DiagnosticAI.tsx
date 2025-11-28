@@ -4,6 +4,7 @@ import SendIcon from '@mui/icons-material/Send';
 import CircularProgress from '@mui/material/CircularProgress';
 import WrenchIcon from '@mui/icons-material/Build';
 import BookOpenIcon from '@mui/icons-material/MenuBook';
+import { postAIDiagnostic } from '../../../services/ai.services';
 
 const DiagnosticAI: React.FC = () => {
   const [aiQuery, setAiQuery] = useState('');
@@ -17,86 +18,31 @@ const DiagnosticAI: React.FC = () => {
     if (!aiQuery.trim()) return;
 
     setIsLoadingAi(true);
-    setIsPressed(true); // ensure hover-style is applied while analyzing
+    setIsPressed(true);
     setAiDiagnosis(null);
     setAiSources([]);
 
     const MAX_RETRIES = 3;
-    // Hard-coded test API key (temporary)
-    const API_KEY = "AIzaSyDA_yrLeV-_K05T-5CLRWbwh-K7u2dMkgE";
-    console.log('DiagnosticAI: using hard-coded API key for testing');
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${API_KEY}`;
-
-    const systemPrompt = "Act as an expert motorcycle mechanic with 20 years of experience. Your task is to provide a brief, professional, and safety-focused preliminary diagnosis and advice based on the user's description. Always remind the user that this is NOT a definitive diagnosis and they MUST schedule a professional inspection immediately. Respond in Spanish.";
-
-    const payload = {
-      contents: [{ parts: [{ text: aiQuery }] }],
-      tools: [{ google_search: {} }],
-      systemInstruction: { parts: [{ text: systemPrompt }] },
-    } as any;
-
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-      const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+      const delay = Math.pow(2, attempt) * 1000 + Math.random() * 500;
       try {
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
+        const data = await postAIDiagnostic({ text: aiQuery });
 
-        const rawBody = await response.text();
-        console.log('Gemini API status:', response.status);
-        console.log('Gemini API raw response body:', rawBody);
-
-        if (response.status === 429 && attempt < MAX_RETRIES - 1) {
-          await new Promise((r) => setTimeout(r, delay));
-          continue;
-        }
-
-        if (!response.ok) {
-          let parsedBody: any = rawBody;
-          try {
-            parsedBody = JSON.parse(rawBody);
-          } catch (e) {
-            /* ignore */
-          }
-          const msg = parsedBody?.error?.message || parsedBody?.message || rawBody;
-          throw new Error(`HTTP error! status: ${response.status} body: ${msg}`);
-        }
-
-        const result = (() => {
-          try {
-            return JSON.parse(rawBody);
-          } catch (e) {
-            return {} as any;
-          }
-        })();
-
-        const candidate = result.candidates?.[0];
-
-        if (candidate && candidate.content?.parts?.[0]?.text) {
-          const text = candidate.content.parts[0].text;
-          setAiDiagnosis(text);
-
-          let sources: Array<{ uri?: string; title?: string }> = [];
-          const groundingMetadata = candidate.groundingMetadata;
-          if (groundingMetadata && groundingMetadata.groundingAttributions) {
-            sources = groundingMetadata.groundingAttributions
-              .map((attribution: any) => ({ uri: attribution.web?.uri, title: attribution.web?.title }))
-              .filter((source: any) => source.uri && source.title);
-            setAiSources(sources);
-          }
+        if (data && data.diagnosis) {
+          setAiDiagnosis(data.diagnosis);
+          setAiSources(data.sources || []);
         } else {
           setAiDiagnosis('Lo sentimos, la IA no pudo generar un diagnóstico. Por favor, sé más específico o contáctanos directamente.');
         }
 
         break;
-      } catch (error) {
-        console.error('Error fetching AI diagnosis:', error);
+      } catch (err) {
+        console.error('postAIDiagnostic error:', err);
         if (attempt === MAX_RETRIES - 1) {
           setAiDiagnosis('Lo sentimos, ha ocurrido un error al intentar generar el diagnóstico. Por favor, inténtalo de nuevo más tarde.');
+        } else {
+          await new Promise((r) => setTimeout(r, delay));
         }
-        await new Promise((r) => setTimeout(r, delay));
       }
     }
 
