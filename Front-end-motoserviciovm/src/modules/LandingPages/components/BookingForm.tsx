@@ -8,7 +8,6 @@ import PhoneIcon from '@mui/icons-material/Phone';
 const BookingForm: React.FC = () => {
   const today = new Date().toISOString().split('T')[0];
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
   const [placa, setPlaca] = useState('');
   const [dpiNit, setDpiNit] = useState('');
   const [message, setMessage] = useState('');
@@ -42,7 +41,7 @@ const BookingForm: React.FC = () => {
     setLastSubmission({ date: selectedDate, time: selectedTime, placa, branch: selectedBranch, dpiNit, serviceType: selectedServiceType });
     setIsModalOpen(true);
 
-    setName(''); setEmail(''); setPlaca(''); setDpiNit(''); setMessage(''); setSelectedDate(today); setSelectedTime(''); setSelectedBranch(''); setSelectedServiceType('');
+    setName(''); setPlaca(''); setDpiNit(''); setMessage(''); setSelectedDate(today); setSelectedTime(''); setSelectedBranch(''); setSelectedServiceType('');
   };
 
   return (
@@ -92,7 +91,6 @@ const BookingForm: React.FC = () => {
             <h3 className="text-2xl font-bold text-accent-orange border-b border-gray-700 pb-3">Paso 2: Confirma tus Datos</h3>
             <form onSubmit={handleSubmit} className="space-y-5">
               <MuiTextFieldWrapper label="Nombre" id="nombre" type="text" placeholder="Tu nombre completo" value={name} onChange={(e) => setName(e.target.value)} required />
-              <MuiTextFieldWrapper label="Email" id="email" type="email" placeholder="ejemplo@correo.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
               <MuiTextFieldWrapper label="Placa de la Moto (Obligatorio)" id="placa" type="text" placeholder="Ej: M123ABC" value={placa} onChange={(e) => setPlaca(e.target.value)} required />
               <MuiTextFieldWrapper label="DPI o NIT (Obligatorio)" id="dpi_nit" type="text" placeholder="Ej: 1234567890123" value={dpiNit} onChange={(e) => setDpiNit(e.target.value)} required />
 
