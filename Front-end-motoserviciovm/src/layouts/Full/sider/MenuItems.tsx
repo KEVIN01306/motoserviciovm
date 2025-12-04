@@ -26,6 +26,21 @@ const MenuItems = [
         ],
     },
     {
+        module: "Servicios",
+        icon: AutoFixHighOutlined,
+        children: [
+            { name: "Opciones de Servicio", link: "/admin/opcionservicio", icon: PiListNumbersBold, permiso: "opcioneservicios:view" },
+            { name: "Tipos de Servicio", link: "/admin/tiposervicio", icon: PiListNumbersBold, permiso: "tiposervicios:view" },
+        ]
+    },
+    {
+        module: "Productos",
+        icon: PiTrademarkRegisteredBold,
+        children: [
+            { name: "Categorías de Producto", link: "/admin/categoriaproducto", icon: PiListNumbersBold, permiso: "categoriaproducto:view" },
+        ],
+    },
+    {
         module: "Administración",
         icon: MdOutlineAdminPanelSettings,
         children: [

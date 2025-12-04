@@ -25,6 +25,8 @@ model Sucursal {
   email           String
 
   usuarios        User[] @relation("UserSucursales")
+  servicios       Servicio[]
+  citas           Cita[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -54,6 +56,11 @@ model User {
   sucursales      Sucursal[] @relation("UserSucursales")
 
   motos           Moto[] @relation("UserMotos")
+
+  serviciosComoCliente Servicio[] @relation("ServicioCliente")
+  serviciosComoMecanico Servicio[] @relation("ServicioMecanico")
+  ventas           Venta[]
+  citas            Cita[] @relation("CitaCliente")
 
   estadoId        Int
   estado          Estado @relation(fields: [estadoId], references: [id])
@@ -169,6 +176,17 @@ model Estado {
   lineas          Linea[]
   cilindradas     Cilindrada[]
   modelos         Modelo[]
+  tipoServicios   TipoServicio[]
+  opcionServicios OpcionServicio[]
+  servicios       Servicio[]
+  inventarios     Inventario[]
+  categoriaProductos CategoriaProducto[]
+  productos       Producto[]
+  ventas          Venta[]
+  enParqueos      EnParqueo[]
+  enReparaciones  EnReparacion[]
+  repuestosReparaciones RepuestosReparacion[]
+  citas           Cita[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -188,6 +206,11 @@ model Moto {
   estadoId        Int
   estado          Estado @relation(fields: [estadoId], references: [id])
 
+  servicios       Servicio[]
+  enParqueos      EnParqueo[]
+  enReparaciones  EnReparacion[]
+  citas           Cita[]
+
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -198,7 +221,9 @@ model TipoServicio {
   tipo            String @unique
   descripcion     String?
 
-  OpcionServicios OpcionServicio[] @relation("TipoOpcionServicios")
+  opcionServicios OpcionServicio[] @relation("TipoOpcionServicios")
+
+  servicios       Servicio[]
 
   estadoId        Int
   estado          Estado @relation(fields: [estadoId], references: [id])
@@ -212,7 +237,7 @@ model OpcionServicio {
   opcion          String @unique
   descripcion     String?
 
-  TipoServicios TipoServicio[] @relation("TipoOpcionServicios")
+  tipoServicios TipoServicio[] @relation("TipoOpcionServicios")
 
   estadoId        Int
   estado          Estado @relation(fields: [estadoId], references: [id])
@@ -258,6 +283,8 @@ model Servicio {
   imagen          Imagen[]
 
   servicioItems   ServicioInventario[]
+  ventas           Venta[]
+  productosCliente ServicioProductoCliente[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -274,6 +301,20 @@ model Imagen {
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+model ServicioProductoCliente {
+  id              Int @id @default(autoincrement())
+
+  nombre          String
+  cantidad       Int
+
+  servicioId      Int
+  servicio        Servicio @relation(fields: [servicioId], references: [id])
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
 }
 
 model ServicioInventario {
@@ -303,7 +344,6 @@ model Inventario {
   activo          Boolean @default(true)
 
   servicioItems   ServicioInventario[]
-
 
   estadoId        Int
   estado          Estado @relation(fields: [estadoId], references: [id])
@@ -391,6 +431,52 @@ model EnParqueo {
   updatedAt       DateTime @updatedAt
 }
 
+model EnReparacion {
+  id              Int @id @default(autoincrement())
+  descripcion     String
+
+  fechaEntrada    DateTime
+
+  fechaSalida     DateTime?
+
+  total           Float?
+
+  observaciones    String?
+
+  motoId          Int
+  moto            Moto @relation(fields: [motoId], references: [id])  
+
+  repuestos       RepuestosReparacion[]
+
+  estadoId        Int
+  estado          Estado @relation(fields: [estadoId], references: [id])
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model RepuestosReparacion {
+  id              Int @id @default(autoincrement())
+  nombre          String
+  descripcion     String
+
+  imagen          String?
+
+  refencia       String
+  cantidad       Int
+
+  checked         Boolean @default(false)
+
+  reparacionId    Int
+  reparacion      EnReparacion @relation(fields: [reparacionId], references: [id])
+
+  estadoId        Int
+  estado          Estado @relation(fields: [estadoId], references: [id])
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
 model Cita {
   id              Int @id @default(autoincrement())
   descripcion     String
@@ -404,7 +490,7 @@ model Cita {
   sucursal       Sucursal @relation(fields: [sucursalId], references: [id])
 
   clienteId      Int?
-  cliente        User @relation("CitaCliente", fields: [clienteId], references: [id])
+  cliente        User? @relation("CitaCliente", fields: [clienteId], references: [id])
 
   dpiNit          String?
 

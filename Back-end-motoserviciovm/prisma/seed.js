@@ -45,6 +45,24 @@ const PERMISOS_SEED = [
   { permiso: "motos:detail", modulo: "MOTOS", estadoId: 1 },
   { permiso: "motos:delete", modulo: "MOTOS", estadoId: 1 },
   
+  { permiso: "opcioneservicios:view", modulo: "OPCIONESERVICIOS", estadoId: 1 },
+  { permiso: "opcioneservicios:create", modulo: "OPCIONESERVICIOS", estadoId: 1 },
+  { permiso: "opcioneservicios:edit", modulo: "OPCIONESERVICIOS", estadoId: 1 },
+  { permiso: "opcioneservicios:detail", modulo: "OPCIONESERVICIOS", estadoId: 1 },
+  { permiso: "opcioneservicios:delete", modulo: "OPCIONESERVICIOS", estadoId: 1 },
+  
+  { permiso: "tiposervicios:view", modulo: "TIPOSERVICIOS", estadoId: 1 },
+  { permiso: "tiposervicios:create", modulo: "TIPOSERVICIOS", estadoId: 1 },
+  { permiso: "tiposervicios:edit", modulo: "TIPOSERVICIOS", estadoId: 1 },
+  { permiso: "tiposervicios:detail", modulo: "TIPOSERVICIOS", estadoId: 1 },
+  { permiso: "tiposervicios:delete", modulo: "TIPOSERVICIOS", estadoId: 1 },
+
+  { permiso: "categoriaproducto:view", modulo: "CATEGORIAPRODUCTO", estadoId: 1 },
+  { permiso: "categoriaproducto:create", modulo: "CATEGORIAPRODUCTO", estadoId: 1 },
+  { permiso: "categoriaproducto:edit", modulo: "CATEGORIAPRODUCTO", estadoId: 1 },
+  { permiso: "categoriaproducto:detail", modulo: "CATEGORIAPRODUCTO", estadoId: 1 },
+  { permiso: "categoriaproducto:delete", modulo: "CATEGORIAPRODUCTO", estadoId: 1 },
+  
   { permiso: "home:view", modulo: "HOME", estadoId: 1 },
 ];
 
