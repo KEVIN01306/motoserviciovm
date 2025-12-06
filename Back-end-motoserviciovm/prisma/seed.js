@@ -63,6 +63,18 @@ const PERMISOS_SEED = [
   { permiso: "categoriaproducto:detail", modulo: "CATEGORIAPRODUCTO", estadoId: 1 },
   { permiso: "categoriaproducto:delete", modulo: "CATEGORIAPRODUCTO", estadoId: 1 },
   
+  { permiso: "productos:view", modulo: "PRODUCTOS", estadoId: 1 },
+  { permiso: "productos:create", modulo: "PRODUCTOS", estadoId: 1 },
+  { permiso: "productos:edit", modulo: "PRODUCTOS", estadoId: 1 },
+  { permiso: "productos:detail", modulo: "PRODUCTOS", estadoId: 1 },
+  { permiso: "productos:delete", modulo: "PRODUCTOS", estadoId: 1 },
+
+  { permiso: "inventarios:view", modulo: "INVENTARIOS", estadoId: 1 },
+  { permiso: "inventarios:create", modulo: "INVENTARIOS", estadoId: 1 },
+  { permiso: "inventarios:edit", modulo: "INVENTARIOS", estadoId: 1 },
+  { permiso: "inventarios:detail", modulo: "INVENTARIOS", estadoId: 1 },
+  { permiso: "inventarios:delete", modulo: "INVENTARIOS", estadoId: 1 },
+  
   { permiso: "home:view", modulo: "HOME", estadoId: 1 },
 ];
 

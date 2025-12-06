@@ -10,6 +10,8 @@ import { useGoTo } from "../../../hooks/useGoTo";
 import type { motoGetType } from "../../../types/motoType";
 import { RiBikeFill } from "react-icons/ri";
 
+const API_URL = import.meta.env.VITE_DOMAIN;
+
 const MotoDetail = () => {
     const { id } = useParams();
     const goTo = useGoTo();
@@ -57,7 +59,7 @@ const MotoDetail = () => {
                             {moto?.avatar ? (
                                 <Box
                                     component="img"
-                                    src={moto.avatar}
+                                    src={API_URL + moto.avatar}
                                     alt={moto?.placa ?? "avatar"}
                                     sx={{ width: "100%", maxHeight: 400, objectFit: "contain", borderRadius: 1 }}
                                 />

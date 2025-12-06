@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Grid, Divider, Button } from "@mui/material";
 import { useForm } from "react-hook-form";
@@ -20,7 +20,7 @@ const OpcionesServiciosEdit = () => {
   const { id } = useParams();
   const goTo = useGoTo();
 
-  const { register, handleSubmit, reset, formState, setValue } = useForm<OpcionServicioType>({
+  const { register, handleSubmit, reset, formState } = useForm<OpcionServicioType>({
     resolver: zodResolver(opcionesServicioSchema) as any,
     defaultValues: OpcionServicioInitialState as any,
   });

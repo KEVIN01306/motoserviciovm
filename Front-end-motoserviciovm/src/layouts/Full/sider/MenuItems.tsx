@@ -1,7 +1,8 @@
 import { PiUserCheckDuotone, PiUsersDuotone, PiListNumbersBold, PiTrademarkRegisteredBold, PiCylinderBold } from "react-icons/pi";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import { AdminPanelSettings, AutoFixHighOutlined, HomeMaxOutlined, StoreMallDirectoryOutlined } from "@mui/icons-material";
-import { RiBikeFill, RiEBikeLine } from "react-icons/ri";
+import { RiBikeFill, RiEBikeLine, RiProductHuntLine } from "react-icons/ri";
+import { IoCubeSharp } from "react-icons/io5";
 
 /**
  * Grouped menu structure: each entry is a module group with a title and children items.
@@ -31,13 +32,15 @@ const MenuItems = [
         children: [
             { name: "Opciones de Servicio", link: "/admin/opcionservicio", icon: PiListNumbersBold, permiso: "opcioneservicios:view" },
             { name: "Tipos de Servicio", link: "/admin/tiposervicio", icon: PiListNumbersBold, permiso: "tiposervicios:view" },
+            { name: "Inventarios", link: "/admin/inventarios", icon: IoCubeSharp, permiso: "inventarios:view" },
         ]
     },
     {
         module: "Productos",
-        icon: PiTrademarkRegisteredBold,
+        icon: IoCubeSharp,
         children: [
             { name: "Categorías de Producto", link: "/admin/categoriaproducto", icon: PiListNumbersBold, permiso: "categoriaproducto:view" },
+            { name: "Productos", link: "/admin/productos", icon: IoCubeSharp, permiso: "productos:view" },
         ],
     },
     {

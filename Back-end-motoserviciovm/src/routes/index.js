@@ -1,7 +1,10 @@
 import { Router } from "express";
+import path from "path";
+import express from "express";
 
 const router = Router();
 
+router.use(express.static(path.join(process.cwd(), 'public')));
 router.use('/users', (await import('./user.routes.js')).default);
 router.use('/roles', (await import('./rol.routes.js')).default);
 router.use('/permisos', (await import('./permiso.routes.js')).default);
@@ -17,6 +20,7 @@ router.use('/opcionservicio', (await import('./opcionservicio.routes.js')).defau
 router.use('/tiposervicio', (await import('./tipoServicio.routes.js')).default);
 router.use('/categoriasproducto', (await import('./categoriaProducto.routes.js')).default);
 router.use('/productos', (await import('./producto.routes.js')).default);
+router.use('/inventarios', (await import('./inventario.routes.js')).default);
 
     
 export default router;

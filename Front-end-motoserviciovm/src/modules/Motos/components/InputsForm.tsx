@@ -61,42 +61,33 @@ const InputsForm = ({ control, register, errors }: Props) => {
     };
   }, [cameraModalOpen]);
 
-  const resizeImageDataUrl = (dataUrl: string, maxWidth = 1024, quality = 0.8) =>
-    new Promise<string>((resolve) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let { width: w, height: h } = img;
-        if (w > maxWidth) {
-          const ratio = maxWidth / w;
-          w = Math.round(w * ratio);
-          h = Math.round(h * ratio);
-        }
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return resolve(dataUrl.replace(/^data:.*;base64,/, ''));
-        ctx.drawImage(img, 0, 0, w, h);
-        const compressed = canvas.toDataURL('image/jpeg', quality);
-        resolve(compressed.replace(/^data:.*;base64,/, ''));
-      };
-      img.onerror = () => resolve(dataUrl.replace(/^data:.*;base64,/, ''));
-      img.src = dataUrl;
-    });
-
-  const fileToBase64 = (file: File) =>
-    new Promise<string>((resolve, reject) => {
+  const resizeFile = (file: File, maxWidth = 1024, quality = 0.8) =>
+    new Promise<File>((resolve) => {
       const reader = new FileReader();
-      reader.onload = async () => {
-        try {
-          const result = String(reader.result || "");
-          const base64Only = await resizeImageDataUrl(result, 1024, 0.8);
-          resolve(base64Only);
-        } catch (err) {
-          reject(err);
-        }
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let { width: w, height: h } = img;
+          if (w > maxWidth) {
+            const ratio = maxWidth / w;
+            w = Math.round(w * ratio);
+            h = Math.round(h * ratio);
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return resolve(file);
+          ctx.drawImage(img, 0, 0, w, h);
+          canvas.toBlob((blob) => {
+            if (!blob) return resolve(file);
+            const newFile = new File([blob], file.name || 'avatar.jpg', { type: 'image/jpeg' });
+            resolve(newFile);
+          }, 'image/jpeg', quality);
+        };
+        img.onerror = () => resolve(file);
+        img.src = String(reader.result || '');
       };
-      reader.onerror = (e) => reject(e);
       reader.readAsDataURL(file);
     });
 
@@ -104,8 +95,9 @@ const InputsForm = ({ control, register, errors }: Props) => {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      const base64 = await fileToBase64(file);
-      field.onChange(base64);
+      const resized = await resizeFile(file, 1024, 0.8);
+      // set File directly so submission can detect and send multipart/form-data
+      field.onChange(resized);
     } catch (err) {
       console.error(err);
     }
@@ -130,9 +122,12 @@ const InputsForm = ({ control, register, errors }: Props) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     ctx.drawImage(video, 0, 0, drawW, drawH);
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-    const base64Only = dataUrl.replace(/^data:.*;base64,/, '');
-    if (currentFieldRef.current) currentFieldRef.current.onChange(base64Only);
+    canvas.toBlob(async (blob) => {
+      if (!blob) return;
+      const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
+      const resized = await resizeFile(file, 1024, 0.8);
+      if (currentFieldRef.current) currentFieldRef.current.onChange(resized);
+    }, 'image/jpeg', 0.8);
     setCameraModalOpen(false);
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((t) => t.stop());
@@ -187,14 +182,34 @@ const InputsForm = ({ control, register, errors }: Props) => {
       </Dialog>
 
       <Grid size={12}>
-        <Controller
+            <Controller
           name="avatar"
           control={control}
           render={({ field }) => {
             currentFieldRef.current = field;
-            const srcToShow = field.value
-              ? (String(field.value).trim().startsWith('data:') ? String(field.value).trim() : `data:image/jpeg;base64,${String(field.value).trim()}`)
-              : undefined;
+            const API_URL = import.meta.env.VITE_DOMAIN;
+            let srcToShow: string | undefined = undefined;
+
+            // If current value is a File -> show object URL
+            if (field.value instanceof File) {
+              try {
+                srcToShow = URL.createObjectURL(field.value);
+              } catch (e) {
+                srcToShow = undefined;
+              }
+            } else if (typeof field.value === 'string' && field.value.trim()) {
+              const v = String(field.value).trim();
+              // if it's a data URL, show as-is
+              if (v.startsWith('data:')) {
+                srcToShow = v;
+              } else if (v.startsWith('http://') || v.startsWith('https://')) {
+                // already full URL
+                srcToShow = v;
+              } else {
+                // assume it's a path from the API, prefix domain for display
+                srcToShow = `${API_URL}${v}`;
+              }
+            }
 
             return (
               <Box display="flex" alignItems="center" gap={1}>

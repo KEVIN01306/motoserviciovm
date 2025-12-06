@@ -66,6 +66,28 @@ const getMoto = async (id: motoType["id"]): Promise<motoGetType> => {
 
 const postMoto = async (moto: motoType) => {
     try {
+        // If avatar is a File (user changed image), send multipart/form-data
+        if ((moto as any).avatar instanceof File) {
+            const form = new FormData();
+            Object.entries(moto as any).forEach(([k, v]) => {
+                if (v === undefined || v === null) return;
+                if (k === 'avatar' && v instanceof File) {
+                    form.append('avatar', v);
+                    return;
+                }
+                if (Array.isArray(v) || typeof v === 'object') {
+                    form.append(k, JSON.stringify(v));
+                } else {
+                    form.append(k, String(v));
+                }
+            });
+
+            console.log(moto);
+
+            const response = await api.post<apiResponse<any>>(API_MOTOS, form, { headers: { 'Content-Type': 'multipart/form-data' } }); 
+            return response.data.data ?? "";
+        }
+
         const response = await api.post<apiResponse<any>>(API_MOTOS, moto);
         return response.data.data ?? "";
     } catch (error) {
@@ -94,7 +116,28 @@ const postMoto = async (moto: motoType) => {
 };
 
 const putMoto = async (id: motoType["id"], moto: motoType) => {
+    console.log(moto);
     try {
+        // If avatar is a File (user changed image), send multipart/form-data
+        if ((moto as any).avatar instanceof File) {
+            const form = new FormData();
+            Object.entries(moto as any).forEach(([k, v]) => {
+                if (v === undefined || v === null) return;
+                if (k === 'avatar' && v instanceof File) {
+                    form.append('avatar', v);
+                    return;
+                }
+                if (Array.isArray(v) || typeof v === 'object') {
+                    form.append(k, JSON.stringify(v));
+                } else {
+                    form.append(k, String(v));
+                }
+            });
+
+            const response = await api.put<apiResponse<any>>(`${API_MOTOS}/${id}`, form, { headers: { 'Content-Type': 'multipart/form-data' } });
+            return response.data.data ?? "";
+        }
+
         const response = await api.put<apiResponse<any>>(`${API_MOTOS}/${id}`, moto);
         return response.data.data ?? "";
     } catch (error) {

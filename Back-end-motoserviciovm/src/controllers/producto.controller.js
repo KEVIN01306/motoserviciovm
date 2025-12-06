@@ -8,6 +8,8 @@ import {
 } from "../services/producto.service.js";
 import { productoSchema } from "../zod/producto.schema.js";
 
+const directorio = '/uploads/productos/';
+
 const getProductosHandler = async (req, res) => {
     try {
         const productos = await getProductos();
@@ -48,6 +50,13 @@ const getProductoHandler = async (req, res) => {
 const postProductoHandler = async (req, res) => {
     try {
         const data = req.body;
+        if (req.file) {
+            data.imagen = directorio + req.file.filename;
+        }
+        data.estadoId = parseInt(data.estadoId);
+        data.categoriaId = parseInt(data.categoriaId);
+        data.precio = parseFloat(data.precio);
+        data.cantidad = parseInt(data.cantidad);
 
         const validationResult = productoSchema.safeParse(data);
 
@@ -77,6 +86,13 @@ const putProductoHandler = async (req, res) => {
     try {
         const { id } = req.params;
         const data = req.body;
+        if (req.file) {
+            data.imagen = directorio + req.file.filename;
+        }
+        data.estadoId = parseInt(data.estadoId);
+        data.categoriaId = parseInt(data.categoriaId);
+        data.precio = parseFloat(data.precio);
+        data.cantidad = parseInt(data.cantidad);
         const validationResult = productoSchema.safeParse(data);
         if (!validationResult.success) {
             const errorMessages = validationResult.error.issues.map(issue =>

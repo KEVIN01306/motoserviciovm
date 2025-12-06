@@ -14,6 +14,8 @@ import { CilindradaRoutes } from "../modules/Cilindrada/routes";
 import { OpcionesServiciosRoutes } from "../modules/OpcionesServicios/routes";
 import { TiposServiciosRoutes } from "../modules/TiposServicios/routes";
 import { CategoriaProductoRoutes } from "../modules/CategoriaProducto/routes";
+import { InventariosRoutes } from "../modules/Inventarios/routes";
+import { ProductosRoutes } from "../modules/Productos/routes";
 import { MotosRoutes } from "../modules/Motos/routes";
 import AuthRouteGuard from "../modules/Auth/components/AuthRouteGuard";
 
@@ -52,6 +54,8 @@ const Router = [
                     ...OpcionesServiciosRoutes,
                     ...TiposServiciosRoutes,
                     ...CategoriaProductoRoutes,
+                    ...InventariosRoutes,
+                    ...ProductosRoutes,
                     ...MarcasRoutes,
                     ...ModelosRoutes,
                     ...MotosRoutes,

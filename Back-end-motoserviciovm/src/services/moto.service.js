@@ -2,6 +2,7 @@ import prisma from "../configs/db.config.js";
 import { estados } from "../utils/estados.js";
 import fs from "fs";
 import path from "path";
+import { deleteImage } from "../utils/fileUtils.js";
 
 const fsPromises = fs.promises;
 const IMAGES_DIR = path.join(process.cwd(), "src", "imagenes", "motos");
@@ -89,8 +90,7 @@ const getMoto = async (id) => {
         error.code = 'DATA_NOT_FOUND';
         throw error;
     }
-    const avatarData = moto.avatar ? await readImageAsDataURL(moto.avatar) : null;
-    return { ...moto, avatar: avatarData };
+    return  moto ;
 }
 
 const postMoto = async (data) => {
@@ -105,14 +105,6 @@ const postMoto = async (data) => {
 
     const { users, ...motoData } = data;
 
-    // If avatar comes as base64, save it and store filename
-    if (motoData.avatar) {
-        const maybeFilename = await saveBase64ImageToFile(motoData.avatar);
-        if (maybeFilename) {
-            motoData.avatar = maybeFilename;
-        }
-    }
-
     const usersConnect = users ? users.map(userId => ({ id: userId })) : [];
 
     const newMoto = await prisma.moto.create({
@@ -124,9 +116,7 @@ const postMoto = async (data) => {
         },
     });
 
-    // Return with avatar as data URL
-    const avatarData = newMoto.avatar ? await readImageAsDataURL(newMoto.avatar) : null;
-    return { ...newMoto, avatar: avatarData };
+    return { ...newMoto };
 }
 
 const putMoto = async (id, data) => {
@@ -141,41 +131,30 @@ const putMoto = async (id, data) => {
 
     const { users, ...motoData } = data;
 
-    // If a new avatar (base64) is provided, save it and optionally remove old file
-    if (motoData.avatar) {
-        const parsed = parseBase64Image(motoData.avatar);
-        if (parsed) {
-            // save new image
-            const newFilename = await saveBase64ImageToFile(motoData.avatar);
-            if (newFilename) {
-                // delete old file if it exists and looks like a filename
-                try {
-                    if (moto.avatar) {
-                        const oldPath = path.join(IMAGES_DIR, moto.avatar);
-                        await fsPromises.unlink(oldPath).catch(() => {});
-                    }
-                } catch (err) {
-                    // ignore deletion errors
-                }
-                motoData.avatar = newFilename;
-            }
-        }
-    }
-
     const usersConnect = users ? users.map(userId => ({ id: userId })) : [];
+
+    const oldAvatar = moto.avatar;
+
+    if (oldAvatar && data.avatar && oldAvatar !== data.avatar) {
+            try {
+                await deleteImage(oldAvatar);
+            } catch (err) {
+                console.error('Failed to delete old avatar:', err);
+            }
+    }
 
     const updatedMoto = await prisma.moto.update({
         where: { id: id },
         data: {
             ...motoData,
             users: {
-                connect: usersConnect,
+                set: usersConnect,
             },
         },
     });
 
-    const avatarData = updatedMoto.avatar ? await readImageAsDataURL(updatedMoto.avatar) : null;
-    return { ...updatedMoto, avatar: avatarData };
+
+    return { ...updatedMoto };
 }
 
 const deleteMoto = async (id) => {

@@ -1,7 +1,9 @@
 import { responseError, responseSucces, responseSuccesAll } from "../helpers/response.helper.js";
 import { getMotos,getMoto,postMoto,putMoto,deleteMoto } from "../services/moto.service.js";
+import { parseArrayNumbers } from "../utils/parseArrayNumbers.js";
 import { motoSchema } from "../zod/moto.schema.js";
 
+const directorio = '/uploads/motos/';
 
 const getMotosHandler =  async (req, res) => {
     try {
@@ -43,6 +45,12 @@ const getMotoHandler =  async (req, res) => {
 const postMotoHandler =  async (req, res) => {
     try {
         const data = req.body;
+        if (req.file) {
+            data.avatar = directorio + req.file.filename;
+        }
+        data.modeloId = parseInt(data.modeloId);
+        data.estadoId = parseInt(data.estadoId);
+        data.users = parseArrayNumbers(data.users);
         const validationResult = motoSchema.safeParse(data);
 
         if (!validationResult.success) {
@@ -71,6 +79,12 @@ const putMotoHandler =  async (req, res) => {
     try {
         const { id } = req.params;
         const data = req.body;
+        if (req.file) {
+            data.avatar = directorio + req.file.filename;
+        }
+        data.modeloId = parseInt(data.modeloId);
+        data.estadoId = parseInt(data.estadoId);
+        data.users = parseArrayNumbers(data.users);
         const validationResult = motoSchema.safeParse(data);
         if (!validationResult.success) {
             const errorMessages = validationResult.error.issues.map(issue =>
@@ -90,7 +104,7 @@ const putMotoHandler =  async (req, res) => {
                 errorMessage = error.code;
                 break;
         }
-        res.status(errorCode).json({ error: errorMessage });
+        res.status(errorCode).json(responseError(errorMessage));
     }
 }
 

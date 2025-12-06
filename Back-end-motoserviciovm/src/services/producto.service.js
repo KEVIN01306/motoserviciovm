@@ -1,10 +1,12 @@
 import prisma from "../configs/db.config.js";
 import { estados } from "../utils/estados.js";
+import { deleteImage } from "../utils/fileUtils.js";
 
 const getProductos = async () => {
     const productos = await prisma.producto.findMany({
         where: { estadoId: { not: estados().inactivo } },
         orderBy: { nombre: 'asc' },
+        include: { categoria: true },
     });
     if (!productos || productos.length === 0) {
         const error = new Error('DATA_NOT_FOUND');
@@ -15,8 +17,9 @@ const getProductos = async () => {
 }
 
 const getProducto = async (id) => {
-    const producto = await prisma.producto.findUnique({
+    const producto = await prisma.producto.findFirst({
         where: { id: id, estadoId: { not: estados().inactivo } },
+        include: { categoria: true },
     });
     if (!producto) {
         const error = new Error('DATA_NOT_FOUND');
@@ -27,7 +30,7 @@ const getProducto = async (id) => {
 }
 
 const postProducto = async (data) => {
-    const existingProducto = await prisma.producto.findUnique({
+    const existingProducto = await prisma.producto.findFirst({
         where: { nombre: data.nombre },
     });
     if (existingProducto) {
@@ -42,7 +45,7 @@ const postProducto = async (data) => {
 }
 
 const putProducto = async (id, data) => {
-    const existingProducto = await prisma.producto.findUnique({
+    const existingProducto = await prisma.producto.findFirst({
         where: { id: id },
     });
     if (!existingProducto) {
@@ -50,6 +53,16 @@ const putProducto = async (id, data) => {
         error.code = 'DATA_NOT_FOUND';
         throw error;
     }
+
+    const oldImagen = existingProducto.imagen;
+    if (data.imagen && data.imagen !== oldImagen) {
+       try {
+            await deleteImage(oldImagen);
+       } catch (error) {
+            console.error('Error deleting old image:', error);
+       }
+    }
+
     const updatedProducto = await prisma.producto.update({
         where: { id: id },
         data: data,
@@ -58,8 +71,9 @@ const putProducto = async (id, data) => {
 }
 
 const deleteProducto = async (id) => {
-    const existingProducto = await prisma.producto.findUnique({
+    const existingProducto = await prisma.producto.findFirst({
         where: { id: id },
+        
     });
     if (!existingProducto) {
         const error = new Error('DATA_NOT_FOUND');
