@@ -27,7 +27,6 @@ const OpcionesServiciosCreate = () => {
       await postOpcion(payload);
       successToast(`Opción creada: ${data.opcion}`);
       reset(OpcionServicioInitialState as any);
-      goTo("/admin/opcionservicio");
     } catch (err: any) {
       errorToast(err.message);
     }

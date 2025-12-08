@@ -42,7 +42,6 @@ const TiposServiciosCreate = () => {
       await postTipo(data);
       successToast(`Tipo creado: ${data.tipo}`);
       reset(TipoServicioInitialState as any);
-      goTo("/admin/tiposervicio");
     } catch (err: any) {
       errorToast(err.message);
     }
