@@ -164,9 +164,9 @@ const ModelosList = () => {
                     <Grid size={{ xs: 8, md: 8 }} display={"flex"} flexGrow={1} alignItems={"center"} justifyContent={"end"}>
                         <Search onSearch={setSearchTerm} placeholder="Buscar modelos..." />
                     </Grid>
-                    {user?.permisos?.includes("modelos:create") && (
+                        {user?.permisos?.includes("modelos:create") && (
                         <Grid size={{ xs: 1, md: 1 }} display={"flex"} flexGrow={1} alignItems={"center"} justifyContent={"end"}>
-                            <Fab size="small" color="primary" aria-label="add" onClick={() => goTo("create")}>
+                                <Fab size="small" color="primary" aria-label="add" onClick={() => goTo("/admin/modelos/create")}>
                                 <AddIcon />
                             </Fab>
                         </Grid>

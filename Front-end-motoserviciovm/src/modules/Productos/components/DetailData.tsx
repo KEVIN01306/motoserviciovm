@@ -49,8 +49,13 @@ const DetailData = ({ producto, id }: Props) => {
               </Box>
 
               <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 1 }}>
+                <Typography sx={{ minWidth: 120, color: "#6b7280", fontWeight: 600 }}>Costo</Typography>
+                <Typography>{producto?.costo != null ? "Q "+String(producto.costo) : "-"}</Typography>
+              </Box>
+
+              <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 1 }}>
                 <Typography sx={{ minWidth: 120, color: "#6b7280", fontWeight: 600 }}>Precio</Typography>
-                <Typography>{producto?.precio != null ? String(producto.precio) : "-"}</Typography>
+                <Typography>{producto?.precio != null ? "Q "+String(producto.precio) : "-"}</Typography>
               </Box>
 
               <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 1 }}>

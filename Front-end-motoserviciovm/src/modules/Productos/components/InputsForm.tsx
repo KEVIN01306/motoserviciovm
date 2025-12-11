@@ -173,6 +173,19 @@ const InputsForm = ({ control, register, errors }: Props) => {
 
       <Grid size={12}>
         <TextField
+          {...register("costo", { valueAsNumber: true })}
+          label="Costo"
+          placeholder="0.00"
+          fullWidth
+          variant="standard"
+          type="number"
+          error={!!errors.costo}
+          helperText={errors.costo?.message}
+        />
+      </Grid>
+
+      <Grid size={12}>
+        <TextField
           {...register("precio", { valueAsNumber: true })}
           label="Precio"
           placeholder="0.00"

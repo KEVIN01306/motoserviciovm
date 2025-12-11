@@ -8,7 +8,7 @@ const getProductos = async () => {
         orderBy: { nombre: 'asc' },
         include: { categoria: true },
     });
-    if (!productos || productos.length === 0) {
+    if (!productos) {
         const error = new Error('DATA_NOT_FOUND');
         error.code = 'DATA_NOT_FOUND';
         throw error;

@@ -131,7 +131,7 @@ const CategoriaProductoList = () => {
           </Grid>
           {user?.permisos?.includes("categoriaproducto:create") && (
             <Grid size={{ xs: 1, md: 1 }} display={{ xs: "flex" }} flexGrow={1} alignItems={"center"} justifyContent={"end"}>
-              <Fab size="small" color="primary" aria-label="add" onClick={() => goTo("create")}>
+              <Fab size="small" color="primary" aria-label="add" onClick={() => goTo("/admin/categoriaproducto/create")}>
                 <AddIcon />
               </Fab>
             </Grid>

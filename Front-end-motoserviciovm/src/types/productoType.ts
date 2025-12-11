@@ -12,6 +12,7 @@ export type ProductoGetType = ProductoType & {
 export const ProductoInitialState = {
     nombre: "",
     descripcion: "",
+    costo: 0,
     precio: 0,
     imagen: "",
     cantidad: 0,
@@ -25,6 +26,7 @@ export const mergeProductoDataWithDefaults = (apiData: Partial<ProductoType>): P
     return {
         nombre: apiData.nombre ?? ProductoInitialState.nombre,
         descripcion: apiData.descripcion ?? ProductoInitialState.descripcion,
+        costo: apiData.costo ?? ProductoInitialState.costo,
         precio: apiData.precio ?? ProductoInitialState.precio,
         imagen: apiData.imagen ?? ProductoInitialState.imagen,
         cantidad: apiData.cantidad ?? ProductoInitialState.cantidad,

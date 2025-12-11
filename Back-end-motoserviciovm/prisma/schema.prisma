@@ -280,7 +280,7 @@ model Servicio {
   estadoId        Int
   estado          Estado @relation(fields: [estadoId], references: [id])
 
-  imagen          Imagen[]
+  imagen          Imagen[]  
 
   servicioItems   ServicioInventario[]
   ventas           Venta[]
@@ -370,12 +370,13 @@ model Producto {
   id              Int @id @default(autoincrement())
   nombre          String
   descripcion     String?
+  costo           Float
   precio          Float
   imagen          String?
 
   cantidad        Int
 
-  ventas          Venta[] @relation("VentaProductos")
+  ventasProductos VentaProducto[] @relation("Producto_VentaProducto")
 
   categoriaId     Int
   categoria       CategoriaProducto @relation(fields: [categoriaId], references: [id])
@@ -399,13 +400,32 @@ model Venta {
   
   total           Float
 
-  productos       Producto[] @relation("VentaProductos")
+  productos       VentaProducto[] @relation("Venta_VentaProducto")
 
   estadoId        Int
   estado          Estado @relation(fields: [estadoId], references: [id])
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+model VentaProducto {
+  id              Int @id @default(autoincrement())
+
+  ventaId         Int
+  venta           Venta @relation("Venta_VentaProducto", fields: [ventaId], references: [id])
+
+  productoId      Int
+  producto       Producto @relation("Producto_VentaProducto", fields: [productoId], references: [id])
+
+  cantidad       Int
+
+  totalProducto  Float
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([ventaId, productoId])
 }
 
 

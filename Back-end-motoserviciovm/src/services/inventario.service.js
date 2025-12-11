@@ -7,7 +7,7 @@ const getInventarios = async () => {
         orderBy: { item: 'asc' },
         
     });
-    if (!inventarios || inventarios.length === 0) {
+    if (!inventarios) {
         const error = new Error('DATA_NOT_FOUND');
         error.code = 'DATA_NOT_FOUND';
         throw error;

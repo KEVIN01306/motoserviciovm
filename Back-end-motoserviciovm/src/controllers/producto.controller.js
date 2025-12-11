@@ -55,6 +55,7 @@ const postProductoHandler = async (req, res) => {
         }
         data.estadoId = parseInt(data.estadoId);
         data.categoriaId = parseInt(data.categoriaId);
+        data.costo = parseFloat(data.costo);
         data.precio = parseFloat(data.precio);
         data.cantidad = parseInt(data.cantidad);
 
@@ -91,6 +92,7 @@ const putProductoHandler = async (req, res) => {
         }
         data.estadoId = parseInt(data.estadoId);
         data.categoriaId = parseInt(data.categoriaId);
+        data.costo = parseFloat(data.costo);
         data.precio = parseFloat(data.precio);
         data.cantidad = parseInt(data.cantidad);
         const validationResult = productoSchema.safeParse(data);

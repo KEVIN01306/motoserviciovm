@@ -6,7 +6,7 @@ const getCategoriasProducto = async () => {
         where: { estadoId: { not: estados().inactivo } },
         orderBy: { categoria: 'asc' },
     });
-    if (!categorias || categorias.length === 0) {
+    if (!categorias) {
         const error = new Error('DATA_NOT_FOUND');
         error.code = 'DATA_NOT_FOUND';
         throw error;

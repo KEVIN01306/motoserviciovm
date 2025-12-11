@@ -166,7 +166,7 @@ const MarcasList = () => {
                     </Grid>
                     {user?.permisos?.includes("marcas:create") && (
                         <Grid size={{ xs: 1, md: 1 }} display={"flex"} flexGrow={1} alignItems={"center"} justifyContent={"end"}>
-                            <Fab size="small" color="primary" aria-label="add" onClick={() => goTo("create")}>
+                            <Fab size="small" color="primary" aria-label="add" onClick={() => goTo("/admin/marcas/create")}>
                                 <AddIcon />
                             </Fab>
                         </Grid>

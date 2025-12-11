@@ -7,7 +7,7 @@ const getTiposServicio = async () => {
         orderBy: { tipo: 'asc' },
     });
 
-    if (!tipos || tipos.length === 0) {
+    if (!tipos) {
         const error = new Error('DATA_NOT_FOUND');
         error.code = 'DATA_NOT_FOUND';
         throw error;

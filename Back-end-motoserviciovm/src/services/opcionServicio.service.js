@@ -7,7 +7,7 @@ const getOpcionesServicio = async () => {
         orderBy: { opcion: 'asc' },
     });
 
-    if (!opciones || opciones.length === 0) {
+    if (!opciones) {
         const error = new Error('DATA_NOT_FOUND');
         error.code = 'DATA_NOT_FOUND';
         throw error;
