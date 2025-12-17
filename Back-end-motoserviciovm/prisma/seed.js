@@ -74,7 +74,12 @@ const PERMISOS_SEED = [
   { permiso: "inventarios:edit", modulo: "INVENTARIOS", estadoId: 1 },
   { permiso: "inventarios:detail", modulo: "INVENTARIOS", estadoId: 1 },
   { permiso: "inventarios:delete", modulo: "INVENTARIOS", estadoId: 1 },
-  
+
+  { permiso: "enparqueo:view", modulo: "ENPARQUEO", estadoId: 1 },
+  { permiso: "enparqueo:create", modulo: "ENPARQUEO", estadoId: 1 },
+  { permiso: "enparqueo:salida", modulo: "ENPARQUEO", estadoId: 1 },
+  { permiso: "enparqueo:detail", modulo: "ENPARQUEO", estadoId: 1 },
+
   { permiso: "home:view", modulo: "HOME", estadoId: 1 },
 ];
 
@@ -83,6 +88,13 @@ async function main() {
     data: [
       { id: 1, estado: 'Activo' },
       { id: 2, estado: 'Inactivo' },
+      { id: 3, estado: 'En Parqueo' },
+      { id: 4, estado: 'En Reparacion' },
+      { id: 5, estado: 'En Servicio' },
+      { id: 6, estado: 'Entregado' },
+      { id: 7, estado: 'En Espera' },
+      { id: 8, estado: 'Confirmado' },
+      { id: 9, estado: 'Cancelado' },
     ],
     skipDuplicates: true,
   });

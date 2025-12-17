@@ -24,6 +24,7 @@ const MenuItems = [
             { name: "Marcas", link: "/admin/marcas", icon: PiTrademarkRegisteredBold, permiso: "marcas:view" },
             { name: "Modelos", link: "/admin/modelos", icon: RiEBikeLine, permiso: "modelos:view" },
             { name: "Motos", link: "/admin/motos", icon: RiBikeFill, permiso: "motos:view" },
+            { name: "En Parqueo", link: "/admin/enparqueo", icon: RiBikeFill, permiso: "enparqueo:view" },
         ],
     },
     {

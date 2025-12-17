@@ -21,6 +21,6 @@ router.use('/tiposervicio', (await import('./tipoServicio.routes.js')).default);
 router.use('/categoriasproducto', (await import('./categoriaProducto.routes.js')).default);
 router.use('/productos', (await import('./producto.routes.js')).default);
 router.use('/inventarios', (await import('./inventario.routes.js')).default);
+router.use('/enParqueo', (await import('./enParqueo.routes.js')).default);
 
-    
 export default router;

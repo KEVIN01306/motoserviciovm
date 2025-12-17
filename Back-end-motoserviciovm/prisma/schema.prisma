@@ -526,3 +526,25 @@ model Cita {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
+
+model IngresosEgresos {
+  id              Int @id @default(autoincrement())
+  tipo           String
+  descripcion     String?
+  monto          Float
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+} 
+
+
+model HistorialContabilidad {
+  id              Int @id @default(autoincrement())
+  totalIngresos   Float
+  totalEgresos    Float
+  totalServicios  Float
+  totalVentas      Float
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
