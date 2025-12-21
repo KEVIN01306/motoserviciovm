@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Grid, Fab } from "@mui/material";
+import { Grid, Fab, Chip } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { RiEdit2Line } from "react-icons/ri";
 import { PiDeviceTabletFill } from "react-icons/pi";
@@ -115,10 +115,28 @@ const MotosList = () => {
         return allActions.filter((action) => user?.permisos?.includes(action.permiso));
     };
 
+    const chipColorByEstado = (estado: string) => {
+        switch (estado.toLowerCase()) {
+        case "activo":
+            return "success";
+        case "inactivo":
+            return "default";
+        case "pendiente":
+            return "warning";
+        case "en reparacion":
+            return "error";
+        case "en parqueo":
+            return "warning";
+        default:
+            return "primary";
+        }
+    };
+
     const getTableColumns = (): Column<motoGetType>[] => {
         const baseColumns: Column<motoGetType>[] = [
             { id: "placa", label: "Placa", minWidth: 150 },
             { id: "modelo", label: "Modelo", minWidth: 120, format: (v) => (v ? (v as any).modelo : "-") },
+            { id: "estado", label: "Estado", minWidth: 120, format: (v) => (v ? <Chip label={(v as any).estado} variant="outlined" color={chipColorByEstado((v as any).estado)} /> : "-") },
             {
                 id: "createdAt",
                 label: "Creado el",

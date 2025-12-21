@@ -33,10 +33,10 @@ const handleClick = (href: string) => {
       <div className="relative max-w-4xl space-y-6 z-10 p-4">
         <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight">{s.headline}</h1>
         <p className="text-xl sm:text-2xl font-light">{s.subtitle}</p>
-        <a onClick={() => handleClick('#contacto')} className="inline-block px-10 py-3 mt-6 text-lg font-bold bg-[#ff6600] rounded-lg shadow-xl hover:bg-orange-700 text-white">Agenda tu Servicio Ahora</a>
+        <a onClick={() => handleClick('#contacto')} className="inline-block px-10 py-3 mt-6 text-lg font-bold rounded-lg shadow-xl text-white" style={{ backgroundColor: 'var(--accent-red, #c62828)' }}>Agenda tu Servicio Ahora</a>
         {
             s.promo && (
-            <div className="mt-8 text-sm font-medium bg-white/15 p-3 rounded-lg border-l-4 border-[#ff6600]">{s.promo}</div>
+            <div className="mt-8 text-sm font-medium p-3 rounded-lg border-l-4" style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'var(--accent-red, #c62828)' }}>{s.promo}</div>
             )
         }
       </div>
@@ -50,7 +50,7 @@ const handleClick = (href: string) => {
 
       <div className="absolute bottom-6 flex space-x-2 z-20">
         {slides.map((_, i) => (
-          <button key={i} onClick={() => setCurrent(i)} className={`w-3 h-3 rounded-full ${i === current ? 'bg-[#ff6600] scale-110' : 'bg-white/50'}`} aria-label={`Ir a la diapositiva ${i + 1}`} />
+          <button key={i} onClick={() => setCurrent(i)} className={`w-3 h-3 rounded-full ${i === current ? 'scale-110' : ''}`} style={{ backgroundColor: i === current ? 'var(--accent-red, #c62828)' : 'rgba(255,255,255,0.5)' }} aria-label={`Ir a la diapositiva ${i + 1}`} />
         ))}
       </div>
     </section>

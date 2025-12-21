@@ -1,7 +1,10 @@
-import { Card, CardContent, Grid, Typography } from "@mui/material";
+import { Card, CardContent, Grid, Typography, Button } from "@mui/material";
 import type { EnParqueoGetType } from "../../../types/enParqueoType";
+import { useGoTo } from "../../../hooks/useGoTo";
 
 const DetailData = ({ item }: { item: EnParqueoGetType }) => {
+  const goTo = useGoTo();
+
   return (
     <Card>
       <CardContent>
@@ -25,6 +28,11 @@ const DetailData = ({ item }: { item: EnParqueoGetType }) => {
           <Grid size={6}>
             <Typography variant="subtitle2">Moto</Typography>
             <Typography>{item.moto?.placa ?? "-"}</Typography>
+            {item.moto?.id && (
+              <Button size="small" variant="outlined" sx={{ mt: 1 }} onClick={() => goTo(`/admin/motos/${item.moto.id}`)}>
+                Ver Moto
+              </Button>
+            )}
           </Grid>
           <Grid size={12}>
             <Typography variant="subtitle2">Observaciones</Typography>

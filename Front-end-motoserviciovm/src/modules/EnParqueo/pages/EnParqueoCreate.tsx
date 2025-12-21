@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useGoTo } from "../../../hooks/useGoTo";
 import BreadcrumbsRoutes from "../../../components/utils/Breadcrumbs";
+import { RiBikeFill } from "react-icons/ri";
 import FormEstructure from "../../../components/utils/FormEstructure";
 import InputsForm from "../components/InputsForm";
 import { postEnParqueo } from "../../../services/enParqueo.services";
@@ -32,7 +33,12 @@ const EnParqueoCreate = () => {
 
   return (
     <>
-      <BreadcrumbsRoutes items={[{ label: "En Parqueo", href: "/admin/enparqueo" }, { label: "Crear" }]} />
+      <BreadcrumbsRoutes
+        items={[
+          { label: "En Parqueo", icon: <RiBikeFill fontSize="inherit" />, href: "/admin/enparqueo" },
+          { label: "Crear", icon: <RiBikeFill fontSize="inherit" /> },
+        ]}
+      />
 
       <FormEstructure handleSubmit={handleSubmit(handlerSubmit)}>
         <InputsForm register={register} errors={formState.errors} control={control} />

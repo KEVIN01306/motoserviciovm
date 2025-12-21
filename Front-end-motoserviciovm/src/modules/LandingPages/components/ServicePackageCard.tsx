@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 
 const ServicePackageCard: React.FC<{ serviceName: string; description: string; items: string[]; isMajor: boolean }> = ({ serviceName, description, items, isMajor }) => {
   return (
-    <Card sx={{ p: 2, borderTop: `8px solid ${isMajor ? '#1c1c1c' : '#ff6600'}` }}>
+    <Card sx={{ p: 2, borderTop: `8px solid ${isMajor ? 'var(--accent-contrast, #000)' : 'var(--accent-red, #c62828)'}` }}>
       <CardContent>
         <div className="text-center mb-4">
           <Typography variant="h5" component="div" sx={{ fontWeight: 800 }}>
@@ -24,7 +24,7 @@ const ServicePackageCard: React.FC<{ serviceName: string; description: string; i
         </ul>
       </CardContent>
       <CardActions>
-        <Button fullWidth variant="contained" sx={{ bgcolor: isMajor ? '#1c1c1c' : '#ff6600' }} href="#contacto">
+        <Button fullWidth variant="contained" sx={{ bgcolor: 'var(--accent-red, #c62828)', color: 'var(--accent-contrast, #000)' }} href="#contacto">
           Agendar {serviceName}
         </Button>
       </CardActions>

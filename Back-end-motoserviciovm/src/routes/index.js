@@ -22,5 +22,9 @@ router.use('/categoriasproducto', (await import('./categoriaProducto.routes.js')
 router.use('/productos', (await import('./producto.routes.js')).default);
 router.use('/inventarios', (await import('./inventario.routes.js')).default);
 router.use('/enParqueo', (await import('./enParqueo.routes.js')).default);
+router.use('/enReparacion', (await import('./enReparacion.routes.js')).default);
+router.use('/repuestosReparacion', (await import('./repuestosReparacion.routes.js')).default);
+router.use('/ventas', (await import('./venta.routes.js')).default);
+router.use('/ventaProductos', (await import('./ventaProducto.routes.js')).default);
 
 export default router;

@@ -1,3 +1,4 @@
+import React from 'react';
 import LandingAppBar from './components/LandingAppBar';
 import Carousel from './components/Carousel';
 import ServicePackageCard from './components/ServicePackageCard';
@@ -48,6 +49,21 @@ type Slide = { id: number; headline: string; subtitle: string; promo: string; im
 
 // Componente principal de la aplicación
 const App = () => {
+    // theme for landing (light | dark) - local to landing only
+    const [theme, setTheme] = (React as any).useState<"light" | "dark">(() => {
+        try {
+            const s = localStorage.getItem("landing:theme");
+            return (s as any) === "dark" ? "dark" : "light";
+        } catch {
+            return "light";
+        }
+    });
+
+    const toggleTheme = () => {
+        const next = theme === "light" ? "dark" : "light";
+        setTheme(next);
+        try { localStorage.setItem("landing:theme", next); } catch {}
+    };
     // Minimal orchestration: service packages used by ServicePackageCard components
     const servicePackages = [
         {
@@ -81,8 +97,24 @@ const App = () => {
     // App orchestration only — interactive pieces live in child components
 
 
+    // palette variables: red, yellow, black, white
+    const themeStyles = {
+        backgroundColor: theme === "light" ? "#ffffff" : "#0b0b0b",
+        color: theme === "light" ? "#0b0b0b" : "#ffffff",
+        // accents
+        ["--accent-red"]: "#c62828",
+        ["--accent-yellow"]: "#FFD600",
+        ["--accent-contrast"]: theme === "light" ? "#000000" : "#ffffff",
+        // appbar and root CSS vars
+        ["--bg"]: theme === "light" ? "#ffffff" : "#0b0b0b",
+        ["--text"]: theme === "light" ? "#0b0b0b" : "#ffffff",
+        ["--appbar-border"]: theme === "light" ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.06)",
+        // slightly less dense black for 'nosotros' background
+        ["--bg-darker"]: "#0f1724",
+    } as React.CSSProperties;
+
     return (
-        <div className="font-sans text-primary-dark min-h-screen flex flex-col bg-light-gray">
+        <div style={themeStyles} className="font-sans min-h-screen flex flex-col">
             {/* Definición de animaciones CSS en línea para simular efectos MUI */}
             <style dangerouslySetInnerHTML={{ __html: `
                 @keyframes slideDown {
@@ -101,7 +133,7 @@ const App = () => {
                 }
             ` }} />
 
-            <MuiAppBar sections={sections} />
+            <MuiAppBar sections={sections} theme={theme} toggleTheme={toggleTheme} />
 
             {/* 1. Carrusel (Hero Section) */}
             <Carousel slides={carouselSlides} />
@@ -127,7 +159,7 @@ const App = () => {
 
                 <DiagnosticAI />
             </section>
-            <NosotrosSection />
+            <NosotrosSection theme={theme} />
 
             <BookingForm />
 

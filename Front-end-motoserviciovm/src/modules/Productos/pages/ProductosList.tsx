@@ -120,7 +120,7 @@ const ProductosList = () => {
                 id: "cantidad",
                 label: "Cantidad",
                 minWidth: 100,
-                format: (v) => (v != null ? String(v) : "-"),
+                format: (v) => (v != null ? <p style={{color: v == 0 ? "red" : "inherit"}}>{ String(v)}</p> : "-"),
             },
             {
                 id: "precio",

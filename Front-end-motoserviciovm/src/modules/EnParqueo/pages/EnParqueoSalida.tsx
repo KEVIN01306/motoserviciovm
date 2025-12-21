@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useGoTo } from "../../../hooks/useGoTo";
 import BreadcrumbsRoutes from "../../../components/utils/Breadcrumbs";
+import { RiBikeFill } from "react-icons/ri";
 import FormEstructure from "../../../components/utils/FormEstructure";
 import SalidaForm from "../components/SalidaForm";
 import Loading from "../../../components/utils/Loading";
@@ -34,6 +35,12 @@ const EnParqueoSalida = () => {
         if (id) {
           const data: EnParqueoGetType = await getEnParqueo(Number(id));
           setItem(data);
+          // if already entregado, redirect to detail
+          const estadoLabel = (data.estado?.estado ?? "").toLowerCase();
+          if (estadoLabel.includes("entreg") || estadoLabel.includes("salid") || estadoLabel.includes("salida")) {
+            goTo(`/admin/enparqueo/${id}`);
+            return;
+          }
           // normalize api data to form defaults using merge helper
           const merged = mergeEnParqueoDataWithDefaults(data as Partial<EnParqueoType>);
           reset(merged as any);
@@ -70,7 +77,12 @@ const EnParqueoSalida = () => {
 
   return (
     <>
-      <BreadcrumbsRoutes items={[{ label: "En Parqueo", href: "/admin/enparqueo" }, { label: "Salida" }]} />
+      <BreadcrumbsRoutes
+        items={[
+          { label: "En Parqueo", icon: <RiBikeFill fontSize="inherit" />, href: "/admin/enparqueo" },
+          { label: "Salida", icon: <RiBikeFill fontSize="inherit" /> },
+        ]}
+      />
 
       <FormEstructure handleSubmit={handleSubmit(onSubmit)}>
         <SalidaForm control={control} errors={formState.errors} readOnlyValues={item ?? undefined} register={register}/>

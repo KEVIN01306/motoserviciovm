@@ -80,6 +80,21 @@ const PERMISOS_SEED = [
   { permiso: "enparqueo:salida", modulo: "ENPARQUEO", estadoId: 1 },
   { permiso: "enparqueo:detail", modulo: "ENPARQUEO", estadoId: 1 },
 
+  { permiso: "enreparacion:view", modulo: "ENREPARACION", estadoId: 1 },
+  { permiso: "enreparacion:create", modulo: "ENREPARACION", estadoId: 1 },
+  { permiso: "enreparacion:salida", modulo: "ENREPARACION", estadoId: 1 },
+  { permiso: "enreparacion:edit", modulo: "ENREPARACION", estadoId: 1 },
+  { permiso: "enreparacion:detail", modulo: "ENREPARACION", estadoId: 1 },
+
+  { permiso: "ventas:view", modulo: "VENTAS", estadoId: 1 },
+  { permiso: "ventas:create", modulo: "VENTAS", estadoId: 1 },
+  { permiso: "ventas:edit", modulo: "VENTAS", estadoId: 1 },
+  { permiso: "ventas:detail", modulo: "VENTAS", estadoId: 1 },
+  { permiso: "ventas:finalize", modulo: "VENTAS", estadoId: 1 },
+  { permiso: "ventas:cancel", modulo: "VENTAS", estadoId: 1 },
+
+  
+  
   { permiso: "home:view", modulo: "HOME", estadoId: 1 },
 ];
 

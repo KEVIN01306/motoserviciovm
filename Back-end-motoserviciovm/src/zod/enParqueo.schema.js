@@ -9,4 +9,4 @@ export const enParqueoSchema = z.object({
     observaciones: z.string().max(500, { message: "Las observaciones no pueden exceder los 500 caracteres" }).optional().nullable(),
     motoId: z.number().int().positive({ message: "El ID de la moto debe ser un número positivo" }),
     estadoId: z.number().int().positive().optional(),
-});
+}); 

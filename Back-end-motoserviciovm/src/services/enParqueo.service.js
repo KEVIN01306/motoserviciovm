@@ -49,6 +49,25 @@ const postEnParqueo = async (data) => {
     const existingEnParqueo = await prisma.enParqueo.findFirst({
         where: { motoId: data.motoId, estadoId: estados().activo },
     });
+    const moto = await prisma.moto.findUnique({
+        where: { id: data.motoId },
+    });
+    if (!moto) {
+        const error = new Error('DATA_NOT_FOUND');
+        error.code = 'DATA_NOT_FOUND';
+        throw error;
+    }
+    if (moto.estadoId === estados().enReparacion) {
+        const error = new Error('MOTO_IN_REPARATION');
+        error.code = 'MOTO_IN_REPARATION';
+        throw error;
+    }
+
+    if (moto.estadoId === estados().enParqueo) {
+        const error = new Error('MOTO_ALREADY_IN_PARKING');
+        error.code = 'MOTO_ALREADY_IN_PARKING';
+        throw error;
+    }
 
     if (existingEnParqueo) {
         const error = new Error('CONFLICT');

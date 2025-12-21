@@ -13,11 +13,11 @@ const SalidaForm = ({ control, register, errors, readOnlyValues }: Props) => {
   return (
     <>
       <Grid size={{ xs: 12 }}>
-        <TextField fullWidth label="Placa" value={readOnlyValues?.moto?.placa ?? ""} InputProps={{ readOnly: true }} />
+        <TextField variant="standard" fullWidth label="Placa" value={readOnlyValues?.moto?.placa ?? ""} InputProps={{ readOnly: true }} />
       </Grid>
 
       <Grid size={{ xs: 12 }}>
-        <TextField fullWidth label="Descripción" value={readOnlyValues?.descripcion ?? ""} InputProps={{ readOnly: true }} />
+        <TextField variant="standard" fullWidth label="Descripción" value={readOnlyValues?.descripcion ?? ""} InputProps={{ readOnly: true }} />
       </Grid>
 
       <Grid size={{ xs: 12 }}>
@@ -38,7 +38,7 @@ const SalidaForm = ({ control, register, errors, readOnlyValues }: Props) => {
           control={control}
           name="observaciones"
           render={({ field }) => (
-            <TextField {...field} fullWidth label="Observaciones" multiline rows={3} error={!!errors?.observaciones} helperText={errors?.observaciones?.message} />
+            <TextField variant="standard" {...field} fullWidth label="Observaciones" multiline rows={3} error={!!errors?.observaciones} helperText={errors?.observaciones?.message} />
           )}
         />
       </Grid>

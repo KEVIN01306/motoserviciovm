@@ -60,7 +60,15 @@ const postEnParqueoHandler = async (req, res) => {
         let errorCode = 500;
         let errorMessage = 'INTERNAL_SERVER_ERROR';
         switch (error.code) {
-            case 'CONFLICT':
+            case 'DATA_NOT_FOUND':
+                errorCode = 404;
+                errorMessage = error.code;
+                break;
+            case 'MOTO_IN_REPARATION':
+                errorCode = 409;
+                errorMessage = error.code;
+                break;
+            case 'MOTO_ALREADY_IN_PARKING':
                 errorCode = 409;
                 errorMessage = error.code;
                 break;

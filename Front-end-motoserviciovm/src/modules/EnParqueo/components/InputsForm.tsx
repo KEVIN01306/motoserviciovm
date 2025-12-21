@@ -31,7 +31,7 @@ const InputsForm = ({ control, register, errors, setValue }: Props) => {
   return (
     <>
       <Grid size={12}>
-        <TextField fullWidth label="Descripción" {...register("descripcion")} error={!!errors.descripcion} helperText={errors.descripcion?.message} />
+        <TextField variant="standard" fullWidth label="Descripción" {...register("descripcion")} error={!!errors.descripcion} helperText={errors.descripcion?.message} />
       </Grid>
 
       <Grid size={12}>
@@ -40,6 +40,7 @@ const InputsForm = ({ control, register, errors, setValue }: Props) => {
           name="fechaEntrada"
           render={({ field }) => (
             <TextField
+              variant="standard"
               {...field}
               fullWidth
               type="date"
@@ -62,8 +63,8 @@ const InputsForm = ({ control, register, errors, setValue }: Props) => {
               getOptionLabel={(o) => o.placa || String(o.id)}
               onChange={(_, v) => field.onChange(v?.id ?? null)}
               isOptionEqualToValue={(a, b) => a.id === b.id}
-              renderInput={(params) => (
-                <TextField {...params} label="Moto (placa)" error={!!errors.motoId} helperText={errors.motoId?.message} />
+                renderInput={(params) => (
+                <TextField variant="standard" {...params} label="Moto (placa)" error={!!errors.motoId} helperText={errors.motoId?.message} />
               )}
             />
           )}

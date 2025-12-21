@@ -17,7 +17,10 @@ export interface Column<T> {
   minWidth?: number;
   type?: string;
   align?: "left" | "right" | "center";
-  actions?: { label: string | React.ReactNode ; onClick: (row: T) => void }[];
+  // actions can be a static array or a function that receives the row and returns the array
+  actions?:
+    | { label: string | React.ReactNode; onClick: (row: T) => void }[]
+    | ((row: T) => { label: string | React.ReactNode; onClick: (row: T) => void }[]);
   format?: (value: any, row?: T) => string | number | React.ReactNode;
 }
 
@@ -69,13 +72,10 @@ export default function TableCustom<T>({
                 <TableRow hover role="checkbox" tabIndex={-1} key={rowIndex}>
                   {columns.map((column) => {
                     if (column.id === "actions") {
+                      const actionsForRow = typeof column.actions === "function" ? column.actions(row) : column.actions;
                       return (
-                        <TableCell
-                          key={`actions-${rowIndex}`}
-                          align="center"
-                          sx={{ width: 80 }}
-                        >
-                          <ActionsMenu actions={column.actions!} row={row} />
+                        <TableCell key={`actions-${rowIndex}`} align="center" sx={{ width: 80 }}>
+                          <ActionsMenu actions={actionsForRow!} row={row} />
                         </TableCell>
                       );
                     }

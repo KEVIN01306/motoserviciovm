@@ -77,7 +77,13 @@ const getMotos = async () => {
 const getMoto = async (id) => {
     const moto = await prisma.moto.findUnique({
         include: {
-            modelo: true,
+            modelo: {
+                include: {
+                    marca: true,
+                    cilindrada: true,
+                    linea: true,
+            },
+        },
             users: true,
             estado: true,
         },
@@ -152,7 +158,6 @@ const putMoto = async (id, data) => {
             },
         },
     });
-
 
     return { ...updatedMoto };
 }

@@ -25,6 +25,7 @@ const MenuItems = [
             { name: "Modelos", link: "/admin/modelos", icon: RiEBikeLine, permiso: "modelos:view" },
             { name: "Motos", link: "/admin/motos", icon: RiBikeFill, permiso: "motos:view" },
             { name: "En Parqueo", link: "/admin/enparqueo", icon: RiBikeFill, permiso: "enparqueo:view" },
+            { name: "En Reparación", link: "/admin/enreparacion", icon: IoCubeSharp, permiso: "enreparacion:view" },
         ],
     },
     {
@@ -42,6 +43,7 @@ const MenuItems = [
         children: [
             { name: "Categorías de Producto", link: "/admin/categoriaproducto", icon: PiListNumbersBold, permiso: "categoriaproducto:view" },
             { name: "Productos", link: "/admin/productos", icon: IoCubeSharp, permiso: "productos:view" },
+            { name: "Ventas", link: "/admin/ventas", icon: RiProductHuntLine, permiso: "ventas:view" },
         ],
     },
     {

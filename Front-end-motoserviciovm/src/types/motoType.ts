@@ -2,12 +2,14 @@ import z from "zod";
 import { motoSchema as _motoSchema } from "../zod/moto.schema";
 import type { modeloGetType } from "./modeloType";
 import type { UserGetType } from "./userType";
+import type { EstadoType } from "./estadoType";
 
 export type motoType = z.infer<typeof _motoSchema>;
 
 export type motoGetType = Omit<motoType, "users"> & {
     modelo: modeloGetType;
     users: UserGetType[];
+    estado: EstadoType;
 };
 
 export const MotoInitialState = {

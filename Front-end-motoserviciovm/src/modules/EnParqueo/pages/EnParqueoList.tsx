@@ -76,7 +76,8 @@ const EnParqueoList = () => {
   };
 
   const getActions = () => {
-    const all = [
+    // return a function later per-row instead; keep this for compatibility
+    return [
       {
         label: (
           <>
@@ -105,7 +106,12 @@ const EnParqueoList = () => {
         permiso: "enparqueo:delete",
       },
     ];
-    return all.filter((a) => user?.permisos?.includes(a.permiso));
+  };
+
+  const isEntregado = (row: EnParqueoGetType) => {
+    const estadoLabel = (row.estado?.estado ?? "").toLowerCase();
+    // consider several possible labels for delivered/exit
+    return estadoLabel.includes("entreg") || estadoLabel.includes("salid") || estadoLabel.includes("salida");
   };
 
   const chipColorByEstado = (estado: string) => {
@@ -128,8 +134,21 @@ const EnParqueoList = () => {
       { id: "moto", label: "Moto", minWidth: 120, format: (v) => (v ? (v as any).placa : "-") },
       { id: "estado", label: "Estado", minWidth: 100, format: (v) => (v ? <Chip label={(v as any).estado} color={chipColorByEstado((v as any).estado)} variant="outlined" /> : "-") },
     ];
-    const actions = getActions();
-    if (actions.length > 0) base.push({ id: "actions", label: "Acciones", actions });
+    // For actions we provide a function that returns actions for each row, allowing per-row filtering
+    const allActions = getActions();
+    const actionsForRow = (row: EnParqueoGetType) => {
+      // map to the shape expected by Table (filter by permisos and by estado)
+      return allActions
+        .filter((a: any) => user?.permisos?.includes(a.permiso))
+        .filter((a: any) => {
+          // hide Salida action when registro is already entregado
+          if ((a.permiso as string) === "enparqueo:salida" && isEntregado(row)) return false;
+          return true;
+        })
+        .map((a: any) => ({ label: a.label, onClick: a.onClick }));
+    };
+
+    if (allActions.length > 0) base.push({ id: "actions", label: "Acciones", actions: actionsForRow });
     return base;
   };
 
