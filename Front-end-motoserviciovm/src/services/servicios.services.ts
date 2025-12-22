@@ -25,7 +25,7 @@ const getServicios = async (): Promise<ServicioGetType[]> => {
   }
 };
 
-const getServicio = async (id: string): Promise<ServicioGetType> => {
+const getServicio = async (id: number): Promise<ServicioGetType> => {
   try {
     const response = await api.get<apiResponse<ServicioGetType>>(`${API_SERVICIOS}/${id}`);
     const item = response.data.data;
@@ -57,11 +57,6 @@ const postServicio = async (payload: Partial<ServicioType> & { imagenesFiles?: F
         form.append(key, JSON.stringify(value));
         return;
       }
-      // Dates should be serialized to ISO strings
-      if (value instanceof Date) {
-        form.append(key, value.toISOString());
-        return;
-      }
       form.append(key, String(value));
     });
 
@@ -87,7 +82,7 @@ const postServicio = async (payload: Partial<ServicioType> & { imagenesFiles?: F
   }
 };
 
-const putServicio = async (id: string, payload: Partial<ServicioType> & { imagenesFiles?: File[] }) => {
+const putServicio = async (id: number, payload: Partial<ServicioType> & { imagenesFiles?: File[] }) => {
   try {
     const form = new FormData();
     Object.entries(payload).forEach(([key, value]) => {
@@ -95,10 +90,6 @@ const putServicio = async (id: string, payload: Partial<ServicioType> & { imagen
       if (key === 'imagenesFiles') return;
       if (Array.isArray(value)) {
         form.append(key, JSON.stringify(value));
-        return;
-      }
-      if (value instanceof Date) {
-        form.append(key, value.toISOString());
         return;
       }
       form.append(key, String(value));

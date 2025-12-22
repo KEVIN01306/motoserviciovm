@@ -26,7 +26,7 @@ const CategoriaProductoCreate = () => {
       await postCategoria(data);
       successToast(`Categoría creada: ${data.categoria}`);
       reset(CategoriaProductoInitialState as any);
-      goTo("/admin/categoriaproducto");
+      //goTo("/admin/categoriaproducto");
     } catch (err: any) {
       errorToast(err.message);
     }

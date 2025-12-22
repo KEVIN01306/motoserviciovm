@@ -8,10 +8,8 @@ import { type ServicioType, ServicioInitialState, ServicioProductoClienteInitial
 import { getInventarios } from '../../../services/inventario.services';
 import { getMotos } from '../../../services/moto.services';
 import { getSucursales } from '../../../services/sucursal.services';
-import { getTipos } from '../../../services/tipoServicio.services';
 import { getUsers } from '../../../services/users.services';
 import { errorToast } from '../../../utils/toast';
-import ModalConfirm from '../../../components/utils/modals/ModalConfirm';
 
 type Props = {
   initial?: Partial<ServicioType>;
@@ -30,10 +28,8 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
   const [inventarioItems, setInventarioItems] = useState<any[]>([]);
   const [motosList, setMotosList] = useState<any[]>([]);
   const [sucursalesList, setSucursalesList] = useState<any[]>([]);
-  const [tiposList, setTiposList] = useState<any[]>([]);
   const [usersList, setUsersList] = useState<any[]>([]);
   const [servicioItems, setServicioItems] = useState<ServicioItemType[]>(initial?.servicioItems ?? []);
-  const [confirmOpen, setConfirmOpen] = useState(false);
 
   useEffect(() => {
     // load draft from localStorage
@@ -49,42 +45,6 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
     }
   }, [initial, reset]);
 
-  // when initial changes (edit mode), reset form and populate derived states
-  useEffect(() => {
-    if (!initial) return;
-    try {
-      // format dates for datetime-local inputs if they're ISO strings
-      const fmt = (v: any) => {
-        if (!v) return v;
-        // if already Date, convert to local datetime-local string
-        const d = (v instanceof Date) ? v : new Date(v);
-        if (Number.isNaN(d.getTime())) return v;
-        const pad = (n: number) => String(n).padStart(2, '0');
-        const yyyy = d.getFullYear();
-        const MM = pad(d.getMonth() + 1);
-        const dd = pad(d.getDate());
-        const hh = pad(d.getHours());
-        const mm = pad(d.getMinutes());
-        return `${yyyy}-${MM}-${dd}T${hh}:${mm}`;
-      };
-
-      const toReset = {
-        ...initial,
-        fechaEntrada: fmt((initial as any).fechaEntrada),
-        fechaSalida: fmt((initial as any).fechaSalida),
-        proximaFechaServicio: fmt((initial as any).proximaFechaServicio),
-      } as any;
-
-      reset(toReset);
-      setProductosCliente(initial.productosCliente ?? []);
-      // servicioItems may come from API
-      setServicioItems(initial.servicioItems ?? (ServicioInitialState.servicioItems ?? []));
-      // imagenesMeta from API may include image URLs; use them as previews
-      setImagenesMeta((initial.imagenesMeta ?? []).map((m: any) => ({ descripcion: m.descripcion ?? '', preview: m.imagen ?? m.imagenes ?? undefined })));
-    } catch (e) { console.error(e); }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initial]);
-
   useEffect(() => {
     (async () => {
       try {
@@ -94,8 +54,6 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
         setInventarioItems(inv);
         const suc = await getSucursales();
         setSucursalesList(suc);
-        const tipos = await getTipos();
-        setTiposList(tipos);
         if (initial?.servicioItems && initial.servicioItems.length) {
           setServicioItems(initial.servicioItems as ServicioItemType[]);
         } else if (!servicioItems || servicioItems.length === 0) {
@@ -156,22 +114,6 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
     });
   };
 
-  const clearAll = () => {
-    // revoke previews
-    imagenesMeta.forEach(m => { if (m.preview) URL.revokeObjectURL(m.preview); });
-    // clear states
-    setImagenesFiles([]);
-    setImagenesMeta([]);
-    setProductosCliente([]);
-    setProductoTmp(ServicioProductoClienteInitialState);
-    setServicioItems(ServicioInitialState.servicioItems ?? []);
-    // clear draft
-    try { localStorage.removeItem(LOCAL_KEY); } catch (e) { /* ignore */ }
-    // reset form values
-    reset(ServicioInitialState as any);
-    setConfirmOpen(false);
-  };
-
   useEffect(() => {
     return () => {
       // cleanup previews
@@ -216,12 +158,6 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
         </TextField>
       </Grid>
 
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <TextField select {...register('tipoServicioId' as any)} label="Tipo de Servicio" fullWidth variant="standard">
-          <MenuItem value={0}>Seleccionar</MenuItem>
-          {tiposList.map((t: any) => (<MenuItem key={t.id} value={t.id}>{t.tipo}</MenuItem>))}
-        </TextField>
-      </Grid>
       <Grid size={{ xs: 12 }}>
         <Paper sx={{ p: 2 }}>
           <Grid container spacing={1} alignItems="center">
@@ -313,21 +249,9 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
         )}
       </Grid>
 
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <Button variant="outlined" fullWidth onClick={() => setConfirmOpen(true)}>Cancelar</Button>
-      </Grid>
-      <Grid size={{ xs: 12, sm: 6 }}>
+      <Grid size={{ xs: 12 }}>
         <Button type="submit" variant="contained" fullWidth disabled={isSubmitting}>{submitLabel}</Button>
       </Grid>
-
-      <ModalConfirm
-        open={confirmOpen}
-        title="Confirmar acción"
-        text="¿Desea mantener los datos y archivos? Presione Aceptar para mantener, Cancelar para limpiar el formulario."
-        cancel={{ name: 'Cancelar', cancel: () => clearAll(), color: 'error' }}
-        confirm={{ name: 'Aceptar', confirm: () => setConfirmOpen(false), color: 'primary' }}
-        onClose={() => setConfirmOpen(false)}
-      />
     </FormEstructure>
   );
 };
