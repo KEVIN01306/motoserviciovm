@@ -60,7 +60,8 @@ const VentasList = () => {
     const term = searchTerm.toLowerCase();
     setFilteredItems(items.filter(i =>
       String(i.id).toLowerCase().includes(term) ||
-      (i.trabajador?.primerNombre ?? '').toLowerCase().includes(term)
+      (i.usuario?.primerNombre ?? '').toLowerCase().includes(term) ||
+        (i.estado?.estado ?? '').toLowerCase().includes(term)
     ));
   }, [searchTerm, searchCodigo, items]);
 

@@ -35,6 +35,7 @@ const MenuItems = [
             { name: "Opciones de Servicio", link: "/admin/opcionservicio", icon: PiListNumbersBold, permiso: "opcioneservicios:view" },
             { name: "Tipos de Servicio", link: "/admin/tiposervicio", icon: PiListNumbersBold, permiso: "tiposervicios:view" },
             { name: "Inventarios", link: "/admin/inventarios", icon: IoCubeSharp, permiso: "inventarios:view" },
+            { name: "Servicios", link: "/admin/servicios", icon: AutoFixHighOutlined, permiso: "servicios:view" },
         ]
     },
     {

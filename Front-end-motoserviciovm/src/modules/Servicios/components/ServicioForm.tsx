@@ -1,0 +1,335 @@
+﻿import React, { useEffect, useState } from 'react';
+import { Grid, TextField, Button, MenuItem, Box, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Paper, Checkbox } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useForm } from 'react-hook-form';
+import FormEstructure from '../../../components/utils/FormEstructure';
+import { type ServicioType, ServicioInitialState, ServicioProductoClienteInitialState, type ServicioItemType } from '../../../types/servicioType';
+import { getInventarios } from '../../../services/inventario.services';
+import { getMotos } from '../../../services/moto.services';
+import { getSucursales } from '../../../services/sucursal.services';
+import { getTipos } from '../../../services/tipoServicio.services';
+import { getUsers } from '../../../services/users.services';
+import { errorToast } from '../../../utils/toast';
+import ModalConfirm from '../../../components/utils/modals/ModalConfirm';
+
+type Props = {
+  initial?: Partial<ServicioType>;
+  onSubmit: (payload: Partial<ServicioType> & { imagenesFiles?: File[] }) => Promise<void>;
+  submitLabel?: string;
+};
+
+const LOCAL_KEY = 'servicio.create.draft';
+
+const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
+  const { register, handleSubmit, reset, formState: { isSubmitting }, watch } = useForm<ServicioType>({ defaultValues: { ...(initial ?? ServicioInitialState) } as any });
+  const [productosCliente, setProductosCliente] = useState<Array<{ nombre: string; cantidad: number }>>(initial?.productosCliente ?? []);
+  const [productoTmp, setProductoTmp] = useState(ServicioProductoClienteInitialState);
+  const [imagenesFiles, setImagenesFiles] = useState<File[]>([]);
+  const [imagenesMeta, setImagenesMeta] = useState<Array<{ descripcion?: string; preview?: string }>>(initial?.imagenesMeta?.map((m:any) => ({ descripcion: m.descripcion ?? '', preview: undefined })) ?? []);
+  const [inventarioItems, setInventarioItems] = useState<any[]>([]);
+  const [motosList, setMotosList] = useState<any[]>([]);
+  const [sucursalesList, setSucursalesList] = useState<any[]>([]);
+  const [tiposList, setTiposList] = useState<any[]>([]);
+  const [usersList, setUsersList] = useState<any[]>([]);
+  const [servicioItems, setServicioItems] = useState<ServicioItemType[]>(initial?.servicioItems ?? []);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  useEffect(() => {
+    // load draft from localStorage
+    const draft = localStorage.getItem(LOCAL_KEY);
+    if (draft && !initial) {
+      try {
+        const parsed = JSON.parse(draft);
+        reset(parsed);
+        setProductosCliente(parsed.productosCliente ?? []);
+        setServicioItems(parsed.servicioItems ?? []);
+        setImagenesMeta((parsed.imagenesMeta ?? []).map((m: any) => ({ descripcion: m.descripcion ?? '' })));
+      } catch (e) { console.error(e); }
+    }
+  }, [initial, reset]);
+
+  // when initial changes (edit mode), reset form and populate derived states
+  useEffect(() => {
+    if (!initial) return;
+    try {
+      // format dates for datetime-local inputs if they're ISO strings
+      const fmt = (v: any) => {
+        if (!v) return v;
+        // if already Date, convert to local datetime-local string
+        const d = (v instanceof Date) ? v : new Date(v);
+        if (Number.isNaN(d.getTime())) return v;
+        const pad = (n: number) => String(n).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        const MM = pad(d.getMonth() + 1);
+        const dd = pad(d.getDate());
+        const hh = pad(d.getHours());
+        const mm = pad(d.getMinutes());
+        return `${yyyy}-${MM}-${dd}T${hh}:${mm}`;
+      };
+
+      const toReset = {
+        ...initial,
+        fechaEntrada: fmt((initial as any).fechaEntrada),
+        fechaSalida: fmt((initial as any).fechaSalida),
+        proximaFechaServicio: fmt((initial as any).proximaFechaServicio),
+      } as any;
+
+      reset(toReset);
+      setProductosCliente(initial.productosCliente ?? []);
+      // servicioItems may come from API
+      setServicioItems(initial.servicioItems ?? (ServicioInitialState.servicioItems ?? []));
+      // imagenesMeta from API may include image URLs; use them as previews
+      setImagenesMeta((initial.imagenesMeta ?? []).map((m: any) => ({ descripcion: m.descripcion ?? '', preview: m.imagen ?? m.imagenes ?? undefined })));
+    } catch (e) { console.error(e); }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initial]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const m = await getMotos();
+        setMotosList(m);
+        const inv = await getInventarios();
+        setInventarioItems(inv);
+        const suc = await getSucursales();
+        setSucursalesList(suc);
+        const tipos = await getTipos();
+        setTiposList(tipos);
+        if (initial?.servicioItems && initial.servicioItems.length) {
+          setServicioItems(initial.servicioItems as ServicioItemType[]);
+        } else if (!servicioItems || servicioItems.length === 0) {
+          setServicioItems(inv.map((it: any) => ({ inventarioId: it.id, checked: false, itemName: it.item ?? undefined, itemDescripcion: '' })));
+        }
+
+        const users = await getUsers();
+        setUsersList(users);
+      } catch (e) { console.error(e); }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    // persist draft: include form values, productosCliente and servicioItems
+    const subscription = watch((values) => {
+      try {
+        const draft = { ...(values ?? {}), productosCliente, servicioItems, imagenesMeta: imagenesMeta.map(m => ({ descripcion: m.descripcion })) } as any;
+        localStorage.setItem(LOCAL_KEY, JSON.stringify(draft));
+      } catch (e) { console.error(e); }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, productosCliente, servicioItems, imagenesMeta]);
+
+  const addProductoCliente = () => {
+    if (!productoTmp.nombre) return errorToast('Ingrese nombre');
+    setProductosCliente(s => [...s, { ...productoTmp }]);
+    setProductoTmp(ServicioProductoClienteInitialState);
+  };
+
+  const toggleServicioItem = (idx: number, checked: boolean) => {
+    setServicioItems(s => s.map((it, i) => i === idx ? { ...it, checked, itemDescripcion: checked ? '' : (it.itemDescripcion ?? '') } : it));
+  };
+
+  const updateServicioItem = (idx: number, patch: Partial<ServicioItemType>) => {
+    setServicioItems(s => s.map((it, i) => i === idx ? { ...it, ...patch } : it));
+  };
+
+  const removeProductoCliente = (idx: number) => setProductosCliente(s => s.filter((_, i) => i !== idx));
+
+  const onFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    // revoke previous previews
+    imagenesMeta.forEach(m => { if (m.preview) URL.revokeObjectURL(m.preview); });
+    const arr = Array.from(files);
+    setImagenesFiles(arr);
+    // initialize meta entries aligned with files and create previews
+    const metas = arr.map(f => ({ descripcion: '', preview: URL.createObjectURL(f) }));
+    setImagenesMeta(metas);
+  };
+
+  const removeImage = (idx: number) => {
+    setImagenesFiles(s => s.filter((_, i) => i !== idx));
+    setImagenesMeta(prev => {
+      const next = prev.filter((_, i) => i !== idx);
+      return next;
+    });
+  };
+
+  const clearAll = () => {
+    // revoke previews
+    imagenesMeta.forEach(m => { if (m.preview) URL.revokeObjectURL(m.preview); });
+    // clear states
+    setImagenesFiles([]);
+    setImagenesMeta([]);
+    setProductosCliente([]);
+    setProductoTmp(ServicioProductoClienteInitialState);
+    setServicioItems(ServicioInitialState.servicioItems ?? []);
+    // clear draft
+    try { localStorage.removeItem(LOCAL_KEY); } catch (e) { /* ignore */ }
+    // reset form values
+    reset(ServicioInitialState as any);
+    setConfirmOpen(false);
+  };
+
+  useEffect(() => {
+    return () => {
+      // cleanup previews
+      imagenesMeta.forEach(m => { if (m.preview) URL.revokeObjectURL(m.preview); });
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const internalSubmit = async (data: ServicioType) => {
+    const normalizedServicioItems = (servicioItems ?? []).map(it => ({ ...it, itemDescripcion: it.itemDescripcion ?? '' }));
+    const payload: Partial<ServicioType> & { imagenesFiles?: File[] } = {
+      ...data,
+      productosCliente,
+      servicioItems: normalizedServicioItems,
+      imagenesMeta: imagenesMeta.map(m => ({ descripcion: m.descripcion ?? '' })),
+      imagenesFiles,
+    };
+    await onSubmit(payload);
+  };
+
+  return (
+    <FormEstructure handleSubmit={handleSubmit(internalSubmit)} pGrid={2}>
+      <Grid size={{ xs: 12 }}>
+        <TextField {...register('descripcion' as any)} label="Descripción" fullWidth variant="standard" />
+      </Grid>
+
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <TextField {...register('fechaEntrada' as any)} label="Fecha Entrada" type="datetime-local" fullWidth variant="standard" />
+      </Grid>
+
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <TextField select {...register('motoId' as any)} label="Moto" fullWidth variant="standard">
+          <MenuItem value={0}>Seleccionar</MenuItem>
+          {motosList.map((m: any) => (<MenuItem key={m.id} value={m.id}>{m.placa}</MenuItem>))}
+        </TextField>
+      </Grid>
+
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <TextField select {...register('sucursalId' as any)} label="Sucursal" fullWidth variant="standard">
+          <MenuItem value={0}>Seleccionar</MenuItem>
+          {sucursalesList.map((s: any) => (<MenuItem key={s.id} value={s.id}>{s.nombre ?? (`Sucursal ${s.id}`)}</MenuItem>))}
+        </TextField>
+      </Grid>
+
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <TextField select {...register('tipoServicioId' as any)} label="Tipo de Servicio" fullWidth variant="standard">
+          <MenuItem value={0}>Seleccionar</MenuItem>
+          {tiposList.map((t: any) => (<MenuItem key={t.id} value={t.id}>{t.tipo}</MenuItem>))}
+        </TextField>
+      </Grid>
+      <Grid size={{ xs: 12 }}>
+        <Paper sx={{ p: 2 }}>
+          <Grid container spacing={1} alignItems="center">
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField label="Producto cliente" value={productoTmp.nombre} onChange={(e) => setProductoTmp(s => ({ ...s, nombre: e.target.value }))} fullWidth variant="standard" />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 3 }}>
+              <TextField label="Cantidad" type="number" value={productoTmp.cantidad} onChange={(e) => setProductoTmp(s => ({ ...s, cantidad: Number(e.target.value) }))} fullWidth variant="standard" />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 3 }}>
+              <Button startIcon={<AddIcon />} variant="contained" onClick={addProductoCliente} fullWidth>Agregar</Button>
+            </Grid>
+          </Grid>
+
+          <Table size="small" sx={{ mt: 2 }}>
+            <TableHead>
+              <TableRow>
+                <TableCell>Nombre</TableCell>
+                <TableCell>Cantidad</TableCell>
+                <TableCell>Acciones</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {productosCliente.map((p, idx) => (
+                <TableRow key={idx}>
+                  <TableCell>{p.nombre}</TableCell>
+                  <TableCell>{p.cantidad}</TableCell>
+                  <TableCell><IconButton onClick={() => removeProductoCliente(idx)}><DeleteIcon /></IconButton></TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Paper>
+      </Grid>
+
+      <Grid size={{ xs: 12 }}>
+        <Paper sx={{ p: 2 }}>
+          <Box sx={{ mb: 1, fontWeight: 700 }}>Items de Inventario</Box>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Item</TableCell>
+                <TableCell>Presente</TableCell>
+                <TableCell>Descripción (si no está presente)</TableCell>
+                <TableCell>Notas</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {servicioItems.map((it, idx) => {
+                const inv = inventarioItems.find(i => i.id === it.inventarioId);
+                return (
+                  <TableRow key={idx}>
+                    <TableCell>{inv?.item ?? `#${it.inventarioId}`}</TableCell>
+                    <TableCell>
+                      <Checkbox checked={!!it.checked} onChange={(e) => toggleServicioItem(idx, e.target.checked)} />
+                    </TableCell>
+                    <TableCell>
+                      <TextField fullWidth variant="standard" value={it.itemDescripcion ?? ''} onChange={(e) => updateServicioItem(idx, { itemDescripcion: e.target.value })} disabled={!!it.checked} />
+                    </TableCell>
+                    <TableCell>
+                      <TextField fullWidth variant="standard" value={it.notas ?? ''} onChange={(e) => updateServicioItem(idx, { notas: e.target.value })} />
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </Paper>
+      </Grid>
+
+      <Grid size={{ xs: 12 }}>
+        <Box sx={{ mb: 1 }}>Subir imágenes (puede usar cámara en móviles)</Box>
+        <Button variant="outlined" component="label">Seleccionar imágenes<input hidden multiple type="file" accept="image/*" capture onChange={onFiles} /></Button>
+
+        {imagenesMeta.length > 0 && (
+          <Paper sx={{ mt: 2, p: 2 }}>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+              {imagenesMeta.map((m, idx) => (
+                <Paper key={idx} sx={{ p: 1, width: 160 }}>
+                  {m.preview ? <img src={m.preview} alt={`img-${idx}`} style={{ width: '100%', height: 90, objectFit: 'cover', borderRadius: 4 }} /> : <Box sx={{ width: '100%', height: 90, bgcolor: '#f0f0f0' }} />}
+                  <TextField fullWidth size="small" placeholder="Descripción" value={m.descripcion} onChange={(e) => setImagenesMeta(s => s.map((it, i) => i === idx ? { ...it, descripcion: e.target.value } : it))} sx={{ mt: 1 }} />
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                    <IconButton size="small" onClick={() => removeImage(idx)}><DeleteIcon fontSize="small" /></IconButton>
+                  </Box>
+                </Paper>
+              ))}
+            </Box>
+          </Paper>
+        )}
+      </Grid>
+
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <Button variant="outlined" fullWidth onClick={() => setConfirmOpen(true)}>Cancelar</Button>
+      </Grid>
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <Button type="submit" variant="contained" fullWidth disabled={isSubmitting}>{submitLabel}</Button>
+      </Grid>
+
+      <ModalConfirm
+        open={confirmOpen}
+        title="Confirmar acción"
+        text="¿Desea mantener los datos y archivos? Presione Aceptar para mantener, Cancelar para limpiar el formulario."
+        cancel={{ name: 'Cancelar', cancel: () => clearAll(), color: 'error' }}
+        confirm={{ name: 'Aceptar', confirm: () => setConfirmOpen(false), color: 'primary' }}
+        onClose={() => setConfirmOpen(false)}
+      />
+    </FormEstructure>
+  );
+};
+
+export default ServicioForm;

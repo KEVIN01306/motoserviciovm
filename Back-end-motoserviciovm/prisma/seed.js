@@ -93,6 +93,10 @@ const PERMISOS_SEED = [
   { permiso: "ventas:finalize", modulo: "VENTAS", estadoId: 1 },
   { permiso: "ventas:cancel", modulo: "VENTAS", estadoId: 1 },
 
+  { permiso: "servicios:view", modulo: "SERVICIOS", estadoId: 1 },
+  { permiso: "servicios:create", modulo: "SERVICIOS", estadoId: 1 },
+  { permiso: "servicios:edit", modulo: "SERVICIOS", estadoId: 1 },
+  { permiso: "servicios:detail", modulo: "SERVICIOS", estadoId: 1 },
   
   
   { permiso: "home:view", modulo: "HOME", estadoId: 1 },

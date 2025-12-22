@@ -123,7 +123,7 @@ const VentaDetail = () => {
 
             <Divider sx={{ my: 3 }} />
 
-            {userlogged?.permisos.includes('ventas:edit') && (
+            {userlogged?.permisos.includes('ventas:edit') && data.estadoId === estados().enEspera && (
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
                 <Button variant="contained" onClick={() => goTo(String('edit'))}>Editar</Button>
               </Box>

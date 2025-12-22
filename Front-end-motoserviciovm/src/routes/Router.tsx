@@ -21,6 +21,7 @@ import { MotosRoutes } from "../modules/Motos/routes";
 import { EnParqueoRoutes } from "../modules/EnParqueo/routes";
 import { EnReparacionRoutes } from "../modules/EnReparacion/routes";
 import AuthRouteGuard from "../modules/Auth/components/AuthRouteGuard";
+import { ServiciosRoutes } from "../modules/Servicios/routes";
 
 const Home = lazy(() => import('../modules/LandingPages/index'))
 const HomePages = lazy(() => import('../modules/Home/pages/HomePages'))
@@ -65,7 +66,7 @@ const Router = [
                     ...MarcasRoutes,
                     ...ModelosRoutes,
                     ...MotosRoutes,
-
+                    ...ServiciosRoutes,
                 ]
             },
 

@@ -252,7 +252,7 @@ model Servicio {
 
   fechaEntrada    DateTime
 
-  fechaSalida     DateTime
+  fechaSalida     DateTime?
 
   total           Float
 
