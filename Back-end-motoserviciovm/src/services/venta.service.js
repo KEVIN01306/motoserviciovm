@@ -5,7 +5,7 @@ const getVentas = async () => {
     const ventas = await prisma.venta.findMany({
         where: { estadoId: { not: estados().inactivo } },
         orderBy: { createdAt: 'desc' },
-        include: { usuario: true, servicio: true, productos: { include: { producto: true } }, estado: true },
+        include: { usuario: true, servicio: true, productos: { include: { producto: true } }, estado: true,sucursal: true },
     });
     if (!ventas) {
         const error = new Error('DATA_NOT_FOUND');
@@ -18,7 +18,7 @@ const getVentas = async () => {
 const getVenta = async (id) => {
     const venta = await prisma.venta.findFirst({
         where: { id: id, estadoId: { not: estados().inactivo } },
-        include: { usuario: true, servicio: true, productos: { include: { producto: true } }, estado: true },
+        include: { usuario: true, servicio: true, productos: { include: { producto: true } }, estado: true, sucursal: true },
     });
     if (!venta) {
         const error = new Error('DATA_NOT_FOUND');

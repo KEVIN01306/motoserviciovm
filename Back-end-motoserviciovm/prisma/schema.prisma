@@ -15,8 +15,6 @@ datasource db {
 }
 
 
-
-
 model Sucursal {
   id              Int @id @default(autoincrement())
   nombre          String @unique
@@ -27,6 +25,12 @@ model Sucursal {
   usuarios        User[] @relation("UserSucursales")
   servicios       Servicio[]
   citas           Cita[]
+  ventas          Venta[]
+  repuestosReparaciones RepuestosReparacion[]
+  ingresosEgresos       IngresosEgresos[]
+  historialContabilidad HistorialContabilidad[]
+  enParqueos      EnParqueo[]
+  enReparaciones  EnReparacion[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -187,6 +191,9 @@ model Estado {
   enReparaciones  EnReparacion[]
   repuestosReparaciones RepuestosReparacion[]
   citas           Cita[]
+  ingresosEgresos IngresosEgresos[]
+
+  historialContabilidad HistorialContabilidad[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -405,12 +412,17 @@ model Venta {
   estadoId        Int
   estado          Estado @relation(fields: [estadoId], references: [id])
 
+  sucursalId     Int?
+  sucursal       Sucursal? @relation(fields: [sucursalId], references: [id])
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
 
 model VentaProducto {
   id              Int @id @default(autoincrement())
+
+  precio          Int?
 
   ventaId         Int
   venta           Venta @relation("Venta_VentaProducto", fields: [ventaId], references: [id])
@@ -447,6 +459,10 @@ model EnParqueo {
   estadoId        Int
   estado          Estado @relation(fields: [estadoId], references: [id])
 
+  sucursalId     Int?
+  sucursal       Sucursal? @relation(fields: [sucursalId], references: [id])
+
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -471,6 +487,9 @@ model EnReparacion {
   estadoId        Int
   estado          Estado @relation(fields: [estadoId], references: [id])
 
+  sucursalId     Int?
+  sucursal       Sucursal? @relation(fields: [sucursalId], references: [id])
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -486,6 +505,9 @@ model RepuestosReparacion {
   cantidad       Int
 
   checked         Boolean @default(false)
+
+  sucursalId     Int?
+  sucursal       Sucursal? @relation(fields: [sucursalId], references: [id])
 
   reparacionId    Int
   reparacion      EnReparacion @relation(fields: [reparacionId], references: [id])
@@ -527,16 +549,33 @@ model Cita {
   updatedAt       DateTime @updatedAt
 }
 
-model IngresosEgresos {
-  id              Int @id @default(autoincrement())
-  tipo           String
-  descripcion     String?
-  monto          Float
+model TipoContabilidad {
+  id            Int @id @default(autoincrement())
+  tipo          String
+
+  IngresosEgresos IngresosEgresos[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-} 
+}
 
+model IngresosEgresos {
+  id              Int @id @default(autoincrement())
+  descripcion     String?
+  monto          Float
+
+  tipoId           Int
+  tipo             TipoContabilidad @relation(fields: [tipoId],references: [id])
+
+  sucursalId     Int
+  sucursal       Sucursal @relation(fields: [sucursalId], references: [id])
+
+  estadoId        Int
+  estado          Estado @relation(fields: [estadoId], references: [id])
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
 
 model HistorialContabilidad {
   id              Int @id @default(autoincrement())
@@ -544,6 +583,13 @@ model HistorialContabilidad {
   totalEgresos    Float
   totalServicios  Float
   totalVentas      Float
+
+  sucursalId     Int
+  sucursal       Sucursal @relation(fields: [sucursalId], references: [id])
+  
+
+  estadoId        Int
+  estado          Estado @relation(fields: [estadoId], references: [id])
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

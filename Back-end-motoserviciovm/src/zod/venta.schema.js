@@ -6,4 +6,5 @@ export const ventaSchema = z.object({
     servicioId: z.number().optional().nullable(),
     total: z.number(),
     estadoId: z.number().optional(),
+    sucursalId: z.number(),
 });

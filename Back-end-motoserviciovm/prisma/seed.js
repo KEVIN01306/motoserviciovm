@@ -97,8 +97,17 @@ const PERMISOS_SEED = [
   { permiso: "servicios:create", modulo: "SERVICIOS", estadoId: 1 },
   { permiso: "servicios:edit", modulo: "SERVICIOS", estadoId: 1 },
   { permiso: "servicios:detail", modulo: "SERVICIOS", estadoId: 1 },
-  
-  
+
+  { permiso: "ingresos-egresos:create", modulo: "INGRESOSEGRESOS", estadoId: 1 },
+  { permiso: "ingresos-egresos:view", modulo: "INGRESOSEGRESOS", estadoId: 1 },
+  { permiso: "ingresos-egresos:edit", modulo: "INGRESOSEGRESOS", estadoId: 1 },
+  { permiso: "ingresos-egresos:detail", modulo: "INGRESOSEGRESOS", estadoId: 1 },
+  { permiso: "ingresos-egresos:delete", modulo: "INGRESOSEGRESOS", estadoId: 1 },
+  { permiso: "ingresos-egresos:finalize", modulo: "INGRESOSEGRESOS", estadoId: 1 },
+  { permiso: "ingresos-egresos:cancel", modulo: "INGRESOSEGRESOS", estadoId: 1 },
+
+  { permiso: "contabilidad:view", modulo: "CONTABILIDAD", estadoId: 1 },
+
   { permiso: "home:view", modulo: "HOME", estadoId: 1 },
 ];
 
@@ -118,6 +127,14 @@ async function main() {
     skipDuplicates: true,
   });
 
+  await prisma.tipoContabilidad.createMany({
+    data: [
+      { id: 1, tipo: 'Ingreso' },
+      { id: 2, tipo: 'Egreso' },
+    ],
+    skipDuplicates: true,
+  });
+  
   await prisma.permiso.createMany({
     data: PERMISOS_SEED,
     skipDuplicates: true,

@@ -27,5 +27,7 @@ router.use('/repuestosReparacion', (await import('./repuestosReparacion.routes.j
 router.use('/ventas', (await import('./venta.routes.js')).default);
 router.use('/ventaProductos', (await import('./ventaProducto.routes.js')).default);
 router.use('/servicios', (await import('./servicio.routes.js')).default);
+router.use('/contabilidad', (await import('./contabilidad.routes.js')).default);
+router.use('/ingresos-egresos', (await import('./ingresosEgresos.routes.js')).default);
 
 export default router;

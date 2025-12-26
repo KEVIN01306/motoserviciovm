@@ -1,17 +1,17 @@
-import * as React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import type { Column } from './Table';
 
 type Props<T> = {
   columns: Column<T>[];
   rows: T[];
+  footerRow?: Partial<T>; // Optional footer row
   headerColor?: string;
   /** optional maximum height for scroll */
   maxHeight?: number;
   colorHeader?: string;
 };
 
-export default function ProductsTable<T>({ columns, rows, headerColor = '#1976d2', maxHeight = 400, colorHeader = '#ffffff' }: Props<T>) {
+export default function ProductsTable<T>({ columns, rows, footerRow, headerColor = '#1976d2', maxHeight = 400, colorHeader = '#ffffff' }: Props<T>) {
   return (
     <Paper sx={{ width: '100%', overflow: 'auto', backgroundColor: '#ffffff' }} elevation={1}>
       <TableContainer sx={{ maxHeight }}>{/* white background is on Paper */}
@@ -64,6 +64,15 @@ export default function ProductsTable<T>({ columns, rows, headerColor = '#1976d2
                 })}
               </TableRow>
             ))}
+            {footerRow && (
+              <TableRow>
+                {columns.map((column) => (
+                  <TableCell key={column.id as string}>
+                    {footerRow[column.id] || ''}
+                  </TableCell>
+                ))}
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </TableContainer>

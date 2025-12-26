@@ -6,7 +6,7 @@ const login = async (data) => {
 
     const userValied = await prisma.user.findUnique({
         where: { email: data.email, password: data.password },
-        include: { roles: true }
+        include: { roles: true, sucursales: true }
     })
 
     if (!userValied) {
@@ -31,7 +31,6 @@ const login = async (data) => {
     const permisoNames = permisos.map(p => p.permiso)
 
     const token = await issueAccessToken({ sub: userValied.id, role: roleNames[0] })
-
     return {
         token,
         user: {
@@ -40,6 +39,7 @@ const login = async (data) => {
             email: userValied.email,
             roles: roleNames,
             permisos: permisoNames,
+            sucursales: userValied.sucursales,
         },
     }
 }
@@ -47,7 +47,7 @@ const login = async (data) => {
 const getMe = async (userId) => {
     const user = await prisma.user.findUnique({
         where: { id: Number(userId) },
-        include: { roles: true }
+        include: { roles: true, sucursales: true }
     })
 
     if (!user) {
@@ -72,12 +72,14 @@ const getMe = async (userId) => {
     const roleNames = user.roles.map(role => role.rol)
     const permisoNames = permisos.map(p => p.permiso)
 
+
     return {
         id: user.id,
         primerNombre: user.primerNombre,
         email: user.email,
         roles: roleNames,
         permisos: permisoNames,
+        sucursales: user.sucursales,
     }
 }
 

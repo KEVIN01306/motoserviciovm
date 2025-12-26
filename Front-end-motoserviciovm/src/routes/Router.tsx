@@ -17,11 +17,13 @@ import { CategoriaProductoRoutes } from "../modules/CategoriaProducto/routes";
 import { InventariosRoutes } from "../modules/Inventarios/routes";
 import { ProductosRoutes } from "../modules/Productos/routes";
 import { VentasRoutes } from "../modules/Ventas/routes";
+import { IngresosEgresosRoutes } from "../modules/IngresosEgresos/routes";
 import { MotosRoutes } from "../modules/Motos/routes";
 import { EnParqueoRoutes } from "../modules/EnParqueo/routes";
 import { EnReparacionRoutes } from "../modules/EnReparacion/routes";
 import AuthRouteGuard from "../modules/Auth/components/AuthRouteGuard";
 import { ServiciosRoutes } from "../modules/Servicios/routes";
+import homeRoutes from "../modules/Home/routes";
 
 const Home = lazy(() => import('../modules/LandingPages/index'))
 const HomePages = lazy(() => import('../modules/Home/pages/HomePages'))
@@ -47,7 +49,7 @@ const Router = [
                     <FullLayout />
                 ),
                 children: [
-                    { index: true, element: <HomePages/> },
+                    
 
                     ...UsersRoutes,
                     ...RolesRoutes,
@@ -63,10 +65,12 @@ const Router = [
                     ...EnReparacionRoutes,
                     ...ProductosRoutes,
                     ...VentasRoutes,
+                    ...IngresosEgresosRoutes,
                     ...MarcasRoutes,
                     ...ModelosRoutes,
                     ...MotosRoutes,
                     ...ServiciosRoutes,
+                    ...homeRoutes,
                 ]
             },
 

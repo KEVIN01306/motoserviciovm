@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Grid, TextField, Button, MenuItem, Box, Table, TableHead, TableRow, TableCell, TableBody, IconButton } from '@mui/material';
+import { Grid, TextField, Button, MenuItem, Box, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Autocomplete } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { useForm } from 'react-hook-form';
@@ -8,6 +8,8 @@ import { errorToast } from '../../../utils/toast';
 import type { VentaType, VentaProductoType, VentaProductoGetType } from '../../../types/ventaType';
 import { VentaInitialState, VentaProductoInitialState, mergeVentaDataWithDefaults, mergeVentaProductoDataWithDefaults } from '../../../types/ventaType';
 import { getProductos } from '../../../services/producto.services';
+import { getSucursales } from '../../../services/sucursal.services';
+import { useAuthStore } from '../../../store/useAuthStore';
 import type { ProductoGetType } from '../../../types/productoType';
 
 type Props = {
@@ -31,6 +33,41 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
         console.error(e);
       }
     })();
+  }, []);
+
+  const user = useAuthStore(state => state.user);
+  console.log('Logged user in VentaForm:', user);
+  const [sucursalesList, setSucursalesList] = useState<any[]>([]);
+  const [sucursalSelected, setSucursalSelected] = useState<any | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const s = await getSucursales();
+        setSucursalesList(s);
+        // default sucursal: prefer initial.sucursalId, otherwise use first sucursal of logged user (if any)
+        const defaultId = (initial && initial.sucursalId) ? initial.sucursalId : undefined;
+        if (defaultId) {
+          const foundInit = s.find((x: any) => Number(x.id) === Number(defaultId));
+          if (foundInit) {
+            setSucursalSelected(foundInit);
+            setValue('sucursalId' as any, foundInit.id);
+          }
+        } else {
+          const userSucArr = Array.isArray(user?.sucursales) ? user!.sucursales : [];
+          if (userSucArr.length > 0) {
+            const first = userSucArr[0];
+            const candidateId = typeof first === 'object' ? first?.id : Number(first);
+            const found = s.find((x: any) => Number(x.id) === Number(candidateId));
+            if (found) {
+              setSucursalSelected(found);
+              setValue('sucursalId' as any, found.id);
+            }
+          }
+        }
+      } catch (e) { console.error(e); }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const addLinea = () => {
@@ -119,21 +156,33 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
         <TextField label="Total" value={total} fullWidth variant="standard" disabled />
       </Grid>
 
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <Autocomplete
+          options={sucursalesList}
+          getOptionLabel={(o: any) => o?.nombre ?? `Sucursal ${o?.id}`}
+          value={sucursalSelected}
+          onChange={(_, n) => { setSucursalSelected(n ?? null); setValue('sucursalId' as any, n?.id ?? 0); }}
+          isOptionEqualToValue={(a: any, b: any) => Number(a?.id) === Number(b?.id)}
+          renderInput={(params) => <TextField {...params} label="Sucursal" variant="standard" fullWidth />}
+        />
+      </Grid>
+
       <Grid size={{ xs: 12 }}>
         <Grid container spacing={1} alignItems="center">
-          <Grid size={{ xs: 12, sm: 3 }}>
-            <TextField select label="Producto" value={linea.productoId ?? 0} onChange={(e) => {
-              const prodId = Number(e.target.value);
-              const prod = productosList.find(p => p.id === prodId);
-              const precio = Number(prod?.precio ?? 0);
-              const cantidad = Number(linea.cantidad ?? 0);
-              setLinea({ ...linea, productoId: prodId, totalProducto: precio * cantidad });
-            }} variant="standard" fullWidth>
-              <MenuItem value={0}>Seleccionar</MenuItem>
-              {productosList.map((p) => (
-                <MenuItem key={p.id} value={p.id} disabled={items.some(it => it.productoId === p.id)}>{p.nombre}</MenuItem>
-              ))}
-            </TextField>
+            <Grid size={{ xs: 12, sm: 3 }}>
+            <Autocomplete
+              options={productosList}
+              getOptionLabel={(o: any) => o?.nombre ?? ''}
+              onChange={(_, val) => {
+                const prodId = val ? Number(val.id) : 0;
+                const prod = productosList.find(p => p.id === prodId);
+                const precio = Number(prod?.precio ?? 0);
+                const cantidad = Number(linea.cantidad ?? 0);
+                setLinea({ ...linea, productoId: prodId, totalProducto: precio * cantidad });
+              }}
+              renderInput={(params) => <TextField {...params} label="Producto" variant="standard" fullWidth />}
+              isOptionEqualToValue={(a: any, b: any) => Number(a?.id) === Number(b?.id)}
+            />
           </Grid>
 
           <Grid size={{ xs: 12, sm: 1 }}>

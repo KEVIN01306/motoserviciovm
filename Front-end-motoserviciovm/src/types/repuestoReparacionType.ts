@@ -6,7 +6,7 @@ export type repuestoReparacionType = z.infer<typeof repuestoReparacionSchema>;
 
 export const repuestoReparacionInitialState: repuestoReparacionType = {
     nombre:     "",
-    descripcion: null,
+    descripcion: "",
     imagen:      null,
     refencia:    null,
     cantidad:    0,

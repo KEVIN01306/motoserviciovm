@@ -1,6 +1,7 @@
 import Typography from "@mui/material/Typography";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Link from "@mui/material/Link";
+import { useGoTo } from "../../hooks/useGoTo";
 
 interface BreadcrumbItem {
   label: string;
@@ -13,6 +14,7 @@ interface DynamicBreadcrumbsProps {
 }
 
 const BreadcrumbsRoutes = ({ items }: DynamicBreadcrumbsProps) => {
+  const goto = useGoTo();
   return (
     <div role="presentation">
       <Breadcrumbs aria-label="breadcrumb">
@@ -37,7 +39,7 @@ const BreadcrumbsRoutes = ({ items }: DynamicBreadcrumbsProps) => {
               underline="hover"
               sx={{ display: "flex", alignItems: "center" }}
               color="inherit"
-              href={item.href || "#"}
+              onClick={() => goto(item.href || "/")}
             >
               {item.icon && <span style={{ marginRight: 4 }}>{item.icon}</span>}
               {item.label}

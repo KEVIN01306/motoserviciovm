@@ -6,6 +6,7 @@ const router = Router();
 router.get('/', getVentaProductosHandler);
 router.get('/:id', getVentaProductoHandler);
 router.post('/', postVentaProductoHandler);
+router.post('/:id', postVentaProductoHandler);
 router.put('/:id', putVentaProductoHandler);
 router.delete('/:id', deleteVentaProductoHandler);
 

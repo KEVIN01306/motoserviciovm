@@ -1,0 +1,90 @@
+import React, { useEffect, useState } from 'react';
+import { Grid, TextField, Button, MenuItem, Autocomplete } from '@mui/material';
+import { useForm } from 'react-hook-form';
+import FormEstructure from '../../../components/utils/FormEstructure';
+import { IngresosEgresosInitialState, type IngresosEgresosType } from '../../../types/ingresosEgresos.Type';
+import { getSucursales } from '../../../services/sucursal.services';
+import { tiposContabilidad } from '../../../utils/tiposContabilidad';
+import { useAuthStore } from '../../../store/useAuthStore';
+
+type Props = {
+  initial?: Partial<IngresosEgresosType>;
+  onSubmit: (payload: IngresosEgresosType) => Promise<void>;
+  submitLabel?: string;
+};
+
+const IngresosEgresosForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
+  const { register, handleSubmit, setValue, formState: { isSubmitting } } = useForm<IngresosEgresosType>({ defaultValues: { ...(initial ?? IngresosEgresosInitialState) } as any });
+  const [sucursales, setSucursales] = useState<any[]>([]);
+  const [sucursalSelected, setSucursalSelected] = useState<any | null>(null);
+  const user = useAuthStore(state => state.user);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const s = await getSucursales();
+        setSucursales(s);
+        const defaultId = initial?.sucursalId ?? undefined;
+        if (defaultId) {
+          const found = s.find((x: any) => Number(x.id) === Number(defaultId));
+          if (found) { setSucursalSelected(found); setValue('sucursalId' as any, found.id); }
+        } else {
+          const userSucArr = Array.isArray(user?.sucursales) ? user!.sucursales : [];
+          if (userSucArr.length > 0) {
+            const first = userSucArr[0];
+            const candidateId = typeof first === 'object' ? first?.id : Number(first);
+            const found = s.find((x: any) => Number(x.id) === Number(candidateId));
+            if (found) { setSucursalSelected(found); setValue('sucursalId' as any, found.id); }
+          }
+        }
+      } catch (e) { console.error(e); }
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const internalSubmit = async (data: IngresosEgresosType) => {
+    await onSubmit({ ...data });
+  };
+
+  const tiposMap = tiposContabilidad();
+  const tipos = [
+    { id: tiposMap.ingreso, tipo: 'Ingreso' },
+    { id: tiposMap.egreso, tipo: 'Egreso' },
+  ];
+
+  return (
+    <FormEstructure handleSubmit={handleSubmit(internalSubmit)} pGrid={2}>
+      <Grid size={{ xs: 12 }}>
+        <TextField {...register('descripcion' as any)} label="Descripción" fullWidth variant="standard" />
+      </Grid>
+
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <TextField {...register('monto' as any, { valueAsNumber: true })} label="Monto" type="number" fullWidth variant="standard" />
+      </Grid>
+
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <TextField select {...register('tipoId' as any)} defaultValue={initial?.tipoId} label="Tipo" fullWidth variant="standard">
+          <MenuItem value={0}>Seleccionar</MenuItem>
+          {tipos.map(t => (<MenuItem key={t.id} value={t.id}>{t.tipo}</MenuItem>))}
+        </TextField>
+      </Grid>
+
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <Autocomplete
+          options={sucursales}
+          getOptionLabel={(o: any) => o?.nombre ?? `Sucursal ${o?.id}`}
+          value={sucursalSelected}
+          onChange={(_, n) => { setSucursalSelected(n ?? null); setValue('sucursalId' as any, n?.id ?? 0); }}
+          isOptionEqualToValue={(a: any, b: any) => Number(a?.id) === Number(b?.id)}
+          renderInput={(params) => <TextField {...params} label="Sucursal" variant="standard" fullWidth />}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12 }}>
+        <Button type="submit" variant="contained" fullWidth disabled={isSubmitting}>{submitLabel}</Button>
+      </Grid>
+    </FormEstructure>
+  );
+};
+
+export default IngresosEgresosForm;

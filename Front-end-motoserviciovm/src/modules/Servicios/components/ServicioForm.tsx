@@ -1,11 +1,13 @@
 ﻿import React, { useEffect, useState } from 'react';
-import { Grid, TextField, Button, MenuItem, Box, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Paper, Checkbox } from '@mui/material';
+import { Grid, TextField, Button, MenuItem, Box, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Paper, Checkbox, Autocomplete } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useForm } from 'react-hook-form';
+import { useAuthStore } from '../../../store/useAuthStore';
 import FormEstructure from '../../../components/utils/FormEstructure';
 import { type ServicioType, ServicioInitialState, ServicioProductoClienteInitialState, type ServicioItemType } from '../../../types/servicioType';
 import { getInventarios } from '../../../services/inventario.services';
+import { getProductos } from '../../../services/producto.services';
 import { getMotos } from '../../../services/moto.services';
 import { getSucursales } from '../../../services/sucursal.services';
 import { getUsers } from '../../../services/users.services';
@@ -20,14 +22,17 @@ type Props = {
 const LOCAL_KEY = 'servicio.create.draft';
 
 const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
-  const { register, handleSubmit, reset, formState: { isSubmitting }, watch } = useForm<ServicioType>({ defaultValues: { ...(initial ?? ServicioInitialState) } as any });
+  const { register, handleSubmit, setValue, reset, formState: { isSubmitting }, watch } = useForm<ServicioType>({ defaultValues: { ...(initial ?? ServicioInitialState) } as any });
   const [productosCliente, setProductosCliente] = useState<Array<{ nombre: string; cantidad: number }>>(initial?.productosCliente ?? []);
   const [productoTmp, setProductoTmp] = useState(ServicioProductoClienteInitialState);
+  const [productosList, setProductosList] = useState<any[]>([]);
   const [imagenesFiles, setImagenesFiles] = useState<File[]>([]);
   const [imagenesMeta, setImagenesMeta] = useState<Array<{ descripcion?: string; preview?: string }>>(initial?.imagenesMeta?.map((m:any) => ({ descripcion: m.descripcion ?? '', preview: undefined })) ?? []);
   const [inventarioItems, setInventarioItems] = useState<any[]>([]);
   const [motosList, setMotosList] = useState<any[]>([]);
   const [sucursalesList, setSucursalesList] = useState<any[]>([]);
+  const [sucursalSelected, setSucursalSelected] = useState<any | null>(null);
+  const user = useAuthStore(state => state.user);
   const [usersList, setUsersList] = useState<any[]>([]);
   const [servicioItems, setServicioItems] = useState<ServicioItemType[]>(initial?.servicioItems ?? []);
 
@@ -54,6 +59,26 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
         setInventarioItems(inv);
         const suc = await getSucursales();
         setSucursalesList(suc);
+        // set default sucursal: prefer `initial.sucursalId`, otherwise use first sucursal of logged user (if any)
+        const defaultId = (initial && initial.sucursalId) ? initial.sucursalId : undefined;
+        if (defaultId) {
+          const foundInit = suc.find((s: any) => Number(s.id) === Number(defaultId));
+          if (foundInit) {
+            setSucursalSelected(foundInit);
+            setValue('sucursalId' as any, foundInit.id);
+          }
+        } else {
+          const userSucArr = Array.isArray(user?.sucursales) ? user!.sucursales : [];
+          if (userSucArr.length > 0) {
+            const first = userSucArr[0];
+            const candidateId = typeof first === 'object' ? first?.id : Number(first);
+            const found = suc.find((s: any) => Number(s.id) === Number(candidateId));
+            if (found) {
+              setSucursalSelected(found);
+              setValue('sucursalId' as any, found.id);
+            }
+          }
+        }
         if (initial?.servicioItems && initial.servicioItems.length) {
           setServicioItems(initial.servicioItems as ServicioItemType[]);
         } else if (!servicioItems || servicioItems.length === 0) {
@@ -61,6 +86,8 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
         }
 
         const users = await getUsers();
+        const prods = await getProductos();
+        setProductosList(prods);
         setUsersList(users);
       } catch (e) { console.error(e); }
     })();
@@ -152,18 +179,32 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
       </Grid>
 
       <Grid size={{ xs: 12, sm: 6 }}>
-        <TextField select {...register('sucursalId' as any)} label="Sucursal" fullWidth variant="standard">
-          <MenuItem value={0}>Seleccionar</MenuItem>
-          {sucursalesList.map((s: any) => (<MenuItem key={s.id} value={s.id}>{s.nombre ?? (`Sucursal ${s.id}`)}</MenuItem>))}
-        </TextField>
+        <Autocomplete
+          options={sucursalesList}
+          getOptionLabel={(opt: any) => opt?.nombre ?? `Sucursal ${opt?.id}`}
+          value={sucursalSelected}
+          onChange={(_, newVal) => {
+            setSucursalSelected(newVal ?? null);
+            setValue('sucursalId' as any, newVal?.id ?? 0);
+          }}
+          isOptionEqualToValue={(option: any, value: any) => Number(option?.id) === Number(value?.id)}
+          renderInput={(params) => <TextField {...params} label="Sucursal" variant="standard" fullWidth />}
+        />
       </Grid>
 
       <Grid size={{ xs: 12 }}>
         <Paper sx={{ p: 2 }}>
           <Grid container spacing={1} alignItems="center">
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField label="Producto cliente" value={productoTmp.nombre} onChange={(e) => setProductoTmp(s => ({ ...s, nombre: e.target.value }))} fullWidth variant="standard" />
-            </Grid>
+                <Autocomplete
+                  options={productosList}
+                  getOptionLabel={(o: any) => o?.nombre ?? ''}
+                  onChange={(_, val) => setProductoTmp(s => ({ ...s, nombre: val ? (val.nombre ?? '') : '' }))}
+                  renderInput={(params) => <TextField {...params} label="Producto cliente" variant="standard" fullWidth />}
+                  freeSolo
+                  value={productosList.find(p => p.nombre === productoTmp.nombre) ?? productoTmp.nombre}
+                />
+              </Grid>
             <Grid size={{ xs: 12, sm: 3 }}>
               <TextField label="Cantidad" type="number" value={productoTmp.cantidad} onChange={(e) => setProductoTmp(s => ({ ...s, cantidad: Number(e.target.value) }))} fullWidth variant="standard" />
             </Grid>

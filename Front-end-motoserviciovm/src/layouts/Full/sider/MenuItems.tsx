@@ -13,6 +13,7 @@ const MenuItems = [
         icon: AdminPanelSettings,
         children: [
             { name: "Home", link: "/admin", icon: HomeMaxOutlined, permiso: "home:view" },
+            { name: "Contabilidad", link: "/admin/contabilidad", icon: AutoFixHighOutlined, permiso: "contabilidad:view" },
         ],
     },
     {
@@ -45,6 +46,13 @@ const MenuItems = [
             { name: "Categorías de Producto", link: "/admin/categoriaproducto", icon: PiListNumbersBold, permiso: "categoriaproducto:view" },
             { name: "Productos", link: "/admin/productos", icon: IoCubeSharp, permiso: "productos:view" },
             { name: "Ventas", link: "/admin/ventas", icon: RiProductHuntLine, permiso: "ventas:view" },
+        ],
+    },
+    {
+        module: "Ingresos/Egresos",
+        icon: PiListNumbersBold,
+        children: [
+            { name: "Ingresos/Egresos", link: "/admin/ingresos-egresos", icon: PiListNumbersBold, permiso: "ingresos-egresos:view" },
         ],
     },
     {
