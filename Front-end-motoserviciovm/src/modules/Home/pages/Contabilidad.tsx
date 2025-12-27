@@ -13,6 +13,7 @@ import type { IngresosEgresosGetType } from '../../../types/ingresosEgresos.Type
 import Loading from '../../../components/utils/Loading';
 import ErrorCard from '../../../components/utils/ErrorCard';
 import { formatDate } from '../../../utils/formatDate';
+import { tiposContabilidad } from '../../../utils/tiposContabilidad';
 
 const Contabilidad: React.FC = () => {
   const [data, setData] = useState<contabilidadTotalesType | null>(null);
@@ -61,28 +62,30 @@ const Contabilidad: React.FC = () => {
       format: (value, row) => row?.moto?.placa || '',
     },
     { id: 'updatedAt', label: 'Fecha', format: (value, row) => formatDate(row.updatedAt) },
-    { id: 'total', label: 'Total' },
+    { id: 'total', label: 'Total', format: (value) => `Q ${(value).toFixed(2)}` },
   ];
 
   const columnsVentas: Column<VentaGetType>[] = [
     { id: 'id', label: 'Código' },
     { id: 'updatedAt', label: 'Fecha', format: (value, row) => formatDate(row.updatedAt) },
-    { id: 'costo', label: 'Costo' },
-    { id: 'precioTotal', label: 'Precio' },
-    { id: 'gananciaTotal', label: 'Ganancia' },
-    { id: 'total', label: 'Monto Total' },
+    { id: 'costo', label: 'Costo', format: (value) => `Q ${(value).toFixed(2)}` },
+    { id: 'precioTotal', label: 'Precio', format: (value) => `Q ${(value).toFixed(2)}` },
+    { id: 'gananciaTotal', label: 'Ganancia', format: (value) => `Q ${(value).toFixed(2)}` },
+    { id: 'total', label: 'Monto Total', format: (value) => `Q ${(value).toFixed(2)}` },
   ];
 
   const columnsIngresosEgresos: Column<IngresosEgresosGetType>[] = [
     { id: 'descripcion', label: 'Descripción' },
     { id: 'tipo', label: 'Tipo', format: (value, row) => row.tipo?.tipo || '' },
-    { id: 'monto', label: 'Monto' },
+    { id: 'monto', label: 'Monto', format(value, row) {
+        return row?.tipoId == tiposContabilidad().ingreso ? `+ Q ${row.monto.toFixed(2)}` : `- Q ${row.monto.toFixed(2)}`;
+    }, },
   ];
 
   const metrics = [
     {
       title: 'Total Servicios',
-      value: data?.totalServicios || 0,
+      value: "Q "+(data?.totalServicios || 0).toFixed(2),
       //trend: 'up' as 'up',
       //trendValue: 5.2,
       icon: FaChartLine,
@@ -90,7 +93,7 @@ const Contabilidad: React.FC = () => {
     },
     {
       title: 'Total Ventas',
-      value: data?.totalVentas || 0,
+      value: "Q "+(data?.totalVentas || 0).toFixed(2),
       //trend: 'down' as 'down',
       //trendValue: 3.1,
       icon: FaShoppingCart,
@@ -98,7 +101,7 @@ const Contabilidad: React.FC = () => {
     },
     {
       title: 'Total Gastos',
-      value: data?.totalGastos || 0,
+      value: "Q "+(data?.totalGastos || 0).toFixed(2),
       //trend: 'down' as 'down',
       //trendValue: 2.8,
       icon: FaDollarSign,
@@ -106,7 +109,7 @@ const Contabilidad: React.FC = () => {
     },
     {
       title: 'Total Ingresos',
-      value: (data?.totalIngresosGenerales || 0),
+      value: "Q "+(data?.totalIngresosGenerales || 0).toFixed(2),
       //trend: 'up' as 'up',
       //trendValue: 4.5,
       icon: FaDollarSign,
@@ -201,7 +204,7 @@ const Contabilidad: React.FC = () => {
             columns={columnsServicios}
             footerRow={{
               placa: 'Totales',
-              total: data.servicios.reduce((sum, row) => sum + (row.total || 0), 0),
+              total: "Q " + (data.servicios.reduce((sum, row) =>  sum + (row.total || 0), 0)).toFixed(2),
             }}
           />
 
@@ -215,10 +218,10 @@ const Contabilidad: React.FC = () => {
             columns={columnsVentas}
             footerRow={{
               id: 'Totales',
-                costo: data.ventas.reduce((sum, row) => sum + (row.costo || 0), 0),
-                precioTotal: data.ventas.reduce((sum, row) => sum + (row.precioTotal || 0), 0),
-                gananciaTotal: data.ventas.reduce((sum, row) => sum + (row.gananciaTotal || 0), 0),
-              total: data.ventas.reduce((sum, row) => sum + (row.total || 0), 0),
+                costo: "Q " + (data.ventas.reduce((sum, row) => sum + (row.costo || 0), 0)).toFixed(2),
+                precioTotal: "Q " + (data.ventas.reduce((sum, row) => sum + (row.precioTotal || 0), 0)).toFixed(2),
+                gananciaTotal: "Q " + (data.ventas.reduce((sum, row) => sum + (row.gananciaTotal || 0), 0)).toFixed(2),
+              total: "Q " + (data.ventas.reduce((sum, row) => sum + (row.total || 0), 0)).toFixed(2),
             }}
           />
 
@@ -231,7 +234,7 @@ const Contabilidad: React.FC = () => {
             columns={columnsIngresosEgresos}
             footerRow={{
               descripcion: 'Totales',
-              monto: data.ingresosEgresos.reduce((sum, row) => sum + (row.monto || 0), 0),
+              monto: "Q " + (data.ingresosEgresos.reduce((sum, row) => sum + (row.monto || 0), 0)).toFixed(2),
             }}
           />
         </>

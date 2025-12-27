@@ -1,4 +1,5 @@
 import { Box, CircularProgress } from "@mui/material"
+import LoadingMoto from "./LoadginMoto";
 
 
 
@@ -14,7 +15,8 @@ const Loading = () => {
                         width: "100%",
 
                     }}>
-                <CircularProgress color="primary" />
+                {/*<CircularProgress color="primary" />*/}
+                <LoadingMoto />
             </Box>
         </>
     )
