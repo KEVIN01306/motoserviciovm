@@ -12,6 +12,7 @@ import type { VentaGetType } from '../../../types/ventaType';
 import type { IngresosEgresosGetType } from '../../../types/ingresosEgresos.Type';
 import Loading from '../../../components/utils/Loading';
 import ErrorCard from '../../../components/utils/ErrorCard';
+import { formatDate } from '../../../utils/formatDate';
 
 const Contabilidad: React.FC = () => {
   const [data, setData] = useState<contabilidadTotalesType | null>(null);
@@ -57,21 +58,24 @@ const Contabilidad: React.FC = () => {
     {
       id: 'placa' as keyof ServicioGetType,
       label: 'Placa',
-      format: (value: ServicioGetType) => (value && value.moto) ? value.moto.placa : 'N/A',
+      format: (value, row) => row?.moto?.placa || '',
     },
-    { id: 'updatedAt', label: 'Fecha', format: (value: ServicioGetType) => value?.updatedAt ? value.updatedAt.toString() : 'N/A' },
+    { id: 'updatedAt', label: 'Fecha', format: (value, row) => formatDate(row.updatedAt) },
     { id: 'total', label: 'Total' },
   ];
 
   const columnsVentas: Column<VentaGetType>[] = [
     { id: 'id', label: 'Código' },
-    { id: 'updatedAt', label: 'Fecha', format: (value: VentaGetType) => value?.updatedAt ? value.updatedAt.toString() : 'N/A' },
+    { id: 'updatedAt', label: 'Fecha', format: (value, row) => formatDate(row.updatedAt) },
+    { id: 'costo', label: 'Costo' },
+    { id: 'precioTotal', label: 'Precio' },
+    { id: 'gananciaTotal', label: 'Ganancia' },
     { id: 'total', label: 'Monto Total' },
   ];
 
   const columnsIngresosEgresos: Column<IngresosEgresosGetType>[] = [
     { id: 'descripcion', label: 'Descripción' },
-    { id: 'tipo', label: 'Tipo', format: (value: IngresosEgresosGetType) => value.tipoId},
+    { id: 'tipo', label: 'Tipo', format: (value, row) => row.tipo?.tipo || '' },
     { id: 'monto', label: 'Monto' },
   ];
 
@@ -102,7 +106,7 @@ const Contabilidad: React.FC = () => {
     },
     {
       title: 'Total Ingresos',
-      value: data?.totalIngresos || 0,
+      value: (data?.totalIngresosGenerales || 0),
       //trend: 'up' as 'up',
       //trendValue: 4.5,
       icon: FaDollarSign,
@@ -211,6 +215,9 @@ const Contabilidad: React.FC = () => {
             columns={columnsVentas}
             footerRow={{
               id: 'Totales',
+                costo: data.ventas.reduce((sum, row) => sum + (row.costo || 0), 0),
+                precioTotal: data.ventas.reduce((sum, row) => sum + (row.precioTotal || 0), 0),
+                gananciaTotal: data.ventas.reduce((sum, row) => sum + (row.gananciaTotal || 0), 0),
               total: data.ventas.reduce((sum, row) => sum + (row.total || 0), 0),
             }}
           />

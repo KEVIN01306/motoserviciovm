@@ -52,8 +52,8 @@ const postVentaWithProductos = async (data) => {
 
             const upsertData = {
                 where: { ventaId_productoId: { ventaId: createdVenta.id, productoId: p.productoId } },
-                update: { cantidad: p.cantidad, totalProducto: p.totalProducto },
-                create: { ventaId: createdVenta.id, productoId: p.productoId, cantidad: p.cantidad, totalProducto: p.totalProducto }
+                update: { cantidad: p.cantidad, totalProducto: p.totalProducto, costo: p.costo, precio: p.precio, ganacia: p.ganacia },
+                create: { ventaId: createdVenta.id, productoId: p.productoId, cantidad: p.cantidad, totalProducto: p.totalProducto, costo: prod.costo, precio: prod.precio, ganacia: (prod.precio - prod.costo) * p.cantidad}
             };
             try {
                 await prisma.ventaProducto.upsert(upsertData);
@@ -112,8 +112,8 @@ const putVentaWithProductos = async (id, data) => {
 
             const upsertData = {
                 where: { ventaId_productoId: { ventaId: id, productoId: p.productoId } },
-                update: { cantidad: p.cantidad, totalProducto: p.totalProducto },
-                create: { ventaId: id, productoId: p.productoId, cantidad: p.cantidad, totalProducto: p.totalProducto }
+                update: { cantidad: p.cantidad, totalProducto: p.totalProducto, costo: prod.costo, precio: prod.precio, ganacia: (prod.precio - prod.costo) * p.cantidad },
+                create: { ventaId: id, productoId: p.productoId, cantidad: p.cantidad, totalProducto: p.totalProducto, costo: prod.costo, precio: prod.precio, ganacia: (prod.precio - prod.costo) * p.cantidad }
             };
             try {
                 await prisma.ventaProducto.upsert(upsertData);
@@ -201,7 +201,30 @@ const patchFinalizarVenta = async (id) => {
         error.code = 'DATA_NOT_FOUND';
         throw error;
     }
-    const finalized = await prisma.venta.update({ where: { id: id }, data: { estadoId: estados().confirmado } });
+
+    const ventaProductos = await prisma.ventaProducto.findMany({
+        where: { ventaId: id },
+    });
+
+    let totalGanancia = 0;
+    let costoTotal = 0;
+    let precioTotal = 0;
+
+    for (const vp of ventaProductos) {
+        totalGanancia += vp.ganacia;
+        costoTotal += vp.costo * vp.cantidad;
+        precioTotal += vp.precio * vp.cantidad;
+    }
+
+    const finalized = await prisma.venta.update({
+        where: { id: id },
+        data: {
+            estadoId: estados().confirmado,
+            gananciaTotal: totalGanancia,
+            costo: costoTotal,
+            precioTotal: precioTotal,
+        },
+    });
     return finalized;
 }
 

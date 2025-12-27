@@ -18,5 +18,7 @@ export type contabilidadTotalesType = {
   totalVentas: number;
   totalGastos: number;
   totalIngresos: number;
+  totalGananciasVentas: number;
+  totalIngresosGenerales: number;
 }
 

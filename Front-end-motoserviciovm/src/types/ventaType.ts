@@ -14,6 +14,9 @@ export type VentaGetType = VentaType & {
     productos: VentaProductoGetType[];
     sucursal: SucursalGetType;
     estado: EstadoType;
+    costo: number;
+    precioTotal: number;
+    gananciaTotal: number;
 };
 
 export type VentaProductoType = z.infer<typeof ventaProductoSchema>;
@@ -21,6 +24,9 @@ export type VentaProductoType = z.infer<typeof ventaProductoSchema>;
 export type VentaProductoGetType = VentaProductoType & {
     usuario: UserGetType;
     producto: ProductoGetType;
+    precio: number;
+    costo: number;
+    ganancia: number;
 };
 
 export const VentaInitialState: VentaType = {

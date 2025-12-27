@@ -28,7 +28,6 @@ model Sucursal {
   ventas          Venta[]
   repuestosReparaciones RepuestosReparacion[]
   ingresosEgresos       IngresosEgresos[]
-  historialContabilidad HistorialContabilidad[]
   enParqueos      EnParqueo[]
   enReparaciones  EnReparacion[]
 
@@ -192,8 +191,6 @@ model Estado {
   repuestosReparaciones RepuestosReparacion[]
   citas           Cita[]
   ingresosEgresos IngresosEgresos[]
-
-  historialContabilidad HistorialContabilidad[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -399,6 +396,12 @@ model Producto {
 model Venta {
   id              Int @id @default(autoincrement())
 
+  costo          Float?
+
+  precioTotal     Float?
+
+  gananciaTotal   Float?
+
   usuarioId       Int
   usuario         User @relation(fields: [usuarioId], references: [id])
 
@@ -422,7 +425,11 @@ model Venta {
 model VentaProducto {
   id              Int @id @default(autoincrement())
 
-  precio          Int?
+  costo           Float?  
+
+  precio          Float?
+
+  ganacia         Float?
 
   ventaId         Int
   venta           Venta @relation("Venta_VentaProducto", fields: [ventaId], references: [id])
@@ -569,24 +576,6 @@ model IngresosEgresos {
 
   sucursalId     Int
   sucursal       Sucursal @relation(fields: [sucursalId], references: [id])
-
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-}
-
-model HistorialContabilidad {
-  id              Int @id @default(autoincrement())
-  totalIngresos   Float
-  totalEgresos    Float
-  totalServicios  Float
-  totalVentas      Float
-
-  sucursalId     Int
-  sucursal       Sucursal @relation(fields: [sucursalId], references: [id])
-  
 
   estadoId        Int
   estado          Estado @relation(fields: [estadoId], references: [id])

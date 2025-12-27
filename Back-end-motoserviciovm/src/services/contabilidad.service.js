@@ -9,8 +9,13 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
         _sum: { total: true },
     });
 
+    const totalGananciasVentas = await prisma.ventaProducto.aggregate({
+        where: { venta: { estadoId: estados().confirmado, sucursalId: { in: sucursalIds }, updatedAt: { gte: fechaInicio, lte: fechaFin } } },
+        _sum: { ganacia: true },
+    });
+
     const totalServicios = await prisma.servicio.aggregate({
-        where: { estadoId: estados().confirmado, sucursalId: { in: sucursalIds } },
+        where: { estadoId: estados().confirmado, sucursalId: { in: sucursalIds }, updatedAt: { gte: fechaInicio, lte: fechaFin } },
         _sum: { total: true },
     });
 
@@ -34,7 +39,7 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
     });
 
     const Servicios = await prisma.servicio.findMany({
-        where: { estadoId: estados().confirmado, sucursalId: { in: sucursalIds } },
+        where: { estadoId: estados().confirmado, sucursalId: { in: sucursalIds }, updatedAt: { gte: fechaInicio, lte: fechaFin } },
         include: { moto: true },
     });
 
@@ -49,6 +54,8 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
         totalVentas: totalVentas._sum.total || 0,
         totalGastos: totalGastos._sum.monto || 0,
         totalIngresos: totalIngresos._sum.monto || 0,
+        totalGananciasVentas: totalGananciasVentas._sum.ganacia || 0,
+        totalIngresosGenerales: (totalServicios._sum.total || 0) + (totalGananciasVentas._sum.ganacia || 0) + (totalIngresos._sum.monto || 0),
     };
 }
 
