@@ -1,88 +1,30 @@
+import type z from "zod";
 import { estados } from "../utils/estados";
+import { servicioItemSchema, servicioSchema } from "../zod/servicio.schema";
+import { servicioProductoClienteSchema } from "../zod/servicio.schema";
+import { imagenMetaSchema } from "../zod/servicio.schema";
+import type { motoGetType } from "./motoType";
+import type { SucursalType } from "./sucursalType";
 
-export type ServicioItemType = {
-  id?: number;
-  servicioId?: number;
-  inventarioId: number;
-  checked?: boolean;
-  itemName?: string | null;
-  itemDescripcion?: string | null;
-  notas?: string | null;
-  createdAt?: string;
-  updatedAt?: string;
-};
+export type ServicioItemType = z.infer<typeof servicioItemSchema>;
 
-export type ServicioProductoClienteType = {
-  id?: number;
-  nombre: string;
-  cantidad: number;
-  servicioId?: number;
-  createdAt?: string;
-  updatedAt?: string;
-};
+export type ServicioProductoClienteType = z.infer<typeof servicioProductoClienteSchema>;
 
-export type ImagenMetaType = {
-  descripcion?: string | null;
-};
+export type ImagenMetaType = z.infer<typeof imagenMetaSchema>
 
-export type ImagenGetType = {
+export type ImagenGetType = ImagenMetaType & {
   id: number;
   imagen: string;
-  descripcion?: string | null;
   servicioId?: number;
   createdAt?: string;
   updatedAt?: string;
 };
 
-export type MotoGetType = {
-  id: number;
-  placa?: string;
-  avatar?: string | null;
-  modeloId?: number;
-  estadoId?: number;
-  createdAt?: string;
-  updatedAt?: string;
-};
-
-export type SucursalGetType = {
-  id: number;
-  nombre?: string;
-  direccion?: string;
-  telefono?: string;
-  email?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  estadoId?: number;
-};
-
-export type ServicioType = {
-  id?: number;
-  descripcion: string;
-  fechaEntrada?: string;
-  fechaSalida?: string | null;
-  total?: number;
-  observaciones?: string | null;
-  proximaFechaServicio?: string | null;
-  descripcionProximoServicio?: string | null;
-  sucursalId: number;
-  motoId: number;
-  clienteId?: number | null;
-  mecanicoId: number;
-  tipoServicioId: number;
-  estadoId: number;
-  servicioItems?: ServicioItemType[];
-  productosCliente?: ServicioProductoClienteType[];
-  imagenesMeta?: ImagenMetaType[];
-};
+export type ServicioType = z.infer<typeof servicioSchema>
 
 export type ServicioGetType = ServicioType & {
-  createdAt?: string;
-  updatedAt?: string;
-  imagen?: ImagenGetType[];
-  servicioItems?: ServicioItemType[];
-  productosCliente?: ServicioProductoClienteType[];
-  moto?: MotoGetType;
-  sucursal?: SucursalGetType;
+  moto?: motoGetType;
+  sucursal?: SucursalType;
 };
 
 export const ServicioInitialState: ServicioType = {

@@ -2,7 +2,7 @@ import z from "zod";
 
 export const motoSchema = z.object({
     id:             z.string().optional(),
-    placa:          z.string().min(6).max(6),
+    placa:          z.string().min(7).max(7),
     // avatar can be a stored path (string) or a File when user uploads a new image
     avatar:         z.union([z.string(), z.instanceof(File)]).optional(),
     modeloId:       z.number().int(),

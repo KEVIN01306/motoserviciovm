@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { Grid, TextField, Button, MenuItem, Autocomplete } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import FormEstructure from '../../../components/utils/FormEstructure';
@@ -13,11 +13,16 @@ type Props = {
   submitLabel?: string;
 };
 
-const IngresosEgresosForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
-  const { register, handleSubmit, setValue, formState: { isSubmitting } } = useForm<IngresosEgresosType>({ defaultValues: { ...(initial ?? IngresosEgresosInitialState) } as any });
+const IngresosEgresosForm = forwardRef((props: Props, ref) => {
+  const { initial, onSubmit, submitLabel = 'Guardar' } = props;
+  const { register, handleSubmit, setValue, formState: { isSubmitting }, reset } = useForm<IngresosEgresosType>({ defaultValues: { ...(initial ?? IngresosEgresosInitialState) } as any });
   const [sucursales, setSucursales] = useState<any[]>([]);
   const [sucursalSelected, setSucursalSelected] = useState<any | null>(null);
   const user = useAuthStore(state => state.user);
+
+  useImperativeHandle(ref, () => ({
+    reset: () => reset(),
+  }));
 
   useEffect(() => {
     (async () => {
@@ -85,6 +90,6 @@ const IngresosEgresosForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Pro
       </Grid>
     </FormEstructure>
   );
-};
+});
 
 export default IngresosEgresosForm;

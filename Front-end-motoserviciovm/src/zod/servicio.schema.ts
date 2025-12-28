@@ -36,4 +36,6 @@ export const servicioSchema = z.object({
     servicioItems: z.array(servicioItemSchema).optional(),
     productosCliente: z.array(servicioProductoClienteSchema).optional(),
     imagenesMeta: z.array(imagenMetaSchema).optional(),
+    createdAt: z.date().optional(),
+    updatedAt: z.date().optional(),
 });

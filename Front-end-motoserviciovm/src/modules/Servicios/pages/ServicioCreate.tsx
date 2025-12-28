@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { Container, Card, CardContent } from '@mui/material';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiToolsLine } from 'react-icons/ri';
@@ -11,9 +11,9 @@ import { successToast, errorToast } from '../../../utils/toast';
 const ServicioCreate = () => {
   const goTo = useGoTo();
   const user = useAuthStore(s => s.user);
-  const [draft, setDraft] = React.useState<any | null>(null);
-
-  React.useEffect(() => {
+  const [draft, setDraft] = useState<any | null>(null);
+ /*
+  useEffect(() => {
     const raw = localStorage.getItem('servicio.create.draft');
     if (raw) {
       try {
@@ -27,6 +27,8 @@ const ServicioCreate = () => {
       } catch (e) { console.error(e); }
     }
   }, []);
+
+  */
 
   const handleSubmit = async (payload: any) => {
     try {
@@ -49,12 +51,10 @@ const ServicioCreate = () => {
   return (
     <>
       <BreadcrumbsRoutes items={breadcrumbs} />
-      <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-        <Card>
+      <Container >
           <CardContent>
             <ServicioForm onSubmit={handleSubmit} initial={draft ?? undefined} />
           </CardContent>
-        </Card>
       </Container>
     </>
   );

@@ -160,7 +160,7 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
     };
     await onSubmit(payload);
   };
-
+  
   return (
     <FormEstructure handleSubmit={handleSubmit(internalSubmit)} pGrid={2}>
       <Grid size={{ xs: 12 }}>
@@ -168,7 +168,7 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
       </Grid>
 
       <Grid size={{ xs: 12, sm: 6 }}>
-        <TextField {...register('fechaEntrada' as any)} label="Fecha Entrada" type="datetime-local" fullWidth variant="standard" />
+        <TextField {...register('fechaEntrada' as any)} label="Fecha Entrada" focused={true} type="datetime-local" fullWidth variant="standard" />
       </Grid>
 
       <Grid size={{ xs: 12, sm: 6 }}>
