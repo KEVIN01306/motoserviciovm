@@ -5,16 +5,19 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useForm } from 'react-hook-form';
 import { useAuthStore } from '../../../store/useAuthStore';
 import FormEstructure from '../../../components/utils/FormEstructure';
-import { type ServicioType, ServicioInitialState, ServicioProductoClienteInitialState, type ServicioItemType } from '../../../types/servicioType';
+import { type ServicioType, ServicioInitialState, ServicioProductoClienteInitialState, type ServicioItemType, type ServicioGetType } from '../../../types/servicioType';
 import { getInventarios } from '../../../services/inventario.services';
 import { getProductos } from '../../../services/producto.services';
 import { getMotos } from '../../../services/moto.services';
 import { getSucursales } from '../../../services/sucursal.services';
 import { getUsers } from '../../../services/users.services';
 import { errorToast } from '../../../utils/toast';
+import type { TipoServicioGetType } from '../../../types/tipoServicioType';
+import { getTipos } from '../../../services/tipoServicio.services';
+import type { SucursalType } from '../../../types/sucursalType';
 
 type Props = {
-  initial?: Partial<ServicioType>;
+  initial?: Partial<ServicioGetType>;
   onSubmit: (payload: Partial<ServicioType> & { imagenesFiles?: File[] }) => Promise<void>;
   submitLabel?: string;
 };
@@ -30,12 +33,15 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
   const [imagenesMeta, setImagenesMeta] = useState<Array<{ descripcion?: string; preview?: string }>>(initial?.imagenesMeta?.map((m:any) => ({ descripcion: m.descripcion ?? '', preview: undefined })) ?? []);
   const [inventarioItems, setInventarioItems] = useState<any[]>([]);
   const [motosList, setMotosList] = useState<any[]>([]);
+  const [motoSedected, setMotoSelected] = useState<any>(initial?.moto ?? null);
   const [sucursalesList, setSucursalesList] = useState<any[]>([]);
-  const [sucursalSelected, setSucursalSelected] = useState<any | null>(null);
+  const [sucursalSelected, setSucursalSelected] = useState<SucursalType | null>(initial?.sucursal ?? null);
   const user = useAuthStore(state => state.user);
   const [usersList, setUsersList] = useState<any[]>([]);
   const [servicioItems, setServicioItems] = useState<ServicioItemType[]>(initial?.servicioItems ?? []);
-
+  const [tiposServicio,setTiposServicio]=useState<TipoServicioGetType[]>([]);
+  const [tipoServicioSelected,setTipoServicioSelected]=useState<TipoServicioGetType|null>(initial?.tipoServicio ? initial.tipoServicio : null);
+/*
   useEffect(() => {
     // load draft from localStorage
     const draft = localStorage.getItem(LOCAL_KEY);
@@ -49,7 +55,7 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
       } catch (e) { console.error(e); }
     }
   }, [initial, reset]);
-
+*/
   useEffect(() => {
     (async () => {
       try {
@@ -59,6 +65,8 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
         setInventarioItems(inv);
         const suc = await getSucursales();
         setSucursalesList(suc);
+        const ts = await getTipos();
+        setTiposServicio(ts);
         // set default sucursal: prefer `initial.sucursalId`, otherwise use first sucursal of logged user (if any)
         const defaultId = (initial && initial.sucursalId) ? initial.sucursalId : undefined;
         if (defaultId) {
@@ -93,7 +101,7 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
+/*
   useEffect(() => {
     // persist draft: include form values, productosCliente and servicioItems
     const subscription = watch((values) => {
@@ -104,7 +112,7 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
     });
     return () => subscription.unsubscribe();
   }, [watch, productosCliente, servicioItems, imagenesMeta]);
-
+  */
   const addProductoCliente = () => {
     if (!productoTmp.nombre) return errorToast('Ingrese nombre');
     setProductosCliente(s => [...s, { ...productoTmp }]);
@@ -172,10 +180,17 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
       </Grid>
 
       <Grid size={{ xs: 12, sm: 6 }}>
-        <TextField select {...register('motoId' as any)} label="Moto" fullWidth variant="standard">
-          <MenuItem value={0}>Seleccionar</MenuItem>
-          {motosList.map((m: any) => (<MenuItem key={m.id} value={m.id}>{m.placa}</MenuItem>))}
-        </TextField>
+        <Autocomplete
+          options={motosList}
+          getOptionLabel={(opt: any) => opt?.placa ?? `Moto ${opt?.id}`}
+          value={motoSedected}
+          onChange={(_, newVal) => {
+            setMotoSelected(newVal ?? null);
+            setValue('motoId' as any, newVal?.id ?? 0);
+          }}
+          isOptionEqualToValue={(option: any, value: any) => Number(option?.id) === Number(value?.id)}
+          renderInput={(params) => <TextField {...params} label="Moto" variant="standard" fullWidth />}
+        />
       </Grid>
 
       <Grid size={{ xs: 12, sm: 6 }}>
@@ -192,18 +207,26 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
         />
       </Grid>
 
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <Autocomplete
+          options={tiposServicio}
+          getOptionLabel={(opt: TipoServicioGetType) => opt?.tipo ?? `Tipo Servicio ${opt?.id}`}
+          value={tipoServicioSelected}
+          onChange={(_, newVal) => {
+            setTipoServicioSelected(newVal ?? null);
+            setValue('tipoServicioId' as any, newVal?.id ?? 0);
+          }}
+          isOptionEqualToValue={(option: any, value: any) => Number(option?.id) === Number(value?.id)}
+          renderInput={(params) => <TextField {...params} label="Tipo Servicio" variant="standard" fullWidth />}
+        />
+      </Grid>
+
       <Grid size={{ xs: 12 }}>
         <Paper sx={{ p: 2 }}>
           <Grid container spacing={1} alignItems="center">
             <Grid size={{ xs: 12, sm: 6 }}>
-                <Autocomplete
-                  options={productosList}
-                  getOptionLabel={(o: any) => o?.nombre ?? ''}
-                  onChange={(_, val) => setProductoTmp(s => ({ ...s, nombre: val ? (val.nombre ?? '') : '' }))}
-                  renderInput={(params) => <TextField {...params} label="Producto cliente" variant="standard" fullWidth />}
-                  freeSolo
-                  value={productosList.find(p => p.nombre === productoTmp.nombre) ?? productoTmp.nombre}
-                />
+                <TextField label="Producto cliente" variant="standard" fullWidth value={productoTmp.nombre} onChange={(e) => setProductoTmp(s => ({ ...s, nombre: e.target.value }))} />
+                 
               </Grid>
             <Grid size={{ xs: 12, sm: 3 }}>
               <TextField label="Cantidad" type="number" value={productoTmp.cantidad} onChange={(e) => setProductoTmp(s => ({ ...s, cantidad: Number(e.target.value) }))} fullWidth variant="standard" />
@@ -269,6 +292,18 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
         </Paper>
       </Grid>
 
+        
+      <Grid size={{ xs: 12 }}>
+        <Button type="submit" variant="contained" fullWidth disabled={isSubmitting}>{submitLabel}</Button>
+      </Grid>
+    </FormEstructure>
+  );
+};
+
+export default ServicioForm;
+
+
+/*
       <Grid size={{ xs: 12 }}>
         <Box sx={{ mb: 1 }}>Subir imágenes (puede usar cámara en móviles)</Box>
         <Button variant="outlined" component="label">Seleccionar imágenes<input hidden multiple type="file" accept="image/*" capture onChange={onFiles} /></Button>
@@ -288,13 +323,4 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
             </Box>
           </Paper>
         )}
-      </Grid>
-
-      <Grid size={{ xs: 12 }}>
-        <Button type="submit" variant="contained" fullWidth disabled={isSubmitting}>{submitLabel}</Button>
-      </Grid>
-    </FormEstructure>
-  );
-};
-
-export default ServicioForm;
+      </Grid>*/

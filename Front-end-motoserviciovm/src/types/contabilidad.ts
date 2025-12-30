@@ -3,22 +3,30 @@ import type { ServicioGetType } from "./servicioType";
 import type { VentaGetType } from "./ventaType";
 
 export type contabilidadTotalesType = {
-  // Arrays de objetos (usando los tipos que ya tienes)
-  servicios: ServicioGetType[];
-  ventas: VentaGetType[];
-  ingresosEgresos: IngresosEgresosGetType[];
+        // TALLER 
+        totalServiciosTaller: number,
+        totalGastosTaller: number,
+        totalCajaTaller: number,
 
-  // Contadores
-  servicioCount: number;
-  ventaCount: number;
-  ingresosEgresosCount: number;
+        // TALLER DETALLE
+        serviciosDetalle: ServicioGetType[],
+        gastosTallerDetalle: IngresosEgresosGetType[],
 
-  // Totales financieros
-  totalServicios: number;
-  totalVentas: number;
-  totalGastos: number;
-  totalIngresos: number;
-  totalGananciasVentas: number;
-  totalIngresosGenerales: number;
+        // REPUESTOS
+        totalVentasRepuestos: number,
+        totalGananciasVentas: number,
+        totalGastosRepuestos: number,
+        totalCajaRepuestos: number,
+
+        // REPUESTOS DETALLE
+        ventasDetalle: VentaGetType[],
+        gastosRepuestosDetalle: IngresosEgresosGetType[],
+        // GENERALES
+        totalIngresos: number,
+        totalGastos: number,
+        totalCajaGeneral: number,
+
+        ingresosEgresosDetalle: IngresosEgresosGetType[],
+
 }
 

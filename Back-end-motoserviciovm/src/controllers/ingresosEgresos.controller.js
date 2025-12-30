@@ -40,6 +40,7 @@ const getIngresoEgresoHandler = async (req, res) => {
 };
 
 const postIngresoEgresoHandler = async (req, res) => {
+    console.log("POST INGRESO/EGRESO HANDLER", req.body);
     try {
         const data = req.body;
 

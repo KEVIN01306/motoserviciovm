@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Grid, Fab } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
-import { RiToolsLine } from 'react-icons/ri';
+import { RiMoneyDollarCircleLine, RiToolsLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';
 import ErrorCard from '../../../components/utils/ErrorCard';
 import Search from '../../../components/utils/Search';
@@ -13,6 +13,8 @@ import { useAuthStore } from '../../../store/useAuthStore';
 import { getServicios } from '../../../services/servicios.services';
 import type { ServicioGetType } from '../../../types/servicioType';
 import { formatDate } from '../../../utils/formatDate';
+import { PiDeviceTabletFill, PiUserCheckBold } from 'react-icons/pi';
+import { estados } from '../../../utils/estados';
 
 const ServiciosList = () => {
   const [items, setItems] = useState<ServicioGetType[]>([]);
@@ -51,8 +53,50 @@ const ServiciosList = () => {
       { id: 'total', label: 'Total', minWidth: 120 },
       { id: 'createdAt', label: 'Creado', minWidth: 160, format: (v) => formatDate(v as any) },
     ];
+
+    const actions = getTableActions();
+    if (actions.length) base.push({ id: 'actions', label: 'Acciones', actions });
+
     return base;
   };
+
+  const getTableActions = () => {
+    return (row: ServicioGetType) => {
+      const isEnEspera = row.estadoId === estados().enEspera;
+      const actions: { label: any; onClick: (r: ServicioGetType) => void; permiso: string }[] = [];
+
+      if (!isEnEspera) {
+        if (user?.permisos.includes('servicios:detail')) {
+          actions.push({ label: (<><PiDeviceTabletFill /><span className="ml-1.5">Detalle</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}`), permiso: 'ingresos-egresos:detail' });
+        }
+        return actions;
+      }
+      if (user?.permisos.includes('servicios:detail')) {
+          actions.push({ label: (<><PiDeviceTabletFill /><span className="ml-1.5">Detalle</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}`), permiso: 'servicios:detail' });
+        }
+      if (user?.permisos.includes('servicios:edit')) {
+        actions.push({ label: (<><RiMoneyDollarCircleLine /><span className="ml-1.5">Editar</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/edit`), permiso: 'servicios:edit' });
+      }
+
+      if (user?.permisos.includes('servicios:finalize')) {
+        actions.push({ label: (<><PiUserCheckBold /><span className="ml-1.5">Finalizar</span></>), onClick: async (r) => {
+          if (!window.confirm(`¿Finalizar el registro #${r.id}?`)) return;
+          alert('Funcionalidad no implementada aún');
+        }, permiso: 'servicios:finalize' });
+      }
+
+      if (user?.permisos.includes('servicios:cancel')) {
+        actions.push({ label: (<><RiMoneyDollarCircleLine /><span className="ml-1.5">Cancelar</span></>), onClick: async (r) => {
+          if (!window.confirm(`¿Cancelar el registro #${r.id}?`)) return;
+          alert('Funcionalidad no implementada aún');
+        }, permiso: 'servicios:cancel' });
+      }
+
+      return actions.filter(a => user?.permisos.includes(a.permiso));
+    };
+  };
+
+  
 
   if (loading) return <Loading />;
   if (error) return <ErrorCard errorText={error} restart={fetch} />;

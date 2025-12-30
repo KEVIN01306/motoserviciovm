@@ -24,6 +24,8 @@ export const getContabilidad = async (params: ContabilidadParams): Promise<conta
 
     const data = response.data.data;
 
+    console.log('Contabilidad API response data:', data);
+
     if (!data) {
       throw new Error('DATA_NOT_FOUND');
     }

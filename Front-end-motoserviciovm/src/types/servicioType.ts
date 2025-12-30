@@ -5,6 +5,7 @@ import { servicioProductoClienteSchema } from "../zod/servicio.schema";
 import { imagenMetaSchema } from "../zod/servicio.schema";
 import type { motoGetType } from "./motoType";
 import type { SucursalType } from "./sucursalType";
+import type { TipoServicioGetType } from "./tipoServicioType";
 
 export type ServicioItemType = z.infer<typeof servicioItemSchema>;
 
@@ -25,6 +26,7 @@ export type ServicioType = z.infer<typeof servicioSchema>
 export type ServicioGetType = ServicioType & {
   moto?: motoGetType;
   sucursal?: SucursalType;
+  tipoServicio?: TipoServicioGetType
 };
 
 export const ServicioInitialState: ServicioType = {
@@ -43,7 +45,7 @@ export const ServicioInitialState: ServicioType = {
   servicioItems: [],
   productosCliente: [],
   imagenesMeta: [],
-  estadoId: estados().activo,
+  estadoId: estados().enEspera,
 };
 
 export const ServicioItemInitialState: ServicioItemType = {

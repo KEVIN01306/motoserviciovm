@@ -1,5 +1,5 @@
 import React, { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
-import { Grid, TextField, Button, MenuItem, Autocomplete } from '@mui/material';
+import { Grid, TextField, Button, MenuItem, Autocomplete, Menu } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import FormEstructure from '../../../components/utils/FormEstructure';
 import { IngresosEgresosInitialState, type IngresosEgresosType } from '../../../types/ingresosEgresos.Type';
@@ -15,7 +15,7 @@ type Props = {
 
 const IngresosEgresosForm = forwardRef((props: Props, ref) => {
   const { initial, onSubmit, submitLabel = 'Guardar' } = props;
-  const { register, handleSubmit, setValue, formState: { isSubmitting }, reset } = useForm<IngresosEgresosType>({ defaultValues: { ...(initial ?? IngresosEgresosInitialState) } as any });
+  const { register, handleSubmit, setValue, formState: { isSubmitting }, reset, watch } = useForm<IngresosEgresosType>({ defaultValues: { ...(initial ?? IngresosEgresosInitialState) } as any });
   const [sucursales, setSucursales] = useState<any[]>([]);
   const [sucursalSelected, setSucursalSelected] = useState<any | null>(null);
   const user = useAuthStore(state => state.user);
@@ -57,6 +57,9 @@ const IngresosEgresosForm = forwardRef((props: Props, ref) => {
     { id: tiposMap.egreso, tipo: 'Egreso' },
   ];
 
+  const tipoIdWatch = watch('tipoId');
+
+
   return (
     <FormEstructure handleSubmit={handleSubmit(internalSubmit)} pGrid={2}>
       <Grid size={{ xs: 12 }}>
@@ -84,6 +87,17 @@ const IngresosEgresosForm = forwardRef((props: Props, ref) => {
           renderInput={(params) => <TextField {...params} label="Sucursal" variant="standard" fullWidth />}
         />
       </Grid>
+
+      {
+        tipoIdWatch === tiposContabilidad().egreso && (
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField select {...register('moduloTallerId' as any, { valueAsNumber: true })} defaultValue={initial?.moduloTallerId} fullWidth label="Módulo" variant="standard" >
+             <MenuItem selected value={1}>Taller</MenuItem>
+             <MenuItem value={2}>Repuestos</MenuItem>
+            </TextField>
+          </Grid>
+        )
+      }
 
       <Grid size={{ xs: 12 }}>
         <Button type="submit" variant="contained" fullWidth disabled={isSubmitting}>{submitLabel}</Button>

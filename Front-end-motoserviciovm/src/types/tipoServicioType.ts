@@ -12,6 +12,7 @@ export const TipoServicioInitialState = {
     tipo: "",
     descripcion: "",
     opcionServicios: [],
+    servicioCompleto: false,
     estadoId: 1,
 };
 
@@ -25,5 +26,6 @@ export const mergeTipoServicioDataWithDefaults = (apiData: Partial<TipoServicioG
             map((opcion: OpcionServicioType) => (opcion.id !== undefined ? Number(opcion.id) : undefined))
             .filter((id): id is number => typeof id === 'number' && !Number.isNaN(id)),
         estadoId: apiData.estadoId ?? TipoServicioInitialState.estadoId,
+        servicioCompleto: apiData.servicioCompleto ?? TipoServicioInitialState.servicioCompleto,
     };
 }

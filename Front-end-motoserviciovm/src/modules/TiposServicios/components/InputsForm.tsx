@@ -1,4 +1,4 @@
-import { Autocomplete, Checkbox, Grid, TextField } from "@mui/material";
+import { Autocomplete, Checkbox, FormControlLabel, FormLabel, Grid, TextField } from "@mui/material";
 import { Controller, type Control, type FieldErrors, type UseFormRegister, type UseFormSetValue, type UseFormWatch } from "react-hook-form";
 import type { TipoServicioType } from "../../../types/tipoServicioType";
 import type { OpcionServicioType } from "../../../types/opcionServicioType";
@@ -90,6 +90,19 @@ const InputsForm = ({ register, errors, control, watch, setValue, opciones }: In
                         );
                     }}
                 />
+            </Grid>
+
+            <Grid>
+                <Controller name="servicioCompleto" control={control} render={({field}) => (
+                    <FormControlLabel 
+                       label="¿Es un servicio completo?"
+                        control={
+                            <Checkbox  {...field} checked={field.value} onChange={(e: any) => field.onChange(e.target.checked)} />
+                        }
+                    />
+                )}>
+
+                </Controller>
             </Grid>
 
             <Grid size={{ xs: 12 }}>

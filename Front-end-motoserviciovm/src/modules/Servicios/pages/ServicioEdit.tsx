@@ -9,10 +9,11 @@ import ServicioForm from '../components/ServicioForm';
 import { getServicio, putServicio } from '../../../services/servicios.services';
 import { useGoTo } from '../../../hooks/useGoTo';
 import { successToast, errorToast } from '../../../utils/toast';
+import type { ServicioGetType } from '../../../types/servicioType';
 
 const ServicioEdit = () => {
   const { id } = useParams();
-  const [data, setData] = useState<any | null>(null);
+  const [data, setData] = useState<ServicioGetType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const goTo = useGoTo();
@@ -51,12 +52,10 @@ const ServicioEdit = () => {
   return (
     <>
       <BreadcrumbsRoutes items={breadcrumbs} />
-      <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-        <Card>
+      <Container sx={{ mt: 4, mb: 4 }}>
           <CardContent>
             <ServicioForm initial={data} onSubmit={handleSubmit} submitLabel="Actualizar" />
           </CardContent>
-        </Card>
       </Container>
     </>
   );

@@ -229,6 +229,8 @@ model TipoServicio {
 
   servicios       Servicio[]
 
+  servicioCompleto  Boolean? @default(false)
+
   estadoId        Int
   estado          Estado @relation(fields: [estadoId], references: [id])
 
@@ -566,6 +568,16 @@ model TipoContabilidad {
   updatedAt       DateTime @updatedAt
 }
 
+model ModuloTaller {
+  id              Int @id @default(autoincrement())
+  modulo          String @unique
+
+  IngresosEgresos IngresosEgresos[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
 model IngresosEgresos {
   id              Int @id @default(autoincrement())
   descripcion     String?
@@ -573,6 +585,9 @@ model IngresosEgresos {
 
   tipoId           Int
   tipo             TipoContabilidad @relation(fields: [tipoId],references: [id])
+
+  moduloTallerId   Int?
+  moduloTaller     ModuloTaller? @relation(fields: [moduloTallerId], references: [id])
 
   sucursalId     Int
   sucursal       Sucursal @relation(fields: [sucursalId], references: [id])

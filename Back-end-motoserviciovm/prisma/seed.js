@@ -135,6 +135,14 @@ async function main() {
     skipDuplicates: true,
   });
   
+  await prisma.moduloTaller.createMany({
+    data: [
+      { id: 1, modulo: 'CONTROL TALLER' },
+      { id: 2, modulo: 'CONTROL REPUESTOS' },
+    ],
+    skipDuplicates: true,
+  });
+
   await prisma.permiso.createMany({
     data: PERMISOS_SEED,
     skipDuplicates: true,

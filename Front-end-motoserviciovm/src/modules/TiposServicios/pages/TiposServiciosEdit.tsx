@@ -38,6 +38,7 @@ const TiposServiciosEdit = () => {
         setLoading(true);
         const [resOpciones, res] = await Promise.all([getOpciones(), getTipo(String(id))]);
         setOpciones(resOpciones);
+        console.log('Fetched tipo servicio:', res);
         setItem(res);
         const merged = mergeTipoServicioDataWithDefaults(res as any) as any;
         reset(merged);

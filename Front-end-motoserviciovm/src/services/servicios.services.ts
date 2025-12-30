@@ -82,7 +82,7 @@ const postServicio = async (payload: Partial<ServicioType> & { imagenesFiles?: F
   }
 };
 
-const putServicio = async (id: number, payload: Partial<ServicioType> & { imagenesFiles?: File[] }) => {
+const putServicio = async (id: string, payload: Partial<ServicioType> & { imagenesFiles?: File[] }) => {
   try {
     const form = new FormData();
     Object.entries(payload).forEach(([key, value]) => {

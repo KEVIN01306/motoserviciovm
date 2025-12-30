@@ -1,9 +1,9 @@
-import { PiUserCheckDuotone, PiUsersDuotone, PiListNumbersBold, PiTrademarkRegisteredBold, PiCylinderBold } from "react-icons/pi";
+import { PiUserCheckDuotone, PiUsersDuotone, PiListNumbersBold, PiTrademarkRegisteredBold, PiCylinderBold, PiCashRegisterDuotone } from "react-icons/pi";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
-import { AdminPanelSettings, AutoFixHighOutlined, HomeMaxOutlined, StoreMallDirectoryOutlined } from "@mui/icons-material";
+import { AdminPanelSettings, AutoFixHighOutlined, StoreMallDirectoryOutlined } from "@mui/icons-material";
 import { RiBikeFill, RiEBikeLine, RiProductHuntLine } from "react-icons/ri";
 import { IoCubeSharp } from "react-icons/io5";
-
+import { AiTwotoneHome } from "react-icons/ai";screenTop
 /**
  * Grouped menu structure: each entry is a module group with a title and children items.
  */
@@ -12,8 +12,8 @@ const MenuItems = [
         module: "Panel",
         icon: AdminPanelSettings,
         children: [
-            { name: "Home", link: "/admin", icon: HomeMaxOutlined, permiso: "home:view" },
-            { name: "Contabilidad", link: "/admin/contabilidad", icon: AutoFixHighOutlined, permiso: "contabilidad:view" },
+            { name: "Home", link: "/admin", icon: AiTwotoneHome  , permiso: "home:view" },
+            { name: "Contabilidad", link: "/admin/contabilidad", icon: PiCashRegisterDuotone, permiso: "contabilidad:view" },
         ],
     },
     {

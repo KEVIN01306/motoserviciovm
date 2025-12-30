@@ -5,6 +5,7 @@ const ingresosEgresosSchema = z.object({
     monto: z.number().positive('El monto debe ser un número positivo'),
     tipoId: z.number().int('El tipo debe ser un número entero'),
     sucursalId: z.number().int('La sucursal debe ser un número entero'),
+    moduloTallerId: z.number().int('El módulo taller debe ser un número entero').optional().nullable(),
     estadoId: z.number().int('El estado debe ser un número entero'),
     createdAt: z.date().optional(),
     updatedAt: z.date().optional(),

@@ -6,7 +6,7 @@ import { RiToolsLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';
 import ErrorCard from '../../../components/utils/ErrorCard';
 import { getServicio } from '../../../services/servicios.services';
-import type { ServicioGetType } from '../../../types/servicioType';
+import type { ServicioGetType, ServicioItemType } from '../../../types/servicioType';
 import ProductsTable from '../../../components/Table/ProductsTable';
 import { formatDate } from '../../../utils/formatDate';
 
@@ -53,7 +53,7 @@ const ServicioDetail = () => {
 
               <Grid size={{ xs: 12, md: 6 }}>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Mecánico</Typography><Typography>{data.mecanico.primerNombre + " " +  data.mecanico.primerApellido ?? '-'}</Typography></Box>
-                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Cliente</Typography><Typography>{data.cliente.primerNombre + " " + data.cliente.primerApellido ?? '-'}</Typography></Box>
+                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Cliente</Typography><Typography>{(data.cliente?.primerNombre + " " + data.cliente?.primerApellido )?? '-'}</Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Total</Typography><Typography>{data.total ?? '-'}</Typography></Box>
               </Grid>
             </Grid>
@@ -72,13 +72,13 @@ const ServicioDetail = () => {
 
             <Divider sx={{ my: 2 }} />
 
-            <Typography variant="h6" gutterBottom>Items</Typography>
+            <Typography variant="h6" gutterBottom>Inventario</Typography>
             <ProductsTable
               columns={[
-                { id: 'inventarioId', label: 'Inventario ID', minWidth: 120, format: (v:any, row:any) => row.inventario?.item ?? '' },
+                { id: 'itemName', label: 'Inventario', minWidth: 120, format: (v:any) => v ?? '' },
                 { id: 'checked', label: 'Presente', minWidth: 80, align: 'center', format: (v:any) => v ? 'Sí' : 'No' },
-                { id: 'descripcion', label: 'Descripción', minWidth: 180 },
-                { id: 'notas', label: 'Notas', minWidth: 180 }
+                { id: 'itemDescripcion', label: 'Descripción', minWidth: 180, format: (v:any) => v ?? '' },
+                { id: 'notas', label: 'Notas', minWidth: 180, format: (v:any) => v ?? '' },
               ] as any}
               rows={data.servicioItems ?? []}
               headerColor="#1565c0"
