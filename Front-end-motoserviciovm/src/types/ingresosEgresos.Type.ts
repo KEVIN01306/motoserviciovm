@@ -12,6 +12,7 @@ const sucursalId = useAuthStore.getState().user.sucursales[0].id;
 export type IngresosEgresosType = z.infer<typeof ingresosEgresosSchema>;
 
 export type IngresosEgresosGetType = IngresosEgresosType & {
+    id: number
     sucursal: SucursalType;
     estado: EstadoType;
     tipo: TipoContabilidadType;

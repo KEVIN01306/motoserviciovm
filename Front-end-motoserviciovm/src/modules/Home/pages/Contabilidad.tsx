@@ -15,6 +15,8 @@ import Loading from '../../../components/utils/Loading';
 import ErrorCard from '../../../components/utils/ErrorCard';
 import { formatDate } from '../../../utils/formatDate';
 import { tiposContabilidad } from '../../../utils/tiposContabilidad';
+import LinkStylesNavigate from '../../../components/utils/links';
+import { useGoTo } from '../../../hooks/useGoTo';
 
 const Contabilidad: React.FC = () => {
   const [data, setData] = useState<contabilidadTotalesType | null>(null);
@@ -54,6 +56,8 @@ const Contabilidad: React.FC = () => {
     }
   };
 
+  const goTo = useGoTo()
+
   useEffect(() => {
     fetchContabilidad();
 
@@ -61,6 +65,11 @@ const Contabilidad: React.FC = () => {
   }, []);
 
   const columnsServicios: Column<ServicioGetType>[] = [
+    {
+      id: 'id',
+      label: 'Código',
+      format: (value, row) =>  <LinkStylesNavigate label={`Servicio #${row.id}`} onClick={() => goTo(`/admin/servicios/${row.id}`)} variant="body1" />
+    },
     {
       id: 'placa' as keyof ServicioGetType,
       label: 'Placa',
@@ -71,7 +80,7 @@ const Contabilidad: React.FC = () => {
   ];
 
   const columnsVentas: Column<VentaGetType>[] = [
-    { id: 'id', label: 'Código' },
+    { id: 'id', label: 'Código', format: (value, row) =>  <LinkStylesNavigate label={`Venta #${row.id}`} onClick={() => goTo(`/admin/ventas/${row.id}`)} variant="body1" />},
     { id: 'updatedAt', label: 'Fecha', format: (value, row) => formatDate(row.updatedAt) },
     { id: 'costo', label: 'Costo', format: (value) => `Q ${(value).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
     { id: 'precioTotal', label: 'Precio', format: (value) => `Q ${(value).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
@@ -80,7 +89,7 @@ const Contabilidad: React.FC = () => {
   ];
 
   const columnsIngresosEgresos: Column<IngresosEgresosGetType>[] = [
-    { id: 'descripcion', label: 'Descripción' },
+    { id: 'descripcion', label: 'Descripción', format: (value, row) =>  <LinkStylesNavigate label={row.descripcion || ''} onClick={() => goTo(`/admin/ingresos-egresos/${row?.id}`)} variant="body1" />},
     { id: 'updatedAt', label: 'Fecha', format: (value, row) => formatDate(row.updatedAt) },
     { id: 'tipo', label: 'Tipo', format: (value, row) => row.tipo?.tipo || '' },
     { id: 'monto', label: 'Monto', format(value, row) {

@@ -12,6 +12,7 @@ import { useGoTo } from '../../../hooks/useGoTo';
 import ProductsTable from '../../../components/Table/ProductsTable';
 import type { VentaProductoGetType, VentaGetType } from '../../../types/ventaType';
 import { estados } from '../../../utils/estados';
+import LinkStylesNavigate from '../../../components/utils/links';
 
 const VentaDetail = () => {
   const { id } = useParams();
@@ -77,7 +78,7 @@ const VentaDetail = () => {
                 <Box>
                   <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 1 }}>
                     <Typography sx={{ minWidth: 120, color: '#6b7280', fontWeight: 600 }}>Vendedor</Typography>
-                    <Typography>{data.usuario?.primerNombre + ' ' + (data.usuario?.primerApellido ?? '') ?? '-'}</Typography>
+                    <LinkStylesNavigate label={data.usuario?.primerNombre + ' ' + (data.usuario?.primerApellido ?? '') ?? '-'} onClick={() => goTo(`/admin/users/${data.usuario?.id}`)} variant="body1" />
                   </Box>
 
                   <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 1 }}>
@@ -106,7 +107,7 @@ const VentaDetail = () => {
 
                   <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
                     <Typography sx={{ minWidth: 120, color: '#6b7280', fontWeight: 600 }}>Servicio</Typography>
-                    <Typography>{data.servicioId ?? '-'}</Typography>
+                    <LinkStylesNavigate label={data.servicioId ?? '-'} onClick={() => goTo(`/admin/servicios/${data.servicioId}`)} variant="body1" />
                   </Box>
                 </Box>
               </Grid>

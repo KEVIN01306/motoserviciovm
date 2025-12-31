@@ -15,7 +15,7 @@ const getServicios = async () => {
 }
 
 const getServicio = async (id) => {
-    const item = await prisma.servicio.findFirst({ where: { id: id, estadoId: { not: estados().inactivo } }, include: { imagen: true, servicioItems: {include: {inventario: true}}, productosCliente: true, moto: true, sucursal: true,cliente: true, mecanico: true, tipoServicio: true, ventas: { include: { productos: {include: {producto: true}} } } } });
+    const item = await prisma.servicio.findFirst({ where: { id: id, estadoId: { not: estados().inactivo } }, include: { imagen: true, servicioItems: {include: {inventario: true}}, productosCliente: true, moto: true, sucursal: true,cliente: true, mecanico: true, tipoServicio: true, estado: true, ventas: { include: { productos: {include: {producto: true}}, estado: true } } } });
     if (!item) { const error = new Error('DATA_NOT_FOUND'); error.code = 'DATA_NOT_FOUND'; throw error; }
     return item;
 }

@@ -7,6 +7,7 @@ import type { motoGetType } from "./motoType";
 import type { SucursalType } from "./sucursalType";
 import type { TipoServicioGetType } from "./tipoServicioType";
 import type { VentaGetType } from "./ventaType";
+import type { EstadoType } from "./estadoType";
 
 export type ServicioItemType = z.infer<typeof servicioItemSchema>;
 
@@ -27,8 +28,9 @@ export type ServicioType = z.infer<typeof servicioSchema>
 export type ServicioGetType = ServicioType & {
   moto?: motoGetType;
   sucursal?: SucursalType;
-  tipoServicio?: TipoServicioGetType
-  ventas: VentaGetType[]
+  tipoServicio?: TipoServicioGetType;
+  ventas: VentaGetType[];
+  estado: EstadoType;
 };
 
 export const ServicioInitialState: ServicioType = {

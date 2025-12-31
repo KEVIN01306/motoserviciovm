@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container, Card, CardContent, Box, Typography, Divider, Grid } from '@mui/material';
+import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab } from '@mui/material';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiToolsLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';
@@ -10,12 +10,19 @@ import type { ServicioGetType, ServicioItemType } from '../../../types/servicioT
 import ProductsTable from '../../../components/Table/ProductsTable';
 import { formatDate } from '../../../utils/formatDate';
 import type { VentaProductoGetType } from '../../../types/ventaType';
+import { estados } from '../../../utils/estados';
+import { useGoTo } from '../../../hooks/useGoTo';
+import LinkStylesNavigate from '../../../components/utils/links';
+import { exportarAPDF } from '../../../utils/exportarPdf';
+import { ExposureTwoTone } from '@mui/icons-material';
+import { PiExportDuotone } from 'react-icons/pi';
 
 const ServicioDetail = () => {
   const { id } = useParams();
   const [data, setData] = useState<ServicioGetType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const goTo = useGoTo();
 
   const fetch = async () => {
     try {
@@ -38,24 +45,44 @@ const ServicioDetail = () => {
     { label: `Servicio #${data.id}`, icon: <RiToolsLine fontSize="inherit" /> },
   ];
 
+    const chipColorByEstado = (id: number) => {
+          switch (id) {
+          case estados().enEspera:
+              return "warning";
+          case estados().confirmado:
+              return "success";
+          case estados().cancelado:
+              return "error";
+          default:
+              return "primary";
+          }
+      };
+  
   return (
     <>
       <BreadcrumbsRoutes items={breadcrumbs} />
-      <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+      <Grid size={{ xs: 1, md: 1 }} display={'flex'} flexGrow={1} alignItems={'center'} justifyContent={'end'}>
+        <Fab size="small" color="primary" aria-label="Exportar" onClick={() => window.print()}>
+          <PiExportDuotone />
+        </Fab>
+      </Grid>
+      <Container maxWidth="md" sx={{ mt: 4, mb: 4 }} id="servicio-detail-container">
         <Card>
           <CardContent>
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>{`Servicio #${data.id}`}</Typography>
             <Grid container spacing={2}>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Descripción</Typography><Typography>{data.descripcion}</Typography></Box>
-                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Fecha Entrada</Typography><Typography>{formatDate(data.fechaEntrada as any)}</Typography></Box>
-                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Fecha Salida</Typography><Typography>{data.fechaSalida ? formatDate(data.fechaSalida as any) : '-'}</Typography></Box>
-              </Grid>
-
-              <Grid size={{ xs: 12, md: 6 }}>
+              <Grid size={6}>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Mecánico</Typography><Typography>{data.mecanico.primerNombre + " " +  data.mecanico.primerApellido ?? '-'}</Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Cliente</Typography><Typography>{(data.cliente?.primerNombre + " " + data.cliente?.primerApellido )?? '-'}</Typography></Box>
+                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Placa de la moto</Typography><Typography>{data.moto?.placa ?? '-'}</Typography></Box>
+                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Estado</Typography><Typography><Chip label={data.estado?.estado ?? '-'} color={chipColorByEstado(data.estado?.id)} variant='outlined' /></Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Total</Typography><Typography>{data.total ?? '-'}</Typography></Box>
+              </Grid>
+              <Grid size={6}>
+                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Descripción</Typography><Typography>{data.descripcion}</Typography></Box>
+                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Tipo de servicio</Typography><Typography>{data.tipoServicio?.tipo ?? '-'}</Typography></Box>
+                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Fecha Entrada</Typography><Typography>{formatDate(data.fechaEntrada as any)}</Typography></Box>
+                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Fecha Salida</Typography><Typography>{data.fechaSalida ? formatDate(data.fechaSalida as any) : '-'}</Typography></Box>
               </Grid>
             </Grid>
 
@@ -92,7 +119,8 @@ const ServicioDetail = () => {
               ) : (
                 data.ventas?.map((venta) => (
                   <Box key={venta.id} sx={{ mb: 4 }}>
-                    <Typography variant="h6" gutterBottom>{`Venta #${venta.id}`}</Typography>
+                    <LinkStylesNavigate label={`Venta #${venta.id}`} onClick={() => goTo(`/admin/ventas/${venta.id}`)} variant="h6" />
+                    <Chip label={venta.estado?.estado ?? ''} color={chipColorByEstado(venta.estado?.id)} sx={{ mb: 2 }} variant='outlined'/>
                     <ProductsTable
                     columns={[
                       { id: 'producto', label: 'Producto', minWidth: 120, format: (v:any, row: VentaProductoGetType) => row.producto?.nombre ?? '' },
