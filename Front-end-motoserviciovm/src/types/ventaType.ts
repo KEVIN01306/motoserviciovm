@@ -5,15 +5,17 @@ import { estados } from "../utils/estados";
 import type { UserGetType } from "./userType";
 import type { ProductoGetType } from "./productoType";
 import type { EstadoType } from "./estadoType";
-import type { SucursalGetType } from "./servicioType";
+import type { SucursalType } from "./sucursalType";
+import type { ServicioGetType } from "./servicioType";
 
 export type VentaType = z.infer<typeof ventaSchema>;
 
 export type VentaGetType = VentaType & {
     trabajador: UserGetType;
     productos: VentaProductoGetType[];
-    sucursal: SucursalGetType;
+    sucursal: SucursalType;
     estado: EstadoType;
+    servicio: ServicioGetType | null;
     costo: number;
     precioTotal: number;
     gananciaTotal: number;

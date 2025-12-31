@@ -47,7 +47,11 @@ const getVenta = async (id: number): Promise<VentaGetType> => {
 const postVenta = async (payload: VentaType) => {
   try {
     const response = await api.post<apiResponse<VentaGetType>>(API_VENTAS, payload);
-    return response.data.data ?? "";
+    if (response.data && response.data.data) {
+      return response.data.data;
+    }
+
+    throw new Error("El servidor no devolvió los datos del registro creado.");
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;

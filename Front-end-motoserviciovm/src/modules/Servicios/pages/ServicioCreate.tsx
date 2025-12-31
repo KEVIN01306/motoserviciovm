@@ -12,6 +12,11 @@ const ServicioCreate = () => {
   const goTo = useGoTo();
   const user = useAuthStore(s => s.user);
   const [draft, setDraft] = useState<any | null>(null);
+  const [seHaranVentas,setSeHaranVentas]=useState<boolean>(false);
+
+  const changeSeHaranVentas = (value: boolean) => {
+    setSeHaranVentas(value);
+  }
  /*
   useEffect(() => {
     const raw = localStorage.getItem('servicio.create.draft');
@@ -35,9 +40,13 @@ const ServicioCreate = () => {
       // set mecanicoId as logged user
       const mecanicoId = user?.id ?? 0;
       const body = { ...payload, mecanicoId };
-      await postServicio(body);
+      const response = await postServicio(body);
       successToast('Servicio creado');
-      goTo('/admin/servicios');
+      if (seHaranVentas) {
+        goTo('/admin/ventas/create?servicioId=' +( response.id ?? ''));
+      }else{
+        goTo('/admin/servicios');
+      }
     } catch (err: any) {
       errorToast(err?.message ?? 'Error al crear');
     }
@@ -53,7 +62,7 @@ const ServicioCreate = () => {
       <BreadcrumbsRoutes items={breadcrumbs} />
       <Container >
           <CardContent>
-            <ServicioForm onSubmit={handleSubmit} initial={draft ?? undefined} />
+            <ServicioForm onSubmit={handleSubmit} initial={draft ?? undefined} seHaranVentas={seHaranVentas} changeSeHaranVentas={changeSeHaranVentas} />
           </CardContent>
       </Container>
     </>

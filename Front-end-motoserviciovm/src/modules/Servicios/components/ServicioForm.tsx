@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useState } from 'react';
-import { Grid, TextField, Button, MenuItem, Box, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Paper, Checkbox, Autocomplete } from '@mui/material';
+import { Grid, TextField, Button, MenuItem, Box, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Paper, Checkbox, Autocomplete, Fab, FormControlLabel } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useForm } from 'react-hook-form';
@@ -20,11 +20,13 @@ type Props = {
   initial?: Partial<ServicioGetType>;
   onSubmit: (payload: Partial<ServicioType> & { imagenesFiles?: File[] }) => Promise<void>;
   submitLabel?: string;
+  seHaranVentas?: boolean;
+  changeSeHaranVentas? : (value: boolean) => void;
 };
 
 const LOCAL_KEY = 'servicio.create.draft';
 
-const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
+const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVentas, changeSeHaranVentas }: Props) => {
   const { register, handleSubmit, setValue, reset, formState: { isSubmitting }, watch } = useForm<ServicioType>({ defaultValues: { ...(initial ?? ServicioInitialState) } as any });
   const [productosCliente, setProductosCliente] = useState<Array<{ nombre: string; cantidad: number }>>(initial?.productosCliente ?? []);
   const [productoTmp, setProductoTmp] = useState(ServicioProductoClienteInitialState);
@@ -179,8 +181,9 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
         <TextField {...register('fechaEntrada' as any)} label="Fecha Entrada" focused={true} type="datetime-local" fullWidth variant="standard" />
       </Grid>
 
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <Autocomplete
+      <Grid size={{ xs: 12, sm: 6 }} display={'flex'} flexDirection={'row'}>
+        <Grid size={{ xs: 10, sm: 10 }}>
+          <Autocomplete
           options={motosList}
           getOptionLabel={(opt: any) => opt?.placa ?? `Moto ${opt?.id}`}
           value={motoSedected}
@@ -191,6 +194,12 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
           isOptionEqualToValue={(option: any, value: any) => Number(option?.id) === Number(value?.id)}
           renderInput={(params) => <TextField {...params} label="Moto" variant="standard" fullWidth />}
         />
+        </Grid>
+          <Grid size={{ xs: 2, md: 2 }} display={'flex'} flexGrow={1} alignItems={'center'} justifyContent={'end'}>
+            <Fab size="small" color="primary" aria-label="add" >
+              <AddIcon />
+            </Fab>
+          </Grid>
       </Grid>
 
       <Grid size={{ xs: 12, sm: 6 }}>
@@ -213,6 +222,7 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
           getOptionLabel={(opt: TipoServicioGetType) => opt?.tipo ?? `Tipo Servicio ${opt?.id}`}
           value={tipoServicioSelected}
           onChange={(_, newVal) => {
+            console.log('Selected tipo servicio:', newVal);
             setTipoServicioSelected(newVal ?? null);
             setValue('tipoServicioId' as any, newVal?.id ?? 0);
           }}
@@ -256,8 +266,9 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
           </Table>
         </Paper>
       </Grid>
-
-      <Grid size={{ xs: 12 }}>
+      {
+        tipoServicioSelected?.servicioCompleto && (
+          <Grid size={{ xs: 12 }}>
         <Paper sx={{ p: 2 }}>
           <Box sx={{ mb: 1, fontWeight: 700 }}>Items de Inventario</Box>
           <Table size="small">
@@ -290,7 +301,17 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => 
             </TableBody>
           </Table>
         </Paper>
-      </Grid>
+      </Grid>)
+      }
+      {
+        seHaranVentas != null && (
+              <Grid size={{ xs: 12 }}>
+                <FormControlLabel label="Se haran ventas?" control={
+                  <Checkbox checked={seHaranVentas} onChange={(e: any) => changeSeHaranVentas(e.target.checked)} />
+                }/>
+              </Grid>
+        )
+      }
 
         
       <Grid size={{ xs: 12 }}>

@@ -1,4 +1,3 @@
-import React from 'react';
 import VentaForm from '../components/VentaForm';
 import { postVenta } from '../../../services/ventas.services';
 import { useNavigate } from 'react-router-dom';
@@ -6,6 +5,7 @@ import { successToast, errorToast } from '../../../utils/toast';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiProductHuntLine } from 'react-icons/ri';
 import { useAuthStore } from '../../../store/useAuthStore';
+import { useEffect } from 'react';
 
 const VentaCreate = () => {
   const navigate = useNavigate();

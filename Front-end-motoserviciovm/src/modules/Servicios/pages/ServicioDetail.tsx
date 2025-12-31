@@ -9,6 +9,7 @@ import { getServicio } from '../../../services/servicios.services';
 import type { ServicioGetType, ServicioItemType } from '../../../types/servicioType';
 import ProductsTable from '../../../components/Table/ProductsTable';
 import { formatDate } from '../../../utils/formatDate';
+import type { VentaProductoGetType } from '../../../types/ventaType';
 
 const ServicioDetail = () => {
   const { id } = useParams();
@@ -84,6 +85,28 @@ const ServicioDetail = () => {
               headerColor="#1565c0"
             />
 
+            <Typography variant="h4" textAlign={'center'} mt={3} gutterBottom>VENTAS</Typography>
+            {
+              data.ventas?.length === 0 ? (
+                <Typography>No hay ventas asociadas a este servicio.</Typography>
+              ) : (
+                data.ventas?.map((venta) => (
+                  <Box key={venta.id} sx={{ mb: 4 }}>
+                    <Typography variant="h6" gutterBottom>{`Venta #${venta.id}`}</Typography>
+                    <ProductsTable
+                    columns={[
+                      { id: 'producto', label: 'Producto', minWidth: 120, format: (v:any, row: VentaProductoGetType) => row.producto?.nombre ?? '' },
+                      { id: 'precio', label: 'Precio', minWidth: 100, align: 'right', format: (_v:any, row: VentaProductoGetType) => `Q ${Number(row.producto?.precio ?? 0).toFixed(2)}` },
+                      { id: 'cantidad', label: 'Cantidad', minWidth: 80, align: 'center', format: (v:any) => String(v) },
+                      { id: 'totalProducto', label: 'Total', minWidth: 100, align: 'right', format: (v:any) => `Q ${Number(v).toFixed(2)}` },
+                    ] as any}
+                    rows={venta.productos ?? []}
+                    headerColor="#1565c0"
+                      />
+                  </Box>
+                ))
+              )
+            }
           </CardContent>
         </Card>
       </Container>

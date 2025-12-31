@@ -11,6 +11,7 @@ import { getProductos } from '../../../services/producto.services';
 import { getSucursales } from '../../../services/sucursal.services';
 import { useAuthStore } from '../../../store/useAuthStore';
 import type { ProductoGetType } from '../../../types/productoType';
+import { useSearchParams } from 'react-router-dom';
 
 type Props = {
   initial?: Partial<VentaType> & { productos?: VentaProductoType[] };
@@ -93,6 +94,16 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
     setItems((s) => s.filter((_, i) => i !== idx));
   };
 
+    const [searhParams]= useSearchParams();
+    const servicioId = searhParams.get('servicioId');
+
+    useEffect (() => {
+      if (servicioId){
+        setValue('servicioId' as any, Number(servicioId));
+      }
+    },[servicioId, setValue]);
+
+
   const updateLinea = (idx: number, patch: Partial<VentaProductoType>) => {
     // prevent changing productoId to one that already exists in another row
     if (patch.productoId && items.some((it, i) => i !== idx && it.productoId === patch.productoId)) {
@@ -129,6 +140,7 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
     // merge with defaults to avoid sending unwanted nested fields
     const merged = mergeVentaDataWithDefaults(data) as VentaType;
     // normalize productos to VentaProductoType shape expected by API
+    
     const productosPayload: VentaProductoType[] = items.map((it) => {
       const base = mergeVentaProductoDataWithDefaults({
         ventaId: it.ventaId,
@@ -138,7 +150,7 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
       }) as VentaProductoType;
       return base;
     });
-
+    console.log('Submitting Venta with productos:', { ...(merged as any), productos: productosPayload });
     await onSubmit({ ...(merged as any), productos: productosPayload } as any);
   };
 
