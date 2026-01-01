@@ -20,14 +20,15 @@ export const imagenMetaSchema = z.object({
 
 export const servicioSchema = z.object({
     id: z.number().optional(),
+    kilometraje: z.number(),
     descripcion: z.string().min(1, 'La descripcion es obligatoria'),
-    fechaEntrada: z.coerce.date().optional(),
-    fechaSalida: z.coerce.date().optional().nullable(),
     total: z.number().optional(),
     observaciones: z.string().optional(),
     proximaFechaServicio: z.coerce.date().optional().nullable(),
     descripcionProximoServicio: z.string().optional().nullable(),
     sucursalId: z.number(),
+    firmaEntrada:    z.string(),
+    firmaSalida:     z.string().optional(),
     motoId: z.number(),
     clienteId: z.number().optional().nullable(),
     mecanicoId: z.number(),

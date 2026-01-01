@@ -8,6 +8,7 @@ import type { SucursalType } from "./sucursalType";
 import type { TipoServicioGetType } from "./tipoServicioType";
 import type { VentaGetType } from "./ventaType";
 import type { EstadoType } from "./estadoType";
+import type { UserGetType } from "./userType";
 
 export type ServicioItemType = z.infer<typeof servicioItemSchema>;
 
@@ -31,12 +32,15 @@ export type ServicioGetType = ServicioType & {
   tipoServicio?: TipoServicioGetType;
   ventas: VentaGetType[];
   estado: EstadoType;
+  mecanico: UserGetType;
+  cliente: UserGetType
+  fechaEntrada: Date;
+  fechaSalida: Date,
 };
 
 export const ServicioInitialState: ServicioType = {
   descripcion: '',
-  fechaEntrada: new Date(),
-  fechaSalida: null,
+  kilometraje: 0,
   total: 0,
   observaciones: "",
   proximaFechaServicio: undefined,
@@ -72,8 +76,6 @@ export const ImagenMetaInitialState: ImagenMetaType = {
 export const mergeServicioDataWithDefaults = (apiData: Partial<ServicioType>): Partial<ServicioType> => {
   return {
     descripcion: apiData.descripcion ?? ServicioInitialState.descripcion,
-    fechaEntrada: apiData.fechaEntrada ?? ServicioInitialState.fechaEntrada,
-    fechaSalida: apiData.fechaSalida ?? ServicioInitialState.fechaSalida,
     total: apiData.total ?? ServicioInitialState.total,
     observaciones: apiData.observaciones ?? ServicioInitialState.observaciones,
     proximaFechaServicio: apiData.proximaFechaServicio ?? ServicioInitialState.proximaFechaServicio,
@@ -87,6 +89,7 @@ export const mergeServicioDataWithDefaults = (apiData: Partial<ServicioType>): P
     servicioItems: apiData.servicioItems ?? ServicioInitialState.servicioItems,
     productosCliente: apiData.productosCliente ?? ServicioInitialState.productosCliente,
     imagenesMeta: apiData.imagenesMeta ?? ServicioInitialState.imagenesMeta,
+    kilometraje: apiData.kilometraje ?? ServicioInitialState.kilometraje,
   };
 };
 

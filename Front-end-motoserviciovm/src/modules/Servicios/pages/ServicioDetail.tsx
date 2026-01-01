@@ -75,6 +75,7 @@ const ServicioDetail = () => {
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Mecánico</Typography><Typography>{data.mecanico.primerNombre + " " +  data.mecanico.primerApellido ?? '-'}</Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Cliente</Typography><Typography>{(data.cliente?.primerNombre + " " + data.cliente?.primerApellido )?? '-'}</Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Placa de la moto</Typography><Typography>{data.moto?.placa ?? '-'}</Typography></Box>
+                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Kilometraje</Typography><Typography>{data.kilometraje ?? '-'}</Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Estado</Typography><Typography><Chip label={data.estado?.estado ?? '-'} color={chipColorByEstado(data.estado?.id)} variant='outlined' /></Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Total</Typography><Typography>{data.total ?? '-'}</Typography></Box>
               </Grid>

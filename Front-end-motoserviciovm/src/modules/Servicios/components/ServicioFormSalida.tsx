@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useState } from 'react';
-import { Grid, TextField, Button, MenuItem, Box, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Paper, Checkbox, Autocomplete, Fab, FormControlLabel, Typography, TableContainer } from '@mui/material';
+import { Grid, TextField, Button, MenuItem, Box, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Paper, Checkbox, Autocomplete, Fab, FormControlLabel, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useForm } from 'react-hook-form';
@@ -28,7 +28,7 @@ type Props = {
 
 const LOCAL_KEY = 'servicio.create.draft';
 
-const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVentas, changeSeHaranVentas }: Props) => {
+const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVentas, changeSeHaranVentas }: Props) => {
   const { register, handleSubmit, setValue, reset, formState: { isSubmitting }, watch } = useForm<ServicioType>({ defaultValues: { ...(initial ?? ServicioInitialState) } as any });
   const [productosCliente, setProductosCliente] = useState<Array<{ nombre: string; cantidad: number }>>(initial?.productosCliente ?? []);
   const [productoTmp, setProductoTmp] = useState(ServicioProductoClienteInitialState);
@@ -48,6 +48,7 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
   const [mecanicos,setMecanicos] = useState<UserGetType[]>([])
   const [mecanicoSelected,setMecanicoSelected] = useState<UserGetType|null>(initial?.mecanico? initial.mecanico : null )
   const [imagenGuardada, setImagenGuardada] = useState(null);
+  
 /*
   useEffect(() => {
     // load draft from localStorage
@@ -122,41 +123,7 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
     return () => subscription.unsubscribe();
   }, [watch, productosCliente, servicioItems, imagenesMeta]);
   */
-  const addProductoCliente = () => {
-    if (!productoTmp.nombre) return errorToast('Ingrese nombre');
-    setProductosCliente(s => [...s, { ...productoTmp }]);
-    setProductoTmp(ServicioProductoClienteInitialState);
-  };
-
-  const toggleServicioItem = (idx: number, checked: boolean) => {
-    setServicioItems(s => s.map((it, i) => i === idx ? { ...it, checked, itemDescripcion: checked ? '' : (it.itemDescripcion ?? '') } : it));
-  };
-
-  const updateServicioItem = (idx: number, patch: Partial<ServicioItemType>) => {
-    setServicioItems(s => s.map((it, i) => i === idx ? { ...it, ...patch } : it));
-  };
-
-  const removeProductoCliente = (idx: number) => setProductosCliente(s => s.filter((_, i) => i !== idx));
-
-  const onFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    // revoke previous previews
-    imagenesMeta.forEach(m => { if (m.preview) URL.revokeObjectURL(m.preview); });
-    const arr = Array.from(files);
-    setImagenesFiles(arr);
-    // initialize meta entries aligned with files and create previews
-    const metas = arr.map(f => ({ descripcion: '', preview: URL.createObjectURL(f) }));
-    setImagenesMeta(metas);
-  };
-
-  const removeImage = (idx: number) => {
-    setImagenesFiles(s => s.filter((_, i) => i !== idx));
-    setImagenesMeta(prev => {
-      const next = prev.filter((_, i) => i !== idx);
-      return next;
-    });
-  };
+ 
 
   useEffect(() => {
     return () => {
@@ -180,164 +147,28 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
   
   return (
     <FormEstructure handleSubmit={handleSubmit(internalSubmit)} pGrid={2}>
-      <Grid size={{ xs: 12 }}>
-        <TextField {...register('descripcion' as any)} label="Descripción" fullWidth variant="standard" />
+
+      <Grid size={{ xs: 12, sm: 12 }}>
+        <TextField {...register('observaciones' as any)} label="Observaciones" fullWidth variant="standard" />
       </Grid>
-
-      <Grid size={{ xs: 12, sm: 6 }} display={'flex'} flexDirection={'row'}>
-        <Grid size={{ xs: 10, sm: 10 }}>
-          <Autocomplete
-          options={motosList}
-          getOptionLabel={(opt: any) => opt?.placa ?? `Moto ${opt?.id}`}
-          value={motoSedected}
-          onChange={(_, newVal) => {
-            setMotoSelected(newVal ?? null);
-            setValue('motoId' as any, newVal?.id ?? 0);
-          }}
-          isOptionEqualToValue={(option: any, value: any) => Number(option?.id) === Number(value?.id)}
-          renderInput={(params) => <TextField {...params} label="Moto" variant="standard" fullWidth />}
-        />
-        </Grid>
-          <Grid size={{ xs: 2, md: 2 }} display={'flex'} flexGrow={1} alignItems={'center'} justifyContent={'end'}>
-            <Fab size="small" color="primary" aria-label="add" >
-              <AddIcon />
-            </Fab>
-          </Grid>
-      </Grid>
-
-       <Grid size={{ xs: 12, sm: 6 }}>
-        <TextField {...register('kilometraje' as any, { valueAsNumber: true})} label="Kilometraje" type="number" fullWidth variant="standard" />
-      </Grid>
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <Autocomplete
-          options={sucursalesList}
-          getOptionLabel={(opt: any) => opt?.nombre ?? `Sucursal ${opt?.id}`}
-          value={sucursalSelected}
-          onChange={(_, newVal) => {
-            setSucursalSelected(newVal ?? null);
-            setValue('sucursalId' as any, newVal?.id ?? 0);
-          }}
-          isOptionEqualToValue={(option: any, value: any) => Number(option?.id) === Number(value?.id)}
-          renderInput={(params) => <TextField {...params} label="Sucursal" variant="standard" fullWidth />}
-        />
-      </Grid>
-
-       <Grid size={{ xs: 12, sm: 6 }}>
-          <Autocomplete
-          options={mecanicos}
-          getOptionLabel={(opt: any) => opt?.primerNombre ?? `Mecanico ${opt?.id}`}
-          value={mecanicoSelected}
-          onChange={(_, newVal) => {
-            setMecanicoSelected(newVal ?? null);
-            setValue('mecanicoId' as any, newVal?.id ?? 0);
-          }}
-          isOptionEqualToValue={(option: any, value: any) => Number(option?.id) === Number(value?.id)}
-          renderInput={(params) => <TextField {...params} label="Mecanico asignado" variant="standard" fullWidth />}
-        />
-        </Grid>
-
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <Autocomplete
-          options={tiposServicio}
-          getOptionLabel={(opt: TipoServicioGetType) => opt?.tipo ?? `Tipo Servicio ${opt?.id}`}
-          value={tipoServicioSelected}
-          onChange={(_, newVal) => {
-            console.log('Selected tipo servicio:', newVal);
-            setTipoServicioSelected(newVal ?? null);
-            setValue('tipoServicioId' as any, newVal?.id ?? 0);
-          }}
-          isOptionEqualToValue={(option: any, value: any) => Number(option?.id) === Number(value?.id)}
-          renderInput={(params) => <TextField {...params} label="Tipo Servicio" variant="standard" fullWidth />}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12 }}>
-        <Paper sx={{ p: 2 }}>
-          <Grid container spacing={1} alignItems="center">
-            <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField label="Producto cliente" variant="standard" fullWidth value={productoTmp.nombre} onChange={(e) => setProductoTmp(s => ({ ...s, nombre: e.target.value }))} />
-                 
-              </Grid>
-            <Grid size={{ xs: 12, sm: 3 }}>
-              <TextField label="Cantidad" type="number" value={productoTmp.cantidad} onChange={(e) => setProductoTmp(s => ({ ...s, cantidad: Number(e.target.value) }))} fullWidth variant="standard" />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 3 }}>
-              <Button startIcon={<AddIcon />} variant="contained" onClick={addProductoCliente} fullWidth>Agregar</Button>
-            </Grid>
-          </Grid>
-          
-          <TableContainer sx={{ width: '100%', overflowX: 'auto' }}>
-
-          <Table size="small" sx={{ mt: 2 }}>
-            <TableHead>
-              <TableRow>
-                <TableCell>Nombre</TableCell>
-                <TableCell>Cantidad</TableCell>
-                <TableCell>Acciones</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {productosCliente.map((p, idx) => (
-                <TableRow key={idx}>
-                  <TableCell>{p.nombre}</TableCell>
-                  <TableCell>{p.cantidad}</TableCell>
-                  <TableCell><IconButton onClick={() => removeProductoCliente(idx)}><DeleteIcon /></IconButton></TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          </TableContainer>
-        </Paper>
+        <Grid size={{ xs: 12 }}>
+        <TextField {...register('total' as any)} label="Total" type='number' fullWidth variant="standard" />
       </Grid>
       {
-        tipoServicioSelected?.servicioCompleto && (
-          <Grid size={{ xs: 12 }}>
-        <Paper sx={{ p: 2 }}>
-          <Box sx={{ mb: 1, fontWeight: 700 }}>Items de Inventario</Box>
-          <TableContainer sx={{ width: '100%', overflowX: 'auto' }}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>Item</TableCell>
-                <TableCell>Presente</TableCell>
-                <TableCell>Descripción (si no está presente)</TableCell>
-                <TableCell>Notas</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {servicioItems.map((it, idx) => {
-                const inv = inventarioItems.find(i => i.id === it.inventarioId);
-                return (
-                  <TableRow key={idx}>
-                    <TableCell>{inv?.item ?? `#${it.inventarioId}`}</TableCell>
-                    <TableCell>
-                      <Checkbox checked={!!it.checked} onChange={(e) => toggleServicioItem(idx, e.target.checked)} />
-                    </TableCell>
-                    <TableCell>
-                      <TextField fullWidth variant="standard" value={it.itemDescripcion ?? ''} onChange={(e) => updateServicioItem(idx, { itemDescripcion: e.target.value })} disabled={!!it.checked} />
-                    </TableCell>
-                    <TableCell>
-                      <TextField fullWidth variant="standard" value={it.notas ?? ''} onChange={(e) => updateServicioItem(idx, { notas: e.target.value })} />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-          </TableContainer>
-        </Paper>
-      </Grid>)
-      }
-      {
-        seHaranVentas != null && (
-              <Grid size={{ xs: 12 }}>
-                <FormControlLabel label="Se haran ventas?" control={
-                  <Checkbox checked={seHaranVentas} onChange={(e: any) => changeSeHaranVentas(e.target.checked)} />
-                }/>
-              </Grid>
+        initial?.tipoServicio?.servicioCompleto && (
+          <>
+          <Grid size={{ xs: 12, sm: 6 }}> 
+            <TextField {...register('proximaFechaServicio' as any)} label="Fecha Proximo servicio" focused={true} type="datetime-local"  fullWidth variant="standard" />
+          </Grid>
+
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField {...register('descripcionProximoServicio' as any)} label="Descripcion del proximo servicio" fullWidth variant="standard" />
+          </Grid>
+
+          </>
         )
       }
-      
+
       <Grid size={{ xs: 12 }}>
         <Typography variant='h6' textAlign={'center'} marginBottom={4}>
           Firma del cliente
@@ -345,15 +176,15 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
         <SignatureField onSaveSignature={(data: any) => setImagenGuardada(data)}/>
       </Grid>
 
-        
       <Grid size={{ xs: 12 }}>
         <Button type="submit" variant="contained" fullWidth disabled={isSubmitting}>{submitLabel}</Button>
       </Grid>
+
     </FormEstructure>
   );
 };
 
-export default ServicioForm;
+export default ServicioFormSalida;
 
 
 /*

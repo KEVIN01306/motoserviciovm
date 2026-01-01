@@ -47,7 +47,11 @@ const postIngresoEgreso = async (payload: IngresosEgresosType) => {
   console.log(payload)
   try {
     const response = await api.post<apiResponse<IngresosEgresosGetType>>(API_BASE, payload);
-    return response.data.data ?? "";
+
+    if (response.data && response.data.data) {
+      return response.data.data;
+    }
+    throw new Error("El servidor no devolvió los datos del registro creado.");
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;
@@ -64,7 +68,12 @@ const postIngresoEgreso = async (payload: IngresosEgresosType) => {
 const putIngresoEgreso = async (id: number, payload: IngresosEgresosType) => {
   try {
     const response = await api.put<apiResponse<IngresosEgresosGetType>>(`${API_BASE}/${id}`, payload);
-    return response.data.data ?? "";
+    
+    if (response.data && response.data.data) {
+      return response.data.data;
+    }
+
+    throw new Error("El servidor no devolvió los datos del registro actualizado.");
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;

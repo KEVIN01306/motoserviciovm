@@ -6,6 +6,7 @@ const ServiciosList = lazy(() => import('./pages/ServiciosList'));
 const ServicioCreate = lazy(() => import('./pages/ServicioCreate'));
 const ServicioDetail = lazy(() => import('./pages/ServicioDetail'));
 const ServicioEdit = lazy(() => import('./pages/ServicioEdit'));
+const ServicioSalida = lazy(() => import('./pages/ServicioSalida'));
 
 export const ServiciosRoutes: RouteObject[] = [
   {
@@ -15,6 +16,8 @@ export const ServiciosRoutes: RouteObject[] = [
       { path: 'create', element: (<ProtectedRoute allowedPermisos={["servicios:create"]}><ServicioCreate /></ProtectedRoute>) },
       { path: ':id', element: (<ProtectedRoute allowedPermisos={["servicios:detail"]}><ServicioDetail /></ProtectedRoute>) },
       { path: ':id/edit', element: (<ProtectedRoute allowedPermisos={["servicios:edit"]}><ServicioEdit /></ProtectedRoute>) },
+      { path: ':id/salida', element: (<ProtectedRoute allowedPermisos={["servicios:salida"]}><ServicioSalida /></ProtectedRoute>) },
+
     ],
   },
 ];

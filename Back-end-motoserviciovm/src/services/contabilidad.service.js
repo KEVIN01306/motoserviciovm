@@ -27,21 +27,21 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
     // TOTAL DE INGRESOS EN SERVICIOS
 
     const totalServicios = await prisma.servicio.aggregate({
-        where: { estadoId: estados().confirmado, sucursalId: { in: sucursalIds }, updatedAt: { gte: fechaInicio, lte: fechaFin } },
+        where: { estadoId: estados().entregado, sucursalId: { in: sucursalIds }, updatedAt: { gte: fechaInicio, lte: fechaFin } },
         _sum: { total: true },
     });
 
     // SERVICIOS DETALLE
 
     const Servicios = await prisma.servicio.findMany({
-        where: { estadoId: estados().confirmado, sucursalId: { in: sucursalIds }, updatedAt: { gte: fechaInicio, lte: fechaFin } },
+        where: { estadoId: estados().entregado, sucursalId: { in: sucursalIds }, updatedAt: { gte: fechaInicio, lte: fechaFin } },
         include: { moto: true },
     });
 
     // GASTOS TALLER
 
     const totalGastosTaller = await prisma.ingresosEgresos.aggregate({
-        where: { tipoId: tiposContabilidad().egreso, estadoId: estados().confirmado, sucursalId: { in: sucursalIds }, moduloTallerId: tiposModulos().taller, updatedAt: { gte: fechaInicio, lte: fechaFin } },
+        where: { tipoId: tiposContabilidad().egreso, estadoId: estados().entregado, sucursalId: { in: sucursalIds }, moduloTallerId: tiposModulos().taller, updatedAt: { gte: fechaInicio, lte: fechaFin } },
         _sum: { monto: true },
     });
 

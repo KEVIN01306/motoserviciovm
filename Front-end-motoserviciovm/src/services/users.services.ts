@@ -40,6 +40,42 @@ const getUsers = async (): Promise<UserGetType[]> => {
     }
 }
 
+
+const getUsersMecanicos = async (): Promise<UserGetType[]> => {
+    try {
+        const response = await api.get<apiResponse<UserGetType[]>>(API_USERS+'/mecanicos')
+        const users = response.data.data
+
+        if (!Array.isArray(users)) {
+            throw new Error("INVALID_API_RESPONSE_FORMAT");
+        }
+
+        if (users.length == 0) {
+            throw new Error("DATA_NOT_FOUND")
+        }
+
+        return users;
+
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            const status = error.response?.status;
+
+            if (status == 500) {
+                throw new Error("INTERNAL ERROR SERVER")
+            }
+
+            const serverMessage = error.response?.data?.message;
+            if (serverMessage) {
+                throw new Error(serverMessage)
+            }
+            throw new Error("CONNECTION ERROR")
+        }
+
+        throw new Error((error as Error).message)
+
+    }
+}
+
 const getUser = async (id: UserGetType['id']): Promise<UserGetType> => {
     try {
         const response = await api.get<apiResponse<UserGetType>>(API_USERS + "/" + id)
@@ -199,4 +235,5 @@ export {
     postUser,
     putUser,
     patchUserActive,
+    getUsersMecanicos
 }

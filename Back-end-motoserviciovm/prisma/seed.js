@@ -97,6 +97,7 @@ const PERMISOS_SEED = [
   { permiso: "servicios:create", modulo: "SERVICIOS", estadoId: 1 },
   { permiso: "servicios:edit", modulo: "SERVICIOS", estadoId: 1 },
   { permiso: "servicios:detail", modulo: "SERVICIOS", estadoId: 1 },
+  { permiso: "servicios:salida", modulo: "SERVICIOS", estadoId: 1 },
 
   { permiso: "ingresos-egresos:create", modulo: "INGRESOSEGRESOS", estadoId: 1 },
   { permiso: "ingresos-egresos:view", modulo: "INGRESOSEGRESOS", estadoId: 1 },

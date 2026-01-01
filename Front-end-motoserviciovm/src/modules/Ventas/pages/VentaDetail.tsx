@@ -35,19 +35,6 @@ const VentaDetail = () => {
     }
   };
 
-  
-    const chipColorByEstado = (id: number) => {
-        switch (id) {
-        case estados().enEspera:
-            return "warning";
-        case estados().confirmado:
-            return "success";
-        case estados().cancelado:
-            return "error";
-        default:
-            return "primary";
-        }
-    };
 
   useEffect(() => { getVentaOne(); }, [id]);
 

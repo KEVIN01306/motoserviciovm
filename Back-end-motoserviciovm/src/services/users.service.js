@@ -22,6 +22,28 @@ const getUSers = async () => {
 	return users;
 }
 
+const getUSersMecanicos = async () => {
+
+	const users = await prisma.user.findMany({
+		where: {estadoId: {
+			not: estados().inactivo
+		},
+		tipo: ""
+	},
+		include:{
+			roles: true,
+			sucursales: true,
+		}
+	});
+
+	if (!users){
+		const error = new Error("DATA_NOT_FOUND");
+		error.code('DATA_NOT_FOUND')
+		throw error;
+	}
+
+	return users;
+}
 
 const getUSer = async (id) => {
 
@@ -171,4 +193,5 @@ export {
 	postUser,
 	putUser,
 	patchUserActive,
+	getUSersMecanicos
 }

@@ -11,8 +11,15 @@ const router = Router();
 router.get('/', getServiciosHandler);
 router.get('/:id', getServicioHandler);
 // accept multiple images in field 'imagenes'
-router.post('/', upload.array('imagenes', 10), postServicioHandler);
-router.put('/:id', upload.array('imagenes', 10), putServicioHandler);
+router.post('/', upload.fields([
+        { name: 'imagenes', maxCount: 10 },
+        { name: 'firmaEntrada', maxCount: 1 }
+    ]), postServicioHandler);
+router.put('/:id', upload.fields([
+        { name: 'imagenes', maxCount: 10 },
+        { name: 'firmaEntrada', maxCount: 1 },
+        { name: 'firmaSalida', maxCount: 1 }
+    ]), putServicioHandler);
 router.delete('/:id', deleteServicioHandler);
 
 export default router;

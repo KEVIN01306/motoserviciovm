@@ -1,10 +1,11 @@
 import  { Router } from 'express'
-import { getUsersHandler,getUserHandler, postUserHandler, putUserHandler, patchUserActiveHandler} from '../controllers/users.controller.js'
+import { getUsersHandler,getUserHandler, postUserHandler, putUserHandler, patchUserActiveHandler, getUsersMecanicosHandler} from '../controllers/users.controller.js'
 import { verifyTokenHandler } from '../controllers/auth.controller.js';
 
 const router = Router();
 
 router.get("/", verifyTokenHandler(),getUsersHandler);
+router.get("/mecanicos", verifyTokenHandler(),getUsersMecanicosHandler);
 router.get("/:id", verifyTokenHandler(),getUserHandler);
 router.post("/", verifyTokenHandler(),postUserHandler);
 router.put("/:id", verifyTokenHandler(),putUserHandler);

@@ -256,9 +256,15 @@ model Servicio {
   id              Int @id @default(autoincrement())
   descripcion     String
 
+  kilometraje     Int?
+
   fechaEntrada    DateTime
 
   fechaSalida     DateTime?
+
+  firmaEntrada    String?
+
+  firmaSalida     String?
 
   total           Float
 

@@ -5,13 +5,14 @@ import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiToolsLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';
 import ErrorCard from '../../../components/utils/ErrorCard';
-import ServicioForm from '../components/ServicioForm';
 import { getServicio, putServicio } from '../../../services/servicios.services';
 import { useGoTo } from '../../../hooks/useGoTo';
 import { successToast, errorToast } from '../../../utils/toast';
 import { mergeServicioDataWithDefaults, type ServicioGetType } from '../../../types/servicioType';
+import ServicioFormSalida from '../components/ServicioFormSalida';
+import { estados } from '../../../utils/estados';
 
-const ServicioEdit = () => {
+const ServicioSalida = () => {
   const { id } = useParams();
   const [data, setData] = useState<ServicioGetType | null>(null);
   const [loading, setLoading] = useState(true);
@@ -30,8 +31,9 @@ const ServicioEdit = () => {
 
   useEffect(() => { fetch(); }, [id]);
 
-  const handleSubmit = async (payload: any) => {
+  const handleSubmit = async (payload: ServicioGetType) => {
     try {
+      payload.estadoId = estados().entregado
       const normalizedServicioItems = mergeServicioDataWithDefaults(payload);
       await putServicio(id, normalizedServicioItems);
       successToast('Servicio actualizado');
@@ -47,7 +49,7 @@ const ServicioEdit = () => {
 
   const breadcrumbs = [
     { label: 'Servicios', href: '/admin/servicios', icon: <RiToolsLine fontSize="inherit" /> },
-    { label: `Editar Servicio #${data.id}`, icon: <RiToolsLine fontSize="inherit" /> },
+    { label: `Dar salida Servicio #${data.id}`, icon: <RiToolsLine fontSize="inherit" /> },
   ];
 
   return (
@@ -55,11 +57,11 @@ const ServicioEdit = () => {
       <BreadcrumbsRoutes items={breadcrumbs} />
       <Container sx={{ mt: 4, mb: 4 }}>
           <CardContent>
-            <ServicioForm initial={data} onSubmit={handleSubmit} submitLabel="Actualizar" />
+            <ServicioFormSalida initial={data} onSubmit={handleSubmit} submitLabel="Dar Salida" />
           </CardContent>
       </Container>
     </>
   );
 };
 
-export default ServicioEdit;
+export default ServicioSalida;

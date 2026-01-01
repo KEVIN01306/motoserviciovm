@@ -5,11 +5,11 @@ export const servicioItemSchema = z.object({
     checked: z.boolean().optional(),
     itemName: z.string().optional(),
     itemDescripcion: z.string().optional(),
-    notas: z.string().optional(),
+    notas: z.string().optional().nullable(),
 });
 
 export const servicioProductoClienteSchema = z.object({
-    id: z.number().optional(),
+    id: z.string().optional(),
     nombre: z.string().min(1, 'El nombre es obligatorio'),
     cantidad: z.number(),
 });
@@ -20,9 +20,8 @@ export const imagenMetaSchema = z.object({
 
 export const servicioSchema = z.object({
     id: z.string().optional(),
+    kilometraje: z.number(),
     descripcion: z.string().min(1, 'La descripcion es obligatoria'),
-    fechaEntrada: z.coerce.date().optional(),
-    fechaSalida: z.coerce.date().optional().nullable(),
     total: z.number().optional(),
     observaciones: z.string().optional(),
     proximaFechaServicio: z.coerce.date().optional().nullable(),

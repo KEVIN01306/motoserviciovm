@@ -32,6 +32,10 @@ const getServicioHandler = async (req, res) => {
 const postServicioHandler = async (req, res) => {
     try {
         const body = req.body || {};
+
+        if (req.file) {
+            body.firmaEntrada = directorio + req.file.filename;
+        }
         // parse numeric fields
         if (typeof body.estadoId !== 'undefined') body.estadoId = parseInt(body.estadoId);
         if (typeof body.sucursalId !== 'undefined') body.sucursalId = parseInt(body.sucursalId);
@@ -40,6 +44,7 @@ const postServicioHandler = async (req, res) => {
         if (typeof body.mecanicoId !== 'undefined') body.mecanicoId = parseInt(body.mecanicoId);
         if (typeof body.tipoServicioId !== 'undefined') body.tipoServicioId = parseInt(body.tipoServicioId);
         if (typeof body.total !== 'undefined') body.total = parseFloat(body.total);
+        if (typeof body.kilometraje !== 'undefined') body.kilometraje = parseInt(body.kilometraje);
 
         // parse nested arrays if sent as JSON strings; ensure imagenesMeta is always an array
         try { if (typeof body.servicioItems === 'string') body.servicioItems = JSON.parse(body.servicioItems); } catch(e) { body.servicioItems = []; }
@@ -58,8 +63,6 @@ const postServicioHandler = async (req, res) => {
         }
 
         // convert date strings to JS Date objects so Prisma receives Date for DateTime fields
-        if (typeof body.fechaEntrada === 'string' && body.fechaEntrada) body.fechaEntrada = new Date(body.fechaEntrada);
-        if (typeof body.fechaSalida === 'string' && body.fechaSalida) body.fechaSalida = new Date(body.fechaSalida);
         if (typeof body.proximaFechaServicio === 'string' && body.proximaFechaServicio) body.proximaFechaServicio = new Date(body.proximaFechaServicio);
 
         // attach files array to data after converting dates
@@ -86,6 +89,7 @@ const putServicioHandler = async (req, res) => {
         if (typeof body.mecanicoId !== 'undefined') body.mecanicoId = parseInt(body.mecanicoId);
         if (typeof body.tipoServicioId !== 'undefined') body.tipoServicioId = parseInt(body.tipoServicioId);
         if (typeof body.total !== 'undefined') body.total = parseFloat(body.total);
+        if (typeof body.kilometraje !== 'undefined') body.kilometraje = parseInt(body.kilometraje);
 
         try { if (typeof body.servicioItems === 'string') body.servicioItems = JSON.parse(body.servicioItems); } catch(e) { body.servicioItems = []; }
         try { if (typeof body.productosCliente === 'string') body.productosCliente = JSON.parse(body.productosCliente); } catch(e) { body.productosCliente = []; }
@@ -102,8 +106,6 @@ const putServicioHandler = async (req, res) => {
             return res.status(400).json(responseError(msgs));
         }
         // convert date strings to JS Date objects so Prisma receives Date for DateTime fields
-        if (typeof body.fechaEntrada === 'string' && body.fechaEntrada) body.fechaEntrada = new Date(body.fechaEntrada);
-        if (typeof body.fechaSalida === 'string' && body.fechaSalida) body.fechaSalida = new Date(body.fechaSalida);
         if (typeof body.proximaFechaServicio === 'string' && body.proximaFechaServicio) body.proximaFechaServicio = new Date(body.proximaFechaServicio);
 
 

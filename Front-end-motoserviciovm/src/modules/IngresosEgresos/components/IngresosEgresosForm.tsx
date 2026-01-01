@@ -57,7 +57,6 @@ const IngresosEgresosForm = forwardRef((props: Props, ref) => {
     { id: tiposMap.egreso, tipo: 'Egreso' },
   ];
 
-  const tipoIdWatch = watch('tipoId');
 
 
   return (
@@ -71,9 +70,8 @@ const IngresosEgresosForm = forwardRef((props: Props, ref) => {
       </Grid>
 
       <Grid size={{ xs: 12, sm: 6 }}>
-        <TextField select {...register('tipoId' as any)} defaultValue={initial?.tipoId} label="Tipo" fullWidth variant="standard">
-          <MenuItem value={0}>Seleccionar</MenuItem>
-          {tipos.map(t => (<MenuItem key={t.id} value={t.id}>{t.tipo}</MenuItem>))}
+        <TextField select {...register('tipoId' as any)} defaultValue={initial?.tipoId ?? tiposContabilidad().egreso} label="Tipo" fullWidth variant="standard">
+          <MenuItem key={tiposContabilidad().egreso} selected value={tiposContabilidad().egreso}>Egreso</MenuItem>
         </TextField>
       </Grid>
 
@@ -88,16 +86,12 @@ const IngresosEgresosForm = forwardRef((props: Props, ref) => {
         />
       </Grid>
 
-      {
-        tipoIdWatch === tiposContabilidad().egreso && (
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField select {...register('moduloTallerId' as any, { valueAsNumber: true })} defaultValue={initial?.moduloTallerId} fullWidth label="Módulo" variant="standard" >
              <MenuItem selected value={1}>Taller</MenuItem>
              <MenuItem value={2}>Repuestos</MenuItem>
             </TextField>
           </Grid>
-        )
-      }
 
       <Grid size={{ xs: 12 }}>
         <Button type="submit" variant="contained" fullWidth disabled={isSubmitting}>{submitLabel}</Button>

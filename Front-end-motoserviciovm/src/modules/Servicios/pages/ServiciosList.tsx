@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Grid, Fab } from '@mui/material';
+import { Grid, Fab, Chip } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiMoneyDollarCircleLine, RiToolsLine } from 'react-icons/ri';
@@ -15,6 +15,8 @@ import type { ServicioGetType } from '../../../types/servicioType';
 import { formatDate } from '../../../utils/formatDate';
 import { PiDeviceTabletFill, PiUserCheckBold } from 'react-icons/pi';
 import { estados } from '../../../utils/estados';
+import type { EstadoType } from '../../../types/estadoType';
+import { MdBikeScooter } from 'react-icons/md';
 
 const ServiciosList = () => {
   const [items, setItems] = useState<ServicioGetType[]>([]);
@@ -45,12 +47,27 @@ const ServiciosList = () => {
     setFiltered(items.filter(i => String(i.id).toLowerCase().includes(l) || (i.descripcion ?? '').toLowerCase().includes(l) || (i.moto?.placa ?? '').toLowerCase().includes(l)));
   }, [term, items]);
 
+    const chipColorByEstado = (id: number) => {
+        switch (id) {
+        case estados().enEspera:
+            return "warning";
+        case estados().confirmado:
+            return "success";
+        case estados().cancelado:
+            return "error";
+        default:
+            return "primary";
+        }
+    };
+
+
   const columns = (): Column<ServicioGetType>[] => {
     const base: Column<ServicioGetType>[] = [
-      { id: 'id', label: 'ID', minWidth: 60 },
+      { id: 'id', label: 'Codigo', minWidth: 60 },
       { id: 'descripcion', label: 'Descripción', minWidth: 220 },
       { id: 'moto', label: 'Moto', minWidth: 120, format: (v) => v?.placa ?? '-' },
       { id: 'total', label: 'Total', minWidth: 120 },
+       { id: 'estado', label: 'Estado', minWidth: 100, format: (v: EstadoType) => <Chip variant='outlined' label={v?.estado ?? ''} color={chipColorByEstado(v?.id ?? 0)} /> },
       { id: 'createdAt', label: 'Creado', minWidth: 160, format: (v) => formatDate(v as any) },
     ];
 
@@ -77,6 +94,11 @@ const ServiciosList = () => {
       if (user?.permisos.includes('servicios:edit')) {
         actions.push({ label: (<><RiMoneyDollarCircleLine /><span className="ml-1.5">Editar</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/edit`), permiso: 'servicios:edit' });
       }
+
+      if (user?.permisos.includes('servicios:salida')) {
+        actions.push({ label: (<><MdBikeScooter /><span className="ml-1.5">Salida</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/salida`), permiso: 'servicios:edit' });
+      }
+
 
       if (user?.permisos.includes('servicios:finalize')) {
         actions.push({ label: (<><PiUserCheckBold /><span className="ml-1.5">Finalizar</span></>), onClick: async (r) => {

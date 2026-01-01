@@ -8,7 +8,7 @@ const getServicios = async () => {
     const items = await prisma.servicio.findMany({
         where: { estadoId: { not: estados().inactivo } },
         orderBy: { createdAt: 'desc' },
-        include: { imagen: true, servicioItems: true, productosCliente: true, moto: true, sucursal: true,cliente: true, mecanico: true },
+        include: { moto: true, sucursal: true,cliente: true, mecanico: true,estado: true },
     });
     if (!items) { const error = new Error('DATA_NOT_FOUND'); error.code = 'DATA_NOT_FOUND'; throw error; }
     return items;
@@ -23,6 +23,9 @@ const getServicio = async (id) => {
 const postServicio = async (data) => {
     const { servicioItems, productosCliente, imagenesMeta, imagenFiles, ...base } = data;
     const uploaded = Array.isArray(imagenFiles) ? imagenFiles : [];
+    const fechaEntrada = new Date() 
+
+    base.fechaEntrada = fechaEntrada
 
     try {
         const result = await prisma.$transaction(async (tx) => {

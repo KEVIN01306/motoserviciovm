@@ -12,6 +12,8 @@ const getIngresosEgresos = async () => {
                 not: estados().inactivo,
             },
         },
+            
+        orderBy: { createdAt: 'desc' },
         include: { tipo: true, sucursal: true,estado: true },
     });
 

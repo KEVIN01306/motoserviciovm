@@ -25,7 +25,7 @@ const getServicios = async (): Promise<ServicioGetType[]> => {
   }
 };
 
-const getServicio = async (id: number): Promise<ServicioGetType> => {
+const getServicio = async (id: string): Promise<ServicioGetType> => {
   try {
     const response = await api.get<apiResponse<ServicioGetType>>(`${API_SERVICIOS}/${id}`);
     const item = response.data.data;
@@ -83,6 +83,7 @@ const postServicio = async (payload: Partial<ServicioType> & { imagenesFiles?: F
 };
 
 const putServicio = async (id: string, payload: Partial<ServicioType> & { imagenesFiles?: File[] }) => {
+    console.log('Submitting servicio edit with payload:', payload, 'id: ', id);
   try {
     const form = new FormData();
     Object.entries(payload).forEach(([key, value]) => {

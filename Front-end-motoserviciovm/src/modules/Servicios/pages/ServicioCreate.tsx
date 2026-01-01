@@ -37,9 +37,7 @@ const ServicioCreate = () => {
 
   const handleSubmit = async (payload: any) => {
     try {
-      // set mecanicoId as logged user
-      const mecanicoId = user?.id ?? 0;
-      const body = { ...payload, mecanicoId };
+      const body = { ...payload };
       const response = await postServicio(body);
       successToast('Servicio creado');
       if (seHaranVentas) {
@@ -60,10 +58,8 @@ const ServicioCreate = () => {
   return (
     <>
       <BreadcrumbsRoutes items={breadcrumbs} />
-      <Container >
-          <CardContent>
+      <Container sx={{width: '100%', display: 'flex' , justifyContent: 'center'}} >
             <ServicioForm onSubmit={handleSubmit} initial={draft ?? undefined} seHaranVentas={seHaranVentas} changeSeHaranVentas={changeSeHaranVentas} />
-          </CardContent>
       </Container>
     </>
   );
