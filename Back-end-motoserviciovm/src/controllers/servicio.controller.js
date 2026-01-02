@@ -1,5 +1,6 @@
 import { responseError, responseSucces, responseSuccesAll } from "../helpers/response.helper.js";
 import { getServicios, getServicio, postServicio, putServicio, deleteServicio } from "../services/servicio.service.js";
+import { estados } from "../utils/estados.js";
 import { servicioSchema } from "../zod/servicio.schema.js";
 
 const directorio = '/uploads/servicios/';
@@ -32,88 +33,149 @@ const getServicioHandler = async (req, res) => {
 const postServicioHandler = async (req, res) => {
     try {
         const body = req.body || {};
+        const directorio = '/uploads/servicios/'; // Ajusta según tu configuración
 
-        if (req.file) {
-            body.firmaEntrada = directorio + req.file.filename;
+        // 1. Manejo de archivos provenientes de upload.fields
+        // Inicializamos para que Zod no de error de 'undefined'
+        body.firmaEntrada = null; 
+        let imagenesParaPrisma = [];
+
+        if (req.files) {
+            // Manejar la Firma (va al campo string del body)
+            if (req.files['firmaEntrada'] && req.files['firmaEntrada'][0]) {
+                body.firmaEntrada = directorio + req.files['firmaEntrada'][0].filename;
+            }
+
+            // Manejar el Array de Imágenes (se pasará como imagenFiles)
+            if (req.files['imagenes']) {
+                imagenesParaPrisma = req.files['imagenes'];
+            }
         }
-        // parse numeric fields
-        if (typeof body.estadoId !== 'undefined') body.estadoId = parseInt(body.estadoId);
-        if (typeof body.sucursalId !== 'undefined') body.sucursalId = parseInt(body.sucursalId);
-        if (typeof body.motoId !== 'undefined') body.motoId = parseInt(body.motoId);
-        if (typeof body.clienteId !== 'undefined' && body.clienteId !== null) body.clienteId = parseInt(body.clienteId);
-        if (typeof body.mecanicoId !== 'undefined') body.mecanicoId = parseInt(body.mecanicoId);
-        if (typeof body.tipoServicioId !== 'undefined') body.tipoServicioId = parseInt(body.tipoServicioId);
-        if (typeof body.total !== 'undefined') body.total = parseFloat(body.total);
-        if (typeof body.kilometraje !== 'undefined') body.kilometraje = parseInt(body.kilometraje);
 
-        // parse nested arrays if sent as JSON strings; ensure imagenesMeta is always an array
-        try { if (typeof body.servicioItems === 'string') body.servicioItems = JSON.parse(body.servicioItems); } catch(e) { body.servicioItems = []; }
-        try { if (typeof body.productosCliente === 'string') body.productosCliente = JSON.parse(body.productosCliente); } catch(e) { body.productosCliente = []; }
-        try { if (typeof body.imagenesMeta === 'string') body.imagenesMeta = JSON.parse(body.imagenesMeta); } catch(e) { body.imagenesMeta = []; }
-        console.log('Body imagenesMeta before parse:', body.imagenesMeta);
-        try { if (typeof body.imagenesMeta === 'string') body.imagenesMeta = JSON.parse(body.imagenesMeta); } catch(e) { body.imagenesMeta = []; }
-        console.log('Body imagenesMeta after parse:', body.imagenesMeta);
-        if (!Array.isArray(body.imagenesMeta)) body.imagenesMeta = [];
-        console.log('Body imagenesMeta final:', body.imagenesMeta);
+        // 2. Parseo de campos numéricos
+        const camposNumericos = ['estadoId', 'sucursalId', 'motoId', 'clienteId', 'mecanicoId', 'tipoServicioId', 'kilometraje'];
+        camposNumericos.forEach(campo => {
+            if (body[campo] !== undefined && body[campo] !== null && body[campo] !== '') {
+                body[campo] = parseInt(body[campo]);
+            }
+        });
+        if (body.total) body.total = parseFloat(body.total);
 
+        // 3. Parseo de JSON Strings (Arrays anidados)
+        const camposJSON = ['servicioItems', 'productosCliente', 'imagenesMeta'];
+        camposJSON.forEach(campo => {
+            try {
+                if (typeof body[campo] === 'string') {
+                    body[campo] = JSON.parse(body[campo]);
+                }
+            } catch (e) {
+                body[campo] = [];
+            }
+        });
+
+        // 4. Validación con Zod
+        // Ahora firmaEntrada ya es un string o null, no undefined.
         const validation = servicioSchema.safeParse(body);
         if (!validation.success) {
             const msgs = validation.error.issues.map(i => `${i.path.join('.')}: ${i.message}`);
             return res.status(400).json(responseError(msgs));
         }
 
-        // convert date strings to JS Date objects so Prisma receives Date for DateTime fields
-        if (typeof body.proximaFechaServicio === 'string' && body.proximaFechaServicio) body.proximaFechaServicio = new Date(body.proximaFechaServicio);
+        // 5. Preparar objeto final para postServicio(data)
+        if (body.proximaFechaServicio) body.proximaFechaServicio = new Date(body.proximaFechaServicio);
 
-        // attach files array to data after converting dates
-        const dataToSend = { ...body, imagenFiles: req.files };
+        const dataToSend = { 
+            ...body, 
+            imagenFiles: imagenesParaPrisma // Aquí pasamos los archivos para el loop de Prisma
+        };
 
         const created = await postServicio(dataToSend);
         return res.status(201).json(responseSucces('Servicio creado', created));
+
     } catch (err) {
         console.error('Post servicio error:', err);
-        let status = 500; let msg = 'INTERNAL_SERVER_ERROR';
-        if (err.code === 'DATA_NOT_FOUND') { status = 404; msg = err.code; }
+        let status = 500;
+        let msg = 'INTERNAL_SERVER_ERROR';
+        if (err.code === 'DATA_NOT_FOUND_INVENTARIO') {
+            status = 404;
+            msg = 'Uno de los items de inventario no existe';
+        }
         return res.status(status).json(responseError(msg));
     }
 }
-
-const putServicioHandler = async (req, res) => {
+    const putServicioHandler = async (req, res) => {
     try {
         const { id } = req.params;
         const body = req.body || {};
-        if (typeof body.estadoId !== 'undefined') body.estadoId = parseInt(body.estadoId);
-        if (typeof body.sucursalId !== 'undefined') body.sucursalId = parseInt(body.sucursalId);
-        if (typeof body.motoId !== 'undefined') body.motoId = parseInt(body.motoId);
-        if (typeof body.clienteId !== 'undefined' && body.clienteId !== null) body.clienteId = parseInt(body.clienteId);
-        if (typeof body.mecanicoId !== 'undefined') body.mecanicoId = parseInt(body.mecanicoId);
-        if (typeof body.tipoServicioId !== 'undefined') body.tipoServicioId = parseInt(body.tipoServicioId);
-        if (typeof body.total !== 'undefined') body.total = parseFloat(body.total);
-        if (typeof body.kilometraje !== 'undefined') body.kilometraje = parseInt(body.kilometraje);
 
-        try { if (typeof body.servicioItems === 'string') body.servicioItems = JSON.parse(body.servicioItems); } catch(e) { body.servicioItems = []; }
-        try { if (typeof body.productosCliente === 'string') body.productosCliente = JSON.parse(body.productosCliente); } catch(e) { body.productosCliente = []; }
-        console.log('Body imagenesMeta before parse:', body.imagenesMeta);
-        try { if (typeof body.imagenesMeta === 'string') body.imagenesMeta = JSON.parse(body.imagenesMeta); } catch(e) { body.imagenesMeta = []; }
-        console.log('Body imagenesMeta after parse:', body.imagenesMeta);
-        if (!Array.isArray(body.imagenesMeta)) body.imagenesMeta = [];
-        console.log('Body imagenesMeta final:', body.imagenesMeta);
-        const dataToSend = { ...body, imagenFiles: req.files };
+        // 1. Manejo de archivos (Firmas e Imágenes)
+        let imagenesParaPrisma = [];
 
+        if (req.files) {
+            // Firma de Recepción (Entrada)
+            if (req.files['firmaRecepcion'] && req.files['firmaRecepcion'][0]) {
+                body.firmaEntrada = directorio + req.files['firmaRecepcion'][0].filename;
+            }
+
+            // Firma de Salida
+            if (req.files['firmaSalida'] && req.files['firmaSalida'][0]) {
+                body.firmaSalida = directorio + req.files['firmaSalida'][0].filename;
+            }
+
+            // Array de nuevas imágenes
+            if (req.files['imagenes']) {
+                imagenesParaPrisma = req.files['imagenes'];
+            }
+        }
+
+        // 2. Parseo de campos numéricos (solo si vienen en el body)
+        const camposNumericos = ['estadoId', 'sucursalId', 'motoId', 'clienteId', 'mecanicoId', 'tipoServicioId', 'kilometraje'];
+        camposNumericos.forEach(campo => {
+            if (body[campo] !== undefined && body[campo] !== null && body[campo] !== '') {
+                body[campo] = parseInt(body[campo]);
+            }
+        });
+        if (body.total !== undefined) body.total = parseFloat(body.total);
+
+        // 3. Parseo de JSON Strings
+        const camposJSON = ['servicioItems', 'productosCliente', 'imagenesMeta'];
+        camposJSON.forEach(campo => {
+            try {
+                if (typeof body[campo] === 'string') {
+                    body[campo] = JSON.parse(body[campo]);
+                }
+            } catch (e) {
+                // En PUT, a veces es mejor no resetear a [] si falla el parse, 
+                // pero mantenemos tu lógica de consistencia.
+                body[campo] = body[campo] || []; 
+            }
+        });
+
+        // 4. Validación parcial con Zod
         const validation = servicioSchema.partial().safeParse(body);
         if (!validation.success) {
             const msgs = validation.error.issues.map(i => `${i.path.join('.')}: ${i.message}`);
             return res.status(400).json(responseError(msgs));
         }
-        // convert date strings to JS Date objects so Prisma receives Date for DateTime fields
-        if (typeof body.proximaFechaServicio === 'string' && body.proximaFechaServicio) body.proximaFechaServicio = new Date(body.proximaFechaServicio);
 
+        // 5. Conversión de fechas
+        if (typeof body.proximaFechaServicio === 'string' && body.proximaFechaServicio) {
+            body.proximaFechaServicio = new Date(body.proximaFechaServicio);
+        }
+
+        // 6. Preparar objeto para el servicio
+        const dataToSend = { 
+            ...body, 
+            imagenFiles: imagenesParaPrisma 
+        };
 
         const updated = await putServicio(parseInt(id), dataToSend);
         return res.status(200).json(responseSucces('Servicio actualizado', updated));
+
     } catch (err) {
         console.error('Put servicio error:', err);
-        let code = 500; let msg = 'INTERNAL_SERVER_ERROR';
+        let code = 500; 
+        let msg = 'INTERNAL_SERVER_ERROR';
         if (err.code === 'DATA_NOT_FOUND') { code = 404; msg = err.code; }
         return res.status(code).json(responseError(msg));
     }
@@ -132,10 +194,56 @@ const deleteServicioHandler = async (req, res) => {
     }
 }
 
+const salidaServicioHandler = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const body = req.body || {};
+
+        // Handle file uploads
+        if (req.files && req.files['firmaSalida'] && req.files['firmaSalida'][0]) {
+            body.firmaSalida = directorio + req.files['firmaSalida'][0].filename;
+        }
+
+        // Parse numeric fields
+        if (body.total !== undefined) body.total = parseFloat(body.total);
+
+        // Parse date fields
+        if (typeof body.proximaFechaServicio === 'string' && body.proximaFechaServicio) {
+            body.proximaFechaServicio = new Date(body.proximaFechaServicio);
+        }
+
+        // Validate required fields
+        if ( !body.observaciones || !body.total || !body.firmaSalida) {
+            return res.status(400).json(responseError('Missing required fields'));
+        }
+
+        // Prepare data for service
+        const dataToSend = {
+            proximaFechaServicio: body.proximaFechaServicio,
+            descripcionProximoServicio: body.descripcionProximoServicio,
+            observaciones: body.observaciones,
+            total: body.total,
+            firmaSalida: body.firmaSalida,
+            estadoId: estados().entregado,
+            fechaSalida: new Date(),
+        };
+
+        const updated = await putServicio(parseInt(id), dataToSend);
+        return res.status(200).json(responseSucces('Salida registrada', updated));
+    } catch (err) {
+        console.error('Salida servicio error:', err);
+        let code = 500;
+        let msg = 'INTERNAL_SERVER_ERROR';
+        if (err.code === 'DATA_NOT_FOUND') { code = 404; msg = err.code; }
+        return res.status(code).json(responseError(msg));
+    }
+};
+
 export {
     getServiciosHandler,
     getServicioHandler,
     postServicioHandler,
     putServicioHandler,
     deleteServicioHandler,
+    salidaServicioHandler,
 }

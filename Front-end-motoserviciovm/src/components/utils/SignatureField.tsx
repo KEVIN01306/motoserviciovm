@@ -27,9 +27,15 @@ const theme = createTheme({
   shape: { borderRadius: 8 },
 });
 
-const SignatureField = ({ onSaveSignature }) => {
+
+/**
+ * Props:
+ * - onSaveSignature: callback para enviar la firma (base64 o File)
+ * - initialValue: string (url or base64) para mostrar firma inicial
+ */
+const SignatureField = ({ onSaveSignature, initialValue, text }) => {
   const [open, setOpen] = useState(false);
-  const [internalSignature, setInternalSignature] = useState(null); 
+  const [internalSignature, setInternalSignature] = useState(initialValue ?? null); 
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
 
@@ -45,6 +51,12 @@ const SignatureField = ({ onSaveSignature }) => {
         ctx.strokeStyle = '#000';
         ctx.lineWidth = 2;
         ctx.lineCap = 'round';
+        // Si hay firma inicial y es base64, dibujarla
+        if (internalSignature && typeof internalSignature === 'string' && internalSignature.startsWith('data:image')) {
+          const img = new window.Image();
+          img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          img.src = internalSignature;
+        }
       }
     }, 100);
   };
@@ -79,21 +91,23 @@ const SignatureField = ({ onSaveSignature }) => {
     tempCanvas.width = canvas.width;
     tempCanvas.height = canvas.height;
     const tempCtx = tempCanvas.getContext('2d');
-    
     tempCtx.fillStyle = '#fff';
     tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
     tempCtx.drawImage(canvas, 0, 0);
-    
     const jpgBase64 = tempCanvas.toDataURL('image/jpeg', 0.8);
-    
-    // Guardamos localmente para mostrar la vista previa
     setInternalSignature(jpgBase64);
-    
-    // Pasamos la variable al componente padre si la prop existe
     if (onSaveSignature) {
+      // Si quieres enviar como File, descomenta lo siguiente:
+      // const arr = jpgBase64.split(',');
+      // const mime = arr[0].match(/:(.*?);/)[1];
+      // const bstr = atob(arr[1]);
+      // let n = bstr.length;
+      // const u8arr = new Uint8Array(n);
+      // while (n--) u8arr[n] = bstr.charCodeAt(n);
+      // const file = new File([u8arr], 'firma.jpg', { type: mime });
+      // onSaveSignature(file);
       onSaveSignature(jpgBase64);
     }
-    
     setOpen(false);
   };
 
@@ -116,7 +130,7 @@ const SignatureField = ({ onSaveSignature }) => {
           onClick={handleOpen}
           sx={{ textTransform: 'none' }}
         >
-          Firmar Hoja de recepcion
+          {text}
         </Button>
       ) : (
         <Paper variant="outlined" sx={{ p: 1, position: 'relative', bgcolor: '#fff' }}>

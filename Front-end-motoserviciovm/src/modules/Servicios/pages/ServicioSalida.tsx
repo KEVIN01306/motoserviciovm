@@ -5,7 +5,7 @@ import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiToolsLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';
 import ErrorCard from '../../../components/utils/ErrorCard';
-import { getServicio, putServicio } from '../../../services/servicios.services';
+import { getServicio, putFirmaSalida } from '../../../services/servicios.services';
 import { useGoTo } from '../../../hooks/useGoTo';
 import { successToast, errorToast } from '../../../utils/toast';
 import { mergeServicioDataWithDefaults, type ServicioGetType } from '../../../types/servicioType';
@@ -31,12 +31,26 @@ const ServicioSalida = () => {
 
   useEffect(() => { fetch(); }, [id]);
 
-  const handleSubmit = async (payload: ServicioGetType) => {
+  const handleSubmit = async (payload: any) => {
     try {
-      payload.estadoId = estados().entregado
-      const normalizedServicioItems = mergeServicioDataWithDefaults(payload);
-      await putServicio(id, normalizedServicioItems);
-      successToast('Servicio actualizado');
+      // Solo enviar los campos requeridos
+      const {
+        total,
+        observaciones,
+        proximaFechaServicio,
+        descripcionProximoServicio,
+        firmaSalidaFile,
+        // ...otros
+      } = payload;
+      if (!firmaSalidaFile) throw new Error('Debe adjuntar la firma de salida');
+      await putFirmaSalida(id, {
+        total,
+        observaciones,
+        proximaFechaServicio: proximaFechaServicio || '',
+        descripcionProximoServicio: descripcionProximoServicio || '',
+        firmaSalida: firmaSalidaFile,
+      });
+      successToast('Firma de salida registrada');
       goTo('/admin/servicios');
     } catch (err: any) {
       errorToast(err?.message ?? 'Error al actualizar');

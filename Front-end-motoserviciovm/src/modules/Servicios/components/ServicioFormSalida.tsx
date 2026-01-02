@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useState } from 'react';
-import { Grid, TextField, Button, MenuItem, Box, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Paper, Checkbox, Autocomplete, Fab, FormControlLabel, Typography } from '@mui/material';
+import { Grid, TextField, Button, MenuItem, Box, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Paper, Checkbox, Autocomplete, Fab, FormControlLabel, Typography, Alert } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useForm } from 'react-hook-form';
@@ -17,6 +17,8 @@ import { getTipos } from '../../../services/tipoServicio.services';
 import type { SucursalType } from '../../../types/sucursalType';
 import type { UserGetType } from '../../../types/userType';
 import SignatureField from '../../../components/utils/SignatureField';
+import { estados } from '../../../utils/estados';
+import ProductsTable from '../../../components/Table/ProductsTable';
 
 type Props = {
   initial?: Partial<ServicioGetType>;
@@ -47,7 +49,8 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
   const [tipoServicioSelected,setTipoServicioSelected]=useState<TipoServicioGetType|null>(initial?.tipoServicio ? initial.tipoServicio : null);
   const [mecanicos,setMecanicos] = useState<UserGetType[]>([])
   const [mecanicoSelected,setMecanicoSelected] = useState<UserGetType|null>(initial?.mecanico? initial.mecanico : null )
-  const [imagenGuardada, setImagenGuardada] = useState(null);
+  // Puede ser File (nuevo) o string (url existente)
+  const [imagenGuardada, setImagenGuardada] = useState<any>(initial?.firmaSalida ? initial.firmaSalida : null);
   
 /*
   useEffect(() => {
@@ -134,17 +137,47 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
   }, []);
 
   const internalSubmit = async (data: ServicioType) => {
-    const normalizedServicioItems = (servicioItems ?? []).map(it => ({ ...it, itemDescripcion: it.itemDescripcion ?? '', notas: it.notas ?? '' }));
-    const payload: Partial<ServicioType> & { imagenesFiles?: File[] } = {
-      ...data,
-      productosCliente,
-      servicioItems: normalizedServicioItems,
-      imagenesMeta: imagenesMeta.map(m => ({ descripcion: m.descripcion ?? '' })),
-      imagenesFiles,
+    // Solo enviar los campos requeridos para la salida
+    let firmaSalidaFile: File | undefined = undefined;
+    if (imagenGuardada) {
+      if (imagenGuardada instanceof File) {
+        firmaSalidaFile = imagenGuardada;
+      } else if (typeof imagenGuardada === 'string' && imagenGuardada.startsWith('data:image')) {
+        // Convertir base64 a File
+        const arr = imagenGuardada.split(',');
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) u8arr[n] = bstr.charCodeAt(n);
+        const file = new File([u8arr], 'firma.jpg', { type: mime });
+        firmaSalidaFile = file;
+      }
+    }
+    const payload = {
+      total: data.total,
+      observaciones: data.observaciones,
+      proximaFechaServicio: data.proximaFechaServicio,
+      descripcionProximoServicio: data.descripcionProximoServicio,
+      firmaSalidaFile,
     };
     await onSubmit(payload);
   };
+
+  const total = watch('total')
+
+  const ventasValidas = initial?.ventas?.filter(v => v.estadoId == estados().confirmado) ?? [];
+
+  const totalVentas =( ventasValidas.reduce((acc, venta) => acc + (venta.total || 0), 0) || 0);
+
+
+  const isVentasPendientes = (initial?.ventas && initial.ventas.map(v => v.estadoId).includes(estados().enEspera)) ?? false;
   
+  const dataTableTotales = [
+    { label: 'Total Servicio', value: `Q ${Number(total)?.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? '0.00'}` },
+    { label: 'Total Ventas', value: `Q ${totalVentas.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? '0.00'}` },
+    { label: 'Gran Total', value: `Q ${(totalVentas + (Number(total) ?? 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+  ]
   return (
     <FormEstructure handleSubmit={handleSubmit(internalSubmit)} pGrid={2}>
 
@@ -152,7 +185,7 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
         <TextField {...register('observaciones' as any)} label="Observaciones" fullWidth variant="standard" />
       </Grid>
         <Grid size={{ xs: 12 }}>
-        <TextField {...register('total' as any)} label="Total" type='number' fullWidth variant="standard" />
+        <TextField {...register('total' as any)} label="Total Servicio" type='number' fullWidth variant="standard" />
       </Grid>
       {
         initial?.tipoServicio?.servicioCompleto && (
@@ -169,12 +202,36 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
         )
       }
 
+        {
+        isVentasPendientes && (
+          <Alert severity="warning">Aun hay ventas pendientes (La suma del total solo se hara con las ventas confirmadas).</Alert>
+        )
+      }
+      <Grid size={{ xs: 12, md: 6 }}>
+
+        <ProductsTable
+            columns={[
+              { id: 'label', label: 'Indicador', minWidth: 180},
+              { id: 'value', label: 'Total', minWidth: 180},
+            ] as any}
+            rows={dataTableTotales ?? []}
+            headerColor="#1565c0"
+        />
+        
+
+      </Grid>
       <Grid size={{ xs: 12 }}>
         <Typography variant='h6' textAlign={'center'} marginBottom={4}>
           Firma del cliente
-      </Typography>
-        <SignatureField onSaveSignature={(data: any) => setImagenGuardada(data)}/>
+        </Typography>
+        <SignatureField
+          onSaveSignature={(data: any) => setImagenGuardada(data)}
+          initialValue={typeof imagenGuardada === 'string' ? imagenGuardada : undefined}
+          text={'Firma de Salida'}
+        />
       </Grid>
+
+      
 
       <Grid size={{ xs: 12 }}>
         <Button type="submit" variant="contained" fullWidth disabled={isSubmitting}>{submitLabel}</Button>

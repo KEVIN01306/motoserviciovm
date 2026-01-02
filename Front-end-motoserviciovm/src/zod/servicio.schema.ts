@@ -20,6 +20,8 @@ export const imagenMetaSchema = z.object({
 
 export const servicioSchema = z.object({
     id: z.string().optional(),
+    firmaEntrada: z.union([z.string(), z.instanceof(File)]),
+    firmaSalida: z.union([z.string(), z.instanceof(File)]).optional().nullable(),
     kilometraje: z.number(),
     descripcion: z.string().min(1, 'La descripcion es obligatoria'),
     total: z.number().optional(),

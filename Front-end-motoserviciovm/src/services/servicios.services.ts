@@ -2,6 +2,7 @@ import axios from 'axios';
 import { api } from '../axios/axios';
 import type { apiResponse } from '../types/apiResponse';
 import type { ServicioType, ServicioGetType } from '../types/servicioType';
+import type { ServicioSalidaPayloadType } from '../types/servicioType';
 
 const API_URL = import.meta.env.VITE_DOMAIN;
 const API_SERVICIOS = `${API_URL}servicios`;
@@ -44,27 +45,25 @@ const getServicio = async (id: string): Promise<ServicioGetType> => {
 };
 
 // payload may contain files in `imagenesFiles: File[]` and other fields
-const postServicio = async (payload: Partial<ServicioType> & { imagenesFiles?: File[] }) => {
-    console.log('Posting servicio with payload:', payload);
+const postServicio = async (payload: Partial<ServicioType> & { imagenesFiles?: File[], firmaEntradaFile?: File }) => {
+  console.log('Posting servicio with payload:', payload);
   try {
     const form = new FormData();
-    // simple scalar fields
     Object.entries(payload).forEach(([key, value]) => {
       if (value === undefined || value === null) return;
-      if (key === 'imagenesFiles') return;
-      // arrays (servicioItems, productosCliente, imagenesMeta) should be sent as JSON strings
+      if (key === 'imagenesFiles' || key === 'firmaEntradaFile') return;
       if (Array.isArray(value)) {
         form.append(key, JSON.stringify(value));
         return;
       }
       form.append(key, String(value));
     });
-
-    // append files in order
     if (payload.imagenesFiles && Array.isArray(payload.imagenesFiles)) {
       payload.imagenesFiles.forEach((f) => form.append('imagenes', f));
     }
-
+    if (payload.firmaEntradaFile) {
+      form.append('firmaEntrada', payload.firmaEntradaFile);
+    }
     const response = await api.post<apiResponse<ServicioGetType>>(API_SERVICIOS, form, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
@@ -82,13 +81,30 @@ const postServicio = async (payload: Partial<ServicioType> & { imagenesFiles?: F
   }
 };
 
-const putServicio = async (id: string, payload: Partial<ServicioType> & { imagenesFiles?: File[] }) => {
-    console.log('Submitting servicio edit with payload:', payload, 'id: ', id);
+export const putFirmaSalida = async (
+  id: string | number,
+  data: ServicioSalidaPayloadType
+) => {
+  const form = new FormData();
+  form.append('total', String(data.total));
+  if (data.observaciones) form.append('observaciones', data.observaciones);
+  if (data.proximaFechaServicio) form.append('proximaFechaServicio', data.proximaFechaServicio);
+  if (data.descripcionProximoServicio) form.append('descripcionProximoServicio', data.descripcionProximoServicio);
+  form.append('firmaSalida', data.firmaSalida);
+  const response = await api.put(`/servicios/salida/${id}`, form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data.data;
+};
+
+const putServicio = async (id: string, payload: Partial<ServicioType> & { imagenesFiles?: File[], firmaEntradaFile?: File}) => {
+  console.log('Submitting servicio edit with payload:', payload, 'id: ', id);
   try {
     const form = new FormData();
     Object.entries(payload).forEach(([key, value]) => {
       if (value === undefined || value === null) return;
-      if (key === 'imagenesFiles') return;
+      if (key === 'imagenesFiles' || key === 'firmaEntradaFile') return;
+      
       if (Array.isArray(value)) {
         form.append(key, JSON.stringify(value));
         return;
@@ -97,6 +113,9 @@ const putServicio = async (id: string, payload: Partial<ServicioType> & { imagen
     });
     if (payload.imagenesFiles && Array.isArray(payload.imagenesFiles)) {
       payload.imagenesFiles.forEach((f) => form.append('imagenes', f));
+    }
+    if (payload.firmaEntradaFile) {
+      form.append('firmaEntrada', payload.firmaEntradaFile);
     }
 
     const response = await api.put<apiResponse<ServicioGetType>>(`${API_SERVICIOS}/${id}`, form, {

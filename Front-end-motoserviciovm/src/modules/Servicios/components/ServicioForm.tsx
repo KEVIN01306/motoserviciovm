@@ -17,6 +17,10 @@ import { getTipos } from '../../../services/tipoServicio.services';
 import type { SucursalType } from '../../../types/sucursalType';
 import type { UserGetType } from '../../../types/userType';
 import SignatureField from '../../../components/utils/SignatureField';
+import { ModalForm } from '../../Motos/components';
+
+
+const API_URL = import.meta.env.VITE_DOMAIN;
 
 type Props = {
   initial?: Partial<ServicioGetType>;
@@ -47,7 +51,8 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
   const [tipoServicioSelected,setTipoServicioSelected]=useState<TipoServicioGetType|null>(initial?.tipoServicio ? initial.tipoServicio : null);
   const [mecanicos,setMecanicos] = useState<UserGetType[]>([])
   const [mecanicoSelected,setMecanicoSelected] = useState<UserGetType|null>(initial?.mecanico? initial.mecanico : null )
-  const [imagenGuardada, setImagenGuardada] = useState(null);
+  // Puede ser File (nuevo) o string (url/base64)
+  const [imagenGuardada, setImagenGuardada] = useState<any>(initial?.firmaEntrada ? initial.firmaEntrada : null);
 /*
   useEffect(() => {
     // load draft from localStorage
@@ -63,11 +68,15 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
     }
   }, [initial, reset]);
 */
+
+  const getUpdateMotos = async () => {
+        const m = await getMotos();
+        setMotosList(m);
+  }
   useEffect(() => {
     (async () => {
       try {
-        const m = await getMotos();
-        setMotosList(m);
+        getUpdateMotos();
         const inv = await getInventarios();
         setInventarioItems(inv);
         const suc = await getSucursales();
@@ -168,13 +177,28 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
 
   const internalSubmit = async (data: ServicioType) => {
     const normalizedServicioItems = (servicioItems ?? []).map(it => ({ ...it, itemDescripcion: it.itemDescripcion ?? '', notas: it.notas ?? '' }));
-    const payload: Partial<ServicioType> & { imagenesFiles?: File[] } = {
+    const payload: Partial<ServicioType> & { imagenesFiles?: File[], firmaEntradaFile?: File } = {
       ...data,
       productosCliente,
       servicioItems: normalizedServicioItems,
       imagenesMeta: imagenesMeta.map(m => ({ descripcion: m.descripcion ?? '' })),
       imagenesFiles,
     };
+    if (imagenGuardada) {
+      if (imagenGuardada instanceof File) {
+        payload.firmaEntradaFile = imagenGuardada;
+      } else if (typeof imagenGuardada === 'string' && imagenGuardada.startsWith('data:image')) {
+        // Convertir base64 a File
+        const arr = imagenGuardada.split(',');
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) u8arr[n] = bstr.charCodeAt(n);
+        const file = new File([u8arr], 'firma.jpg', { type: mime });
+        payload.firmaEntradaFile = file;
+      }
+    }
     await onSubmit(payload);
   };
   
@@ -198,11 +222,7 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
           renderInput={(params) => <TextField {...params} label="Moto" variant="standard" fullWidth />}
         />
         </Grid>
-          <Grid size={{ xs: 2, md: 2 }} display={'flex'} flexGrow={1} alignItems={'center'} justifyContent={'end'}>
-            <Fab size="small" color="primary" aria-label="add" >
-              <AddIcon />
-            </Fab>
-          </Grid>
+          <ModalForm onFinish={getUpdateMotos} />
       </Grid>
 
        <Grid size={{ xs: 12, sm: 6 }}>
@@ -341,8 +361,13 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
       <Grid size={{ xs: 12 }}>
         <Typography variant='h6' textAlign={'center'} marginBottom={4}>
           Firma del cliente
-      </Typography>
-        <SignatureField onSaveSignature={(data: any) => setImagenGuardada(data)}/>
+        </Typography>
+
+        <SignatureField
+          onSaveSignature={(data: any) => setImagenGuardada(data)}
+          initialValue={typeof imagenGuardada === 'string' ? `${API_URL}/${imagenGuardada}` : undefined}
+          text="Firmar Hoja de recepción"
+        />
       </Grid>
 
         

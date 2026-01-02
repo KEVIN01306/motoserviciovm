@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab } from '@mui/material';
+import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab, Avatar } from '@mui/material';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiToolsLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';
@@ -16,6 +16,8 @@ import LinkStylesNavigate from '../../../components/utils/links';
 import { exportarAPDF } from '../../../utils/exportarPdf';
 import { ExposureTwoTone } from '@mui/icons-material';
 import { PiExportDuotone } from 'react-icons/pi';
+
+const API_URL = import.meta.env.VITE_DOMAIN;
 
 const ServicioDetail = () => {
   const { id } = useParams();
@@ -57,6 +59,14 @@ const ServicioDetail = () => {
               return "primary";
           }
       };
+
+  const totalServicio =( data.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0) || 0) + (data.total || 0);
+
+  const dataTableTotales = [
+    { label: 'Total Servicio', value: `Q ${data.total?.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? '0.00'}` },
+    { label: 'Total Ventas', value: `Q ${data.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? '0.00'}` },
+    { label: 'Gran Total', value: `Q ${totalServicio.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+  ]
   
   return (
     <>
@@ -77,7 +87,6 @@ const ServicioDetail = () => {
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Placa de la moto</Typography><Typography>{data.moto?.placa ?? '-'}</Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Kilometraje</Typography><Typography>{data.kilometraje ?? '-'}</Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Estado</Typography><Typography><Chip label={data.estado?.estado ?? '-'} color={chipColorByEstado(data.estado?.id)} variant='outlined' /></Typography></Box>
-                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Total</Typography><Typography>{data.total ?? '-'}</Typography></Box>
               </Grid>
               <Grid size={6}>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Descripción</Typography><Typography>{data.descripcion}</Typography></Box>
@@ -87,31 +96,50 @@ const ServicioDetail = () => {
               </Grid>
             </Grid>
 
-            <Divider sx={{ my: 2 }} />
-
-            <Typography variant="h6" gutterBottom>Productos del cliente</Typography>
-            <ProductsTable
-              columns={[
-                { id: 'nombre', label: 'Nombre', minWidth: 180, format: (v:any) => v ?? '' },
-                { id: 'cantidad', label: 'Cantidad', minWidth: 80, align: 'center', format: (v:any) => String(v) }
-              ] as any}
-              rows={data.productosCliente ?? []}
-              headerColor="#1565c0"
-            />
+            <Box sx={{ mb: 2 }}>
+              {dataTableTotales.map((item, index) => (
+                <Box key={index} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, borderTop: index === 0 ? '1px solid #e0e0e0' : 'none', pt: index === 0 ? 1 : 0 }}>
+                  <Typography sx={{ color: '#6b7280', fontWeight: 600 }}>{item.label}</Typography>
+                  <Typography>{item.value}</Typography>
+                </Box>
+              ))}
+            </Box>
 
             <Divider sx={{ my: 2 }} />
 
-            <Typography variant="h6" gutterBottom>Inventario</Typography>
-            <ProductsTable
-              columns={[
-                { id: 'itemName', label: 'Inventario', minWidth: 120, format: (v:any) => v ?? '' },
-                { id: 'checked', label: 'Presente', minWidth: 80, align: 'center', format: (v:any) => v ? 'Sí' : 'No' },
-                { id: 'itemDescripcion', label: 'Descripción', minWidth: 180, format: (v:any) => v ?? '' },
-                { id: 'notas', label: 'Notas', minWidth: 180, format: (v:any) => v ?? '' },
-              ] as any}
-              rows={data.servicioItems ?? []}
-              headerColor="#1565c0"
-            />
+            {
+              data.productosCliente?.length !== 0 &&
+                <>|
+                 <Typography variant="h6" gutterBottom>Productos del cliente</Typography>
+                  <ProductsTable
+                    columns={[
+                      { id: 'nombre', label: 'Nombre', minWidth: 180, format: (v:any) => v ?? '' },
+                      { id: 'cantidad', label: 'Cantidad', minWidth: 80, align: 'center', format: (v:any) => String(v) }
+                    ] as any}
+                    rows={data.productosCliente ?? []}
+                    headerColor="#1565c0"
+                  />
+
+                  <Divider sx={{ my: 2 }} />
+                </>
+            }
+
+            {
+              data.tipoServicio?.servicioCompleto &&
+              <>
+                 <Typography variant="h6" gutterBottom>Inventario</Typography>
+                  <ProductsTable
+                    columns={[
+                      { id: 'itemName', label: 'Inventario', minWidth: 120, format: (v:any) => v ?? '' },
+                      { id: 'checked', label: 'Presente', minWidth: 80, align: 'center', format: (v:any) => v ? 'Sí' : 'No' },
+                      { id: 'itemDescripcion', label: 'Descripción', minWidth: 180, format: (v:any) => v ?? '' },
+                      { id: 'notas', label: 'Notas', minWidth: 180, format: (v:any) => v ?? '' },
+                    ] as any}
+                    rows={data.servicioItems ?? []}
+                    headerColor="#1565c0"
+                />
+              </>
+            }
 
             <Typography variant="h4" textAlign={'center'} mt={3} gutterBottom>VENTAS</Typography>
             {
@@ -136,9 +164,30 @@ const ServicioDetail = () => {
                 ))
               )
             }
+
+            <Grid container spacing={2} mt={4} justifyContent="center" alignItems="center">
+              <Grid size={{xs: 12, md: 6}} textAlign="center">
+                <Avatar sx={{ width: 200, height: 120, mx: 'auto', borderRadius: 2, justifyContent: 'center', display: 'flex', alignItems: 'center' }}  src={`${API_URL}/${data.firmaEntrada ?? ''}`} alt="Firma Cliente Entrada" />
+              <Typography variant="body2" color="textSecondary" align="center" sx={{ mt: 2 }}>
+                {'firma cliente (Entrada)'}
+              </Typography>
+              </Grid>
+
+              {
+                data.firmaSalida &&
+              <Grid size={{xs: 12, md: 6}} textAlign="center">
+                <Avatar sx={{ width: 200, height: 120, mx: 'auto', borderRadius: 2, justifyContent: 'center', display: 'flex', alignItems: 'center' }}  src={`${API_URL}/${data.firmaSalida ?? ''}`} alt="Firma Cliente Salida" />
+              <Typography variant="body2" color="textSecondary" align="center" sx={{ mt: 2 }}>
+                {'firma cliente (Salida)'}
+              </Typography>
+              </Grid>
+              }
+            </Grid>
           </CardContent>
         </Card>
       </Container>
+
+
     </>
   );
 };

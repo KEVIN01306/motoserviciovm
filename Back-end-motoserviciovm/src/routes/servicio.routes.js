@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getServiciosHandler, getServicioHandler, postServicioHandler, putServicioHandler, deleteServicioHandler } from '../controllers/servicio.controller.js';
+import { getServiciosHandler, getServicioHandler, postServicioHandler, putServicioHandler, deleteServicioHandler, salidaServicioHandler } from '../controllers/servicio.controller.js';
 import configureMulter from '../configs/multer.config.js';
 import path from 'path';
 
@@ -18,8 +18,10 @@ router.post('/', upload.fields([
 router.put('/:id', upload.fields([
         { name: 'imagenes', maxCount: 10 },
         { name: 'firmaEntrada', maxCount: 1 },
-        { name: 'firmaSalida', maxCount: 1 }
     ]), putServicioHandler);
+router.put('/salida/:id', upload.fields([
+    { name: 'firmaSalida', maxCount: 1 }
+]), salidaServicioHandler);
 router.delete('/:id', deleteServicioHandler);
 
 export default router;

@@ -161,6 +161,7 @@ const putServicio = async (id, data) => {
     }
 }
 
+
 const deleteServicio = async (id) => {
     const existing = await prisma.servicio.findFirst({ where: { id: id } });
     if (!existing) { const error = new Error('DATA_NOT_FOUND'); error.code = 'DATA_NOT_FOUND'; throw error; }
@@ -168,10 +169,37 @@ const deleteServicio = async (id) => {
     return deleted;
 }
 
+const salidaServicio = async (id, data) => {
+    try {
+        const result = await prisma.servicio.update({
+            where: { id: id },
+            data: {
+                proximafecha: data.proximafecha,
+                descripcion: data.descripcion,
+                observaciones: data.observaciones,
+                total: data.total,
+                firmaSalida: data.firmaSalida,
+            },
+        });
+
+        if (!result) {
+            const error = new Error('DATA_NOT_FOUND');
+            error.code = 'DATA_NOT_FOUND';
+            throw error;
+        }
+
+        return result;
+    } catch (err) {
+        console.error('Error in salidaServicio:', err);
+        throw err;
+    }
+};
+
 export {
     getServicios,
     getServicio,
     postServicio,
     putServicio,
     deleteServicio,
+    salidaServicio,
 }

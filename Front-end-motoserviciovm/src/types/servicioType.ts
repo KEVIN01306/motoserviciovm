@@ -24,7 +24,9 @@ export type ImagenGetType = ImagenMetaType & {
   updatedAt?: string;
 };
 
-export type ServicioType = z.infer<typeof servicioSchema>
+export type ServicioType = Omit<z.infer<typeof servicioSchema>, 'firmaSalida'> & {
+  firmaSalida: string | File | null;
+}
 
 export type ServicioGetType = ServicioType & {
   moto?: motoGetType;
@@ -38,9 +40,19 @@ export type ServicioGetType = ServicioType & {
   fechaSalida: Date,
 };
 
+// Payload para la firma de salida (endpoint dedicado)
+export type ServicioSalidaPayloadType = Pick<
+  ServicioType,
+  'total' | 'observaciones' | 'proximaFechaServicio' | 'descripcionProximoServicio'
+> & {
+  firmaSalida: File;
+};
+
 export const ServicioInitialState: ServicioType = {
   descripcion: '',
   kilometraje: 0,
+  firmaEntrada: '',
+  firmaSalida: null,
   total: 0,
   observaciones: "",
   proximaFechaServicio: undefined,

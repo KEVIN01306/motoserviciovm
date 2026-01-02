@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getVenta } from '../../../services/ventas.services';
+import { cancelarVenta, finalizarVenta, getVenta } from '../../../services/ventas.services';
 import { useParams } from 'react-router-dom';
 import { Box, Typography, Table, TableHead, TableRow, TableCell, TableBody, Divider, Button, Container, Card, CardContent, Grid, Chip } from '@mui/material';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
@@ -35,6 +35,19 @@ const VentaDetail = () => {
     }
   };
 
+  
+    const chipColorByEstado = (id: number) => {
+        switch (id) {
+        case estados().enEspera:
+            return "warning";
+        case estados().confirmado:
+            return "success";
+        case estados().cancelado:
+            return "error";
+        default:
+            return "primary";
+        }
+    };
 
   useEffect(() => { getVentaOne(); }, [id]);
 
@@ -115,12 +128,45 @@ const VentaDetail = () => {
              />
 
             <Divider sx={{ my: 3 }} />
-
+            <Grid container spacing={2}>
+            {
+              userlogged?.permisos.includes('ventas:cancel') && data.estadoId === estados().enEspera && (
+                <Grid size={{xs: 5, md: 2}} textAlign="center">
+                  <Button variant="outlined" color="error" onClick={async () => {
+                    if (!window.confirm(`¿Cancelar la venta #${data.id}?`)) return;
+                    try {
+                      await cancelarVenta(data.id);
+                      alert('Venta cancelada');
+                      getVentaOne();
+                    } catch (err: any) {
+                      alert(err?.message ?? 'Error al cancelar');
+                    }
+                  }}>Cancelar</Button>
+                </Grid>
+              )
+            }
+            {
+              userlogged?.permisos.includes('ventas:finalize') && data.estadoId === estados().enEspera && (
+                <Grid size={{xs: 5, md: 2}} textAlign="center">
+                <Button variant="outlined" color="success" onClick={async () => {
+                  if (!window.confirm(`¿Finalizar la venta #${data.id}?`)) return;
+                  try {
+                    await finalizarVenta(data.id);
+                    alert('Venta finalizada');
+                    getVentaOne();
+                  } catch (err: any) {
+                    alert(err?.message ?? 'Error al finalizar');
+                  }
+                }}>Finalizar</Button>
+                </Grid>
+              )
+            }
             {userlogged?.permisos.includes('ventas:edit') && data.estadoId === estados().enEspera && (
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                <Grid size={{xs: 5, md: 2}} textAlign="center">
                 <Button variant="contained" onClick={() => goTo(String('edit'))}>Editar</Button>
-              </Box>
+                </Grid>
             )}
+            </Grid>
           </CardContent>
         </Card>
       </Container>
