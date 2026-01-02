@@ -67,7 +67,12 @@ const postServicio = async (payload: Partial<ServicioType> & { imagenesFiles?: F
     const response = await api.post<apiResponse<ServicioGetType>>(API_SERVICIOS, form, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
-    return response.data.data ?? '';
+
+    if (response.data && response.data.data) {
+      return response.data.data;
+    }
+    
+    throw new Error('El servidor no devolvió los datos del registro creado.');
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;
