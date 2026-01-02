@@ -69,10 +69,10 @@ const ServicioSalida = () => {
   return (
     <>
       <BreadcrumbsRoutes items={breadcrumbs} />
-      <Container sx={{ mt: 4, mb: 4 }}>
-          <CardContent>
+      <Container sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center' }} >
+
             <ServicioFormSalida initial={data} onSubmit={handleSubmit} submitLabel="Dar Salida" />
-          </CardContent>
+       
       </Container>
     </>
   );

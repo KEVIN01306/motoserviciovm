@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab, Avatar } from '@mui/material';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiToolsLine } from 'react-icons/ri';
@@ -25,6 +25,7 @@ const ServicioDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const goTo = useGoTo();
+  const { hash } = useLocation();
 
   const fetch = async () => {
     try {
@@ -37,6 +38,22 @@ const ServicioDetail = () => {
   };
 
   useEffect(() => { fetch(); }, [id]);
+
+  
+  useEffect(() => {
+    // Solo intentamos el scroll si no estamos cargando, hay data y hay un hash
+    if (!loading && data && hash) {
+      const id = hash.replace('#', '');
+      const element = document.getElementById(id);
+      
+      if (element) {
+        // Un pequeño delay de 100ms asegura que Material UI terminó de pintar
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
+    }
+  }, [loading, data, hash]);
 
   if (loading) return <Loading />;
   if (error) return <ErrorCard errorText={error} restart={fetch} />;
@@ -141,13 +158,13 @@ const ServicioDetail = () => {
               </>
             }
 
-            <Typography variant="h4" textAlign={'center'} mt={3} gutterBottom>VENTAS</Typography>
+            <Typography variant="h4" textAlign={'center'} mt={3} gutterBottom id="ventas">VENTAS</Typography>
             {
               data.ventas?.length === 0 ? (
                 <Typography>No hay ventas asociadas a este servicio.</Typography>
               ) : (
                 data.ventas?.map((venta) => (
-                  <Box key={venta.id} sx={{ mb: 4 }}>
+                  <Box key={venta.id} sx={{ mb: 4 }} >
                     <LinkStylesNavigate label={`Venta #${venta.id}`} onClick={() => goTo(`/admin/ventas/${venta.id}`)} variant="h6" />
                     <Chip label={venta.estado?.estado ?? ''} color={chipColorByEstado(venta.estado?.id)} sx={{ mb: 2 }} variant='outlined'/>
                     <ProductsTable

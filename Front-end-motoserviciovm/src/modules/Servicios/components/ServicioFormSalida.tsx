@@ -19,6 +19,8 @@ import type { UserGetType } from '../../../types/userType';
 import SignatureField from '../../../components/utils/SignatureField';
 import { estados } from '../../../utils/estados';
 import ProductsTable from '../../../components/Table/ProductsTable';
+import LinkStylesNavigate from '../../../components/utils/links';
+import { useGoTo } from '../../../hooks/useGoTo';
 
 type Props = {
   initial?: Partial<ServicioGetType>;
@@ -51,6 +53,7 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
   const [mecanicoSelected,setMecanicoSelected] = useState<UserGetType|null>(initial?.mecanico? initial.mecanico : null )
   // Puede ser File (nuevo) o string (url existente)
   const [imagenGuardada, setImagenGuardada] = useState<any>(initial?.firmaSalida ? initial.firmaSalida : null);
+  const goTo = useGoTo();
   
 /*
   useEffect(() => {
@@ -204,7 +207,9 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
 
         {
         isVentasPendientes && (
-          <Alert severity="warning">Aun hay ventas pendientes (La suma del total solo se hara con las ventas confirmadas).</Alert>
+          <Alert severity="warning">Aun hay ventas pendientes (La suma del total solo se hara con las ventas confirmadas).
+            <LinkStylesNavigate label=" Ver ventas pendientes" onClick={() => { goTo('/admin/servicios/'+initial?.id+'#ventas') }} variant="body2" />
+          </Alert>
         )
       }
       <Grid size={{ xs: 12, md: 6 }}>
