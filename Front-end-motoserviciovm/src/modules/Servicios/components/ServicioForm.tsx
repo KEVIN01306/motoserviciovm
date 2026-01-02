@@ -18,6 +18,7 @@ import type { SucursalType } from '../../../types/sucursalType';
 import type { UserGetType } from '../../../types/userType';
 import SignatureField from '../../../components/utils/SignatureField';
 import { ModalForm } from '../../Motos/components';
+import ImagenesEditorInput from '../../../components/utils/ImagenesEditorInput';
 
 
 const API_URL = import.meta.env.VITE_DOMAIN;
@@ -151,24 +152,13 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
 
   const removeProductoCliente = (idx: number) => setProductosCliente(s => s.filter((_, i) => i !== idx));
 
-  const onFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    // revoke previous previews
-    imagenesMeta.forEach(m => { if (m.preview) URL.revokeObjectURL(m.preview); });
-    const arr = Array.from(files);
-    setImagenesFiles(arr);
-    // initialize meta entries aligned with files and create previews
-    const metas = arr.map(f => ({ descripcion: '', preview: URL.createObjectURL(f) }));
-    setImagenesMeta(metas);
-  };
 
-  const removeImage = (idx: number) => {
-    setImagenesFiles(s => s.filter((_, i) => i !== idx));
-    setImagenesMeta(prev => {
-      const next = prev.filter((_, i) => i !== idx);
-      return next;
-    });
+  // Handler for ImagenesEditorInput controlled changes
+  const handleImagenesChange = (files: File[], metas: Array<{ descripcion?: string; preview?: string }>) => {
+    // Clean up old previews
+    imagenesMeta.forEach(m => { if (m.preview) URL.revokeObjectURL(m.preview); });
+    setImagenesFiles(files);
+    setImagenesMeta(metas);
   };
 
   useEffect(() => {
@@ -375,7 +365,15 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
               </Grid>
         )
       }
-      
+
+      <Grid size={{ xs: 12 }}>
+        <ImagenesEditorInput
+          value={{ files: imagenesFiles, metas: imagenesMeta }}
+          onChange={({ files, metas }) => handleImagenesChange(files, metas)}
+        />
+      </Grid>
+
+
       <Grid size={{ xs: 12 }}>
         <Typography variant='h6' textAlign={'center'} marginBottom={4}>
           Firma del cliente
@@ -387,7 +385,7 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
           text="Firmar Hoja de recepción"
         />
       </Grid>
-
+      
         
       <Grid size={{ xs: 12 }}>
         <Button type="submit" variant="contained" fullWidth disabled={isSubmitting}>{submitLabel}</Button>

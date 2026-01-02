@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab, Avatar } from '@mui/material';
+import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab, Avatar, Paper } from '@mui/material';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiToolsLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';
@@ -16,6 +16,7 @@ import LinkStylesNavigate from '../../../components/utils/links';
 import { exportarAPDF } from '../../../utils/exportarPdf';
 import { ExposureTwoTone } from '@mui/icons-material';
 import { PiExportDuotone } from 'react-icons/pi';
+import ImageGallery from '../../../components/utils/GaleryImagenes';
 
 const API_URL = import.meta.env.VITE_DOMAIN;
 
@@ -123,6 +124,12 @@ const ServicioDetail = () => {
             </Box>
 
             <Divider sx={{ my: 2 }} />
+
+            <Box >
+
+                {/* Invocación del componente */}
+                <ImageGallery imagenes={data.imagen ?? []} />
+          </Box>
 
             {
               data.productosCliente?.length !== 0 &&
