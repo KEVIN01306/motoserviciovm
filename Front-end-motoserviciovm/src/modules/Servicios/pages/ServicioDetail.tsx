@@ -99,8 +99,8 @@ const ServicioDetail = () => {
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>{`Servicio #${data.id}`}</Typography>
             <Grid container spacing={2}>
               <Grid size={6}>
-                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Mecánico</Typography><Typography>{data.mecanico.primerNombre + " " +  data.mecanico.primerApellido ?? '-'}</Typography></Box>
-                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Cliente</Typography><Typography>{(data.cliente?.primerNombre + " " + data.cliente?.primerApellido )?? '-'}</Typography></Box>
+                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Mecánico</Typography><Typography> <LinkStylesNavigate label={`${data.mecanico.primerNombre} ${data.mecanico.primerApellido}` } onClick={() => goTo('/admin/users/'+data.mecanico.id)} variant='body2' /></Typography></Box>
+                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Cliente</Typography><Typography> <LinkStylesNavigate label={`${data.cliente?.primerNombre} ${data.cliente?.primerApellido} - ${data.cliente?.dpi || data.cliente?.nit || ""}`} onClick={() => goTo('/admin/users/'+data.cliente?.id)} variant='body2' /></Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Placa de la moto</Typography><Typography>{data.moto?.placa ?? '-'}</Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Kilometraje</Typography><Typography>{data.kilometraje ?? '-'}</Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Estado</Typography><Typography><Chip label={data.estado?.estado ?? '-'} color={chipColorByEstado(data.estado?.id)} variant='outlined' /></Typography></Box>

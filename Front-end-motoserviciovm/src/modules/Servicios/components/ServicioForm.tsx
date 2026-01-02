@@ -10,7 +10,7 @@ import { getInventarios } from '../../../services/inventario.services';
 import { getProductos } from '../../../services/producto.services';
 import { getMotos } from '../../../services/moto.services';
 import { getSucursales } from '../../../services/sucursal.services';
-import { getUsers, getUsersMecanicos } from '../../../services/users.services';
+import { getUsers, getUsersClientes, getUsersMecanicos } from '../../../services/users.services';
 import { errorToast } from '../../../utils/toast';
 import type { TipoServicioGetType } from '../../../types/tipoServicioType';
 import { getTipos } from '../../../services/tipoServicio.services';
@@ -51,6 +51,8 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
   const [tipoServicioSelected,setTipoServicioSelected]=useState<TipoServicioGetType|null>(initial?.tipoServicio ? initial.tipoServicio : null);
   const [mecanicos,setMecanicos] = useState<UserGetType[]>([])
   const [mecanicoSelected,setMecanicoSelected] = useState<UserGetType|null>(initial?.mecanico? initial.mecanico : null )
+  const [clientes,setClientes] = useState<UserGetType[]>([])
+  const [clienteSelected,setClienteSelected] = useState<UserGetType|null>(initial?.cliente? initial.cliente : null )
   // Puede ser File (nuevo) o string (url/base64)
   const [imagenGuardada, setImagenGuardada] = useState<any>(initial?.firmaEntrada ? initial.firmaEntrada : null);
 /*
@@ -85,6 +87,8 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
         setTiposServicio(ts);
         const mn = await getUsersMecanicos();
         setMecanicos(mn)
+        const cl = await getUsersClientes();
+        setClientes(cl)
         // set default sucursal: prefer `initial.sucursalId`, otherwise use first sucursal of logged user (if any)
         const defaultId = (initial && initial.sucursalId) ? initial.sucursalId : undefined;
         if (defaultId) {
@@ -245,7 +249,7 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
        <Grid size={{ xs: 12, sm: 6 }}>
           <Autocomplete
           options={mecanicos}
-          getOptionLabel={(opt: any) => opt?.primerNombre ?? `Mecanico ${opt?.id}`}
+          getOptionLabel={(opt: any) => `${opt?.primerNombre} ${opt?.primerApellido} - ${opt?.dpi || opt?.nit || ""}`}
           value={mecanicoSelected}
           onChange={(_, newVal) => {
             setMecanicoSelected(newVal ?? null);
@@ -253,6 +257,20 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
           }}
           isOptionEqualToValue={(option: any, value: any) => Number(option?.id) === Number(value?.id)}
           renderInput={(params) => <TextField {...params} label="Mecanico asignado" variant="standard" fullWidth />}
+        />
+        </Grid>
+
+       <Grid size={{ xs: 12, sm: 6 }}>
+          <Autocomplete
+          options={clientes}
+          getOptionLabel={(opt: any) => `${opt?.primerNombre} ${opt?.primerApellido} - ${opt?.dpi || opt?.nit || ""}`}
+          value={clienteSelected}
+          onChange={(_, newVal) => {
+            setClienteSelected(newVal ?? null);
+            setValue('clienteId' as any, newVal?.id ?? 0);
+          }}
+          isOptionEqualToValue={(option: any, value: any) => Number(option?.id) === Number(value?.id)}
+          renderInput={(params) => <TextField {...params} label="Cliente" variant="standard" fullWidth />}
         />
         </Grid>
 

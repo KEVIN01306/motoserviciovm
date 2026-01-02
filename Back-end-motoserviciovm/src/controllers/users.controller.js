@@ -1,6 +1,6 @@
 import { responseError, responseSucces, responseSuccesAll } from "../helpers/response.helper.js";
 import { userSchema } from "../zod/user.schema.js";
-import { getUSer, getUSers, getUSersMecanicos, patchUserActive, postUser, putUser /*, patchUserActive*/ } from "../services/users.service.js";
+import { getUSer, getUSers, getUSersClientes, getUSersMecanicos, patchUserActive, postUser, putUser /*, patchUserActive*/ } from "../services/users.service.js";
 
 
 const getUsersHandler = async (req, res) => {
@@ -46,6 +46,30 @@ const getUsersMecanicosHandler = async (req, res) => {
     }
 
 }
+
+
+
+const getUsersClientesHandler = async (req, res) => {
+    try {
+        const users = await getUSersClientes();
+        
+        res.status(200).json(responseSuccesAll("usuarios obtenidos exitosamente", users))
+
+    } catch (error) {
+        let errorCode = 500;
+        let errorMessage = 'INTERNAL_SERVER_ERROR'
+        switch (error.code) {
+            case 'DATA_NOT_FOUND':
+                errorCode = 404;
+                errorMessage = error.code;
+                break;
+        }
+
+        return res.status(errorCode).json(responseError(errorMessage));
+    }
+
+}
+
 
 
 const getUserHandler = async (req, res) => {
@@ -173,5 +197,6 @@ export {
     postUserHandler,
     putUserHandler,
     patchUserActiveHandler,
-    getUsersMecanicosHandler
+    getUsersMecanicosHandler,
+    getUsersClientesHandler
 }
