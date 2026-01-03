@@ -85,6 +85,7 @@ const ServiciosList = () => {
       if (!isEnEspera) {
         if (user?.permisos.includes('servicios:detail')) {
           actions.push({ label: (<><PiDeviceTabletFill /><span className="ml-1.5">Detalle</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}`), permiso: 'ingresos-egresos:detail' });
+          actions.push({ label: (<><PiDeviceTabletFill /><span className="ml-1.5">Detalle Salida</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/salidaDetalle`), permiso: 'ingresos-egresos:detail' });
         }
         return actions;
       }

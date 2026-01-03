@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab, Avatar, Paper } from '@mui/material';
+import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab, Avatar, Paper, Button } from '@mui/material';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiToolsLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';
@@ -17,6 +17,7 @@ import { exportarAPDF } from '../../../utils/exportarPdf';
 import { ExposureTwoTone } from '@mui/icons-material';
 import { PiExportDuotone } from 'react-icons/pi';
 import ImageGallery from '../../../components/utils/GaleryImagenes';
+import { useAuthStore } from '../../../store/useAuthStore';
 
 const API_URL = import.meta.env.VITE_DOMAIN;
 
@@ -27,6 +28,7 @@ const ServicioDetail = () => {
   const [error, setError] = useState<string | null>(null);
   const goTo = useGoTo();
   const { hash } = useLocation();
+  const userlogged = useAuthStore(state => state.user);
 
   const fetch = async () => {
     try {
@@ -77,12 +79,19 @@ const ServicioDetail = () => {
               return "primary";
           }
       };
+  
+  const totalVentasDescuentos = data.ventas?.map(venta =>
+    venta.productos?.reduce((acc, producto) => {
+      const descuento = producto.descuento ? producto.totalProducto : 0;
+      return acc + (descuento);
+    }, 0) || 0
+  ).reduce((acc, curr) => acc + curr, 0) || 0;
 
-  const totalServicio =( data.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0) || 0) + (data.total || 0);
+  const totalServicio =( data.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0) || 0) + (data.total || 0) - totalVentasDescuentos;
 
   const dataTableTotales = [
     { label: 'Total Servicio', value: `Q ${data.total?.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? '0.00'}` },
-    { label: 'Total Ventas', value: `Q ${data.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? '0.00'}` },
+    { label: 'Total Ventas', value: `Q ${(data.ventas?.reduce((acc, venta) => acc + (venta.total || 0) - totalVentasDescuentos, 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? '0.00'}` },
     { label: 'Gran Total', value: `Q ${totalServicio.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
   ]
   
@@ -179,6 +188,7 @@ const ServicioDetail = () => {
                       { id: 'producto', label: 'Producto', minWidth: 120, format: (v:any, row: VentaProductoGetType) => row.producto?.nombre ?? '' },
                       { id: 'precio', label: 'Precio', minWidth: 100, align: 'right', format: (_v:any, row: VentaProductoGetType) => `Q ${Number(row.producto?.precio ?? 0).toFixed(2)}` },
                       { id: 'cantidad', label: 'Cantidad', minWidth: 80, align: 'center', format: (v:any) => String(v) },
+                      { id: 'descuento', label: 'Descuento', minWidth: 80, align: 'center', format: (v:any) => v ? 'Sí' : 'No' },
                       { id: 'totalProducto', label: 'Total', minWidth: 100, align: 'right', format: (v:any) => `Q ${Number(v).toFixed(2)}` },
                     ] as any}
                     rows={venta.productos ?? []}
@@ -207,6 +217,25 @@ const ServicioDetail = () => {
               </Grid>
               }
             </Grid>
+            <Divider sx={{ my: 2 }} />
+            <Grid container spacing={2} justifyContent="center" alignItems="center">
+            {
+              userlogged?.permisos.includes('ventas:create') && data.estadoId === estados().enEspera && (
+                  <Grid size={{xs: 5, md: 3}} textAlign="center">
+                  <Button variant="contained" onClick={() => goTo(`/admin/ventas/create?servicioId=${data.id}`)}>Crear Venta</Button>
+                  </Grid>
+            )
+
+            }
+            {
+              userlogged?.permisos.includes('servicios:salida') && data.estadoId === estados().enEspera && (
+                  <Grid size={{xs: 5, md: 3}} textAlign="center">
+                  <Button variant="outlined" color='success'  onClick={() => goTo(`/admin/servicios/${data.id}/salida`)}>Dar Salida</Button>
+                  </Grid>
+            )
+            }
+            </Grid>
+
           </CardContent>
         </Card>
       </Container>

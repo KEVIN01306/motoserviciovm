@@ -40,6 +40,8 @@ const ServicioSalida = () => {
         proximaFechaServicio,
         descripcionProximoServicio,
         firmaSalidaFile,
+        kilometrajeProximoServicio,
+        proximoServicioItems,
         // ...otros
       } = payload;
       if (!firmaSalidaFile) throw new Error('Debe adjuntar la firma de salida');
@@ -49,8 +51,11 @@ const ServicioSalida = () => {
         proximaFechaServicio: proximaFechaServicio || '',
         descripcionProximoServicio: descripcionProximoServicio || '',
         firmaSalida: firmaSalidaFile,
+        kilometrajeProximoServicio: kilometrajeProximoServicio || 0,
+        proximoServicioItems: proximoServicioItems || []
       });
-      successToast('Firma de salida registrada');
+      console.log()
+      successToast('Firma de salida registrada');payload
       goTo('/admin/servicios');
     } catch (err: any) {
       errorToast(err?.message ?? 'Error al actualizar');

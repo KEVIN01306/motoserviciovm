@@ -9,7 +9,7 @@ import { useAuthStore } from '../../../store/useAuthStore';
 import Loading from '../../../components/utils/Loading';
 import ErrorCard from '../../../components/utils/ErrorCard';
 import { useGoTo } from '../../../hooks/useGoTo';
-import { mergeVentaDataWithDefaults } from '../../../types/ventaType';
+import { mergeVentaDataWithDefaults, type VentaProductoType } from '../../../types/ventaType';
 
 const VentaEdit = () => {
   const { id } = useParams();
@@ -38,8 +38,10 @@ const VentaEdit = () => {
     try {
         console.log('Submitting venta edit with payload:', payload);
       const usuarioId = auth.user?.id ?? payload.usuarioId ?? 0;
-      const productos = (payload.productos || []).map((p: any) => ({ productoId: p.productoId, cantidad: p.cantidad, totalProducto: p.totalProducto }));
+      const productos = (payload.productos || []).map((p: VentaProductoType) => ({ productoId: p.productoId, cantidad: p.cantidad, totalProducto: p.totalProducto,descuento: p.descuento }));
       const finalPayload = { ...payload, usuarioId, productos };
+        console.log('Submitting venta edit with payload:', finalPayload);
+
       await putVenta(Number(id), finalPayload);
       successToast('Venta actualizada');
       goTo('/admin/ventas');

@@ -18,9 +18,15 @@ export const imagenMetaSchema = z.object({
     descripcion: z.string().optional(),
 });
 
+export const servicioProductoProximoSchema = z.object({
+    id: z.number().optional(),
+    nombre: z.string().min(1, 'El nombre es obligatorio'),
+});
+
 export const servicioSchema = z.object({
     id: z.number().optional(),
     kilometraje: z.number(),
+    kilometrajeProximoServicio: z.number().optional().nullable(),
     descripcion: z.string().min(1, 'La descripcion es obligatoria'),
     total: z.number().optional(),
     observaciones: z.string().optional(),
@@ -37,4 +43,5 @@ export const servicioSchema = z.object({
     servicioItems: z.array(servicioItemSchema).optional(),
     productosCliente: z.array(servicioProductoClienteSchema).optional(),
     imagenesMeta: z.array(imagenMetaSchema).optional(),
+    proximoServicioItems: z.array(servicioProductoProximoSchema).optional(),
 });

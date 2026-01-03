@@ -50,6 +50,7 @@ const postVentaHandler = async (req, res) => {
                 if (typeof p.productoId !== 'undefined') p.productoId = parseInt(p.productoId);
                 if (typeof p.cantidad !== 'undefined') p.cantidad = parseInt(p.cantidad);
                 if (typeof p.totalProducto !== 'undefined') p.totalProducto = parseFloat(p.totalProducto);
+                if (typeof p.descuento !== 'undefined') p.descuento = Boolean(p.descuento);
                 const vp = ventaProductoSchema.omit({ ventaId: true }).safeParse(p);
                 if (!vp.success) {
                     const msgs = vp.error.issues.map(i => `${i.path.join('.')}: ${i.message}`);

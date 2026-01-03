@@ -5,5 +5,6 @@ export const ventaProductoSchema = z.object({
     ventaId: z.number(),
     productoId: z.number(),
     cantidad: z.number(),
+    descuento: z.boolean().default(false),
     totalProducto: z.number(),
 });

@@ -1,6 +1,6 @@
 import type z from "zod";
 import { estados } from "../utils/estados";
-import { servicioItemSchema, servicioSchema } from "../zod/servicio.schema";
+import { servicioItemSchema, servicioProductoProximoSchema, servicioSchema } from "../zod/servicio.schema";
 import { servicioProductoClienteSchema } from "../zod/servicio.schema";
 import { imagenMetaSchema } from "../zod/servicio.schema";
 import type { motoGetType } from "./motoType";
@@ -24,6 +24,8 @@ export type ImagenGetType = ImagenMetaType & {
   updatedAt?: string;
 };
 
+
+
 export type ServicioType = Omit<z.infer<typeof servicioSchema>, 'firmaSalida'> & {
   firmaSalida: string | File | null;
 }
@@ -38,14 +40,22 @@ export type ServicioGetType = ServicioType & {
   cliente: UserGetType
   fechaEntrada: Date;
   fechaSalida: Date,
+  proximoServicioItems?: servicioProductoProximoType[];
+};
+
+export type servicioProductoProximoType = z.infer<typeof servicioProductoProximoSchema>;
+
+export const ServicioProductoProximoInitialState: servicioProductoProximoType = {
+  nombre: ''
 };
 
 // Payload para la firma de salida (endpoint dedicado)
 export type ServicioSalidaPayloadType = Pick<
   ServicioType,
-  'total' | 'observaciones' | 'proximaFechaServicio' | 'descripcionProximoServicio'
+  'total' | 'observaciones' | 'proximaFechaServicio' | 'descripcionProximoServicio' |'kilometrajeProximoServicio'
 > & {
   firmaSalida: File;
+  proximoServicioItems?: servicioProductoProximoType[];
 };
 
 export const ServicioInitialState: ServicioType = {
@@ -66,6 +76,7 @@ export const ServicioInitialState: ServicioType = {
   productosCliente: [],
   imagenesMeta: [],
   estadoId: estados().enEspera,
+  kilometrajeProximoServicio: 0,
 };
 
 export const ServicioItemInitialState: ServicioItemType = {

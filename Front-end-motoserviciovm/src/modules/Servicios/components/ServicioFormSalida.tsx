@@ -5,7 +5,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useForm } from 'react-hook-form';
 import { useAuthStore } from '../../../store/useAuthStore';
 import FormEstructure from '../../../components/utils/FormEstructure';
-import { type ServicioType, ServicioInitialState, ServicioProductoClienteInitialState, type ServicioItemType, type ServicioGetType } from '../../../types/servicioType';
+import { type ServicioType, ServicioInitialState, ServicioProductoClienteInitialState, type ServicioItemType, type ServicioGetType,type servicioProductoProximoType } from '../../../types/servicioType';
+import { ServicioProductoProximoInitialState } from '../../../types/servicioType';
 import { getInventarios } from '../../../services/inventario.services';
 import { getProductos } from '../../../services/producto.services';
 import { getMotos } from '../../../services/moto.services';
@@ -35,6 +36,9 @@ const LOCAL_KEY = 'servicio.create.draft';
 const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVentas, changeSeHaranVentas }: Props) => {
   const { register, handleSubmit, setValue, reset, formState: { isSubmitting }, watch } = useForm<ServicioType>({ defaultValues: { ...(initial ?? ServicioInitialState) } as any });
   const [productosCliente, setProductosCliente] = useState<Array<{ nombre: string; cantidad: number }>>(initial?.productosCliente ?? []);
+  // Estado para servicioProductoProximoType
+  const [servicioProductoProximo, setServicioProductoProximo] = useState<servicioProductoProximoType[]>(initial?.proximoServicioItems ?? []);
+  const [servicioProductoProximoTmp, setServicioProductoProximoTmp] = useState<{ nombre: string }>(ServicioProductoProximoInitialState);
   const [productoTmp, setProductoTmp] = useState(ServicioProductoClienteInitialState);
   const [productosList, setProductosList] = useState<any[]>([]);
   const [imagenesFiles, setImagenesFiles] = useState<File[]>([]);
@@ -163,11 +167,21 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
       proximaFechaServicio: data.proximaFechaServicio,
       descripcionProximoServicio: data.descripcionProximoServicio,
       firmaSalidaFile,
+      kilometrajeProximoServicio: data.kilometrajeProximoServicio,
+      proximoServicioItems: servicioProductoProximo.length > 0 ? servicioProductoProximo : undefined,
     };
     await onSubmit(payload);
   };
 
   const total = watch('total')
+
+const totalVentasDescuentos = initial?.ventas
+  ?.filter(venta => venta.estadoId === estados().confirmado) // Filtra solo las confirmadas
+  ?.reduce((acc, venta) => {
+    return acc + (venta.descuentoTotal || 0); // Suma el descuento acumulado
+  }, 0) || 0;
+
+  const totalServicio =( initial?.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0) || 0) + (initial?.total || 0) - totalVentasDescuentos;
 
   const ventasValidas = initial?.ventas?.filter(v => v.estadoId == estados().confirmado) ?? [];
 
@@ -178,8 +192,8 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
   
   const dataTableTotales = [
     { label: 'Total Servicio', value: `Q ${Number(total)?.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? '0.00'}` },
-    { label: 'Total Ventas', value: `Q ${totalVentas.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? '0.00'}` },
-    { label: 'Gran Total', value: `Q ${(totalVentas + (Number(total) ?? 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+    { label: 'Total Ventas', value: `Q ${((totalVentas - totalVentasDescuentos).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})) ?? '0.00'}` },
+    { label: 'Gran Total', value: `Q ${((totalVentas + (Number(total) ?? 0) - totalVentasDescuentos).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}))}` },
   ]
   return (
     <FormEstructure handleSubmit={handleSubmit(internalSubmit)} pGrid={2}>
@@ -189,6 +203,9 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
       </Grid>
         <Grid size={{ xs: 12 }}>
         <TextField {...register('total' as any)} label="Total Servicio" type='number' fullWidth variant="standard" />
+      </Grid>
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <TextField {...register('kilometrajeProximoServicio' as any, { valueAsNumber: true })} label="Kilometraje del próximo servicio" type='number' fullWidth variant="standard" />
       </Grid>
       {
         initial?.tipoServicio?.servicioCompleto && (
@@ -213,7 +230,6 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
         )
       }
       <Grid size={{ xs: 12, md: 6 }}>
-
         <ProductsTable
             columns={[
               { id: 'label', label: 'Indicador', minWidth: 180},
@@ -222,8 +238,56 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
             rows={dataTableTotales ?? []}
             headerColor="#1565c0"
         />
-        
+      </Grid>
 
+      {/* Tabla y formulario para servicioProductoProximoType */}
+      <Grid size={{ xs: 12, md: 8 }}>
+        <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>Proximo servicio</Typography>
+        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+          <TextField
+            label="Nombre del producto"
+            value={servicioProductoProximoTmp.nombre}
+            onChange={e => setServicioProductoProximoTmp(s => ({ ...s, nombre: e.target.value }))}
+            size="small"
+            fullWidth
+            variant='outlined'
+          />
+          <Fab
+            color="primary"
+            size="small"
+            onClick={() => {
+              if (servicioProductoProximoTmp.nombre.trim()) {
+                setServicioProductoProximo(arr => [...arr, { nombre: servicioProductoProximoTmp.nombre.trim() }]);
+                setServicioProductoProximoTmp(ServicioProductoProximoInitialState);
+              }
+            }}
+            aria-label="Agregar producto próximo"
+          >
+            <AddIcon />
+          </Fab>
+        </Box>
+        {servicioProductoProximo.length > 0 && (
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Nombre</TableCell>
+                <TableCell align="right">Acciones</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {servicioProductoProximo.map((row, idx) => (
+                <TableRow key={idx}>
+                  <TableCell>{row.nombre}</TableCell>
+                  <TableCell align="right">
+                    <IconButton size="small" color="error" onClick={() => setServicioProductoProximo(arr => arr.filter((_, i) => i !== idx))}>
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </Grid>
       <Grid size={{ xs: 12 }}>
         <Typography variant='h6' textAlign={'center'} marginBottom={4}>

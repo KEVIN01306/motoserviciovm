@@ -57,7 +57,7 @@ export default function ProductsTable<T>({ columns, rows, footerRow, headerColor
 
                   const value = (row as any)[column.id as keyof typeof row];
                   return (
-                    <TableCell key={String(column.id)} align={column.align} sx={{ color: '#000000', border: '1px solid rgba(0,0,0,0.12)', padding: '8px 16px' }}>
+                    <TableCell key={String(column.id)} /*align={column.align}*/ sx={{ color: '#000000', border: '1px solid rgba(0,0,0,0.12)', padding: '8px 16px' }}>
                       {column.format ? column.format(value, row) : String(value ?? '')}
                     </TableCell>
                   );

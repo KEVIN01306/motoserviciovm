@@ -68,7 +68,12 @@ const postVenta = async (payload: VentaType) => {
 const putVenta = async (id: number, payload: VentaType) => {
   try {
     const response = await api.put<apiResponse<VentaGetType>>(`${API_VENTAS}/${id}`, payload);
-    return response.data.data ?? "";
+
+    if (response.data && response.data.data) {
+      return response.data.data;
+    }
+
+    throw new Error("El servidor no devolvió los datos del registro creado.");
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;

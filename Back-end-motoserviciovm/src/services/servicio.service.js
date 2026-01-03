@@ -15,7 +15,7 @@ const getServicios = async () => {
 }
 
 const getServicio = async (id) => {
-    const item = await prisma.servicio.findFirst({ where: { id: id, estadoId: { not: estados().inactivo } }, include: { imagen: true, servicioItems: {include: {inventario: true}}, productosCliente: true, moto: true, sucursal: true,cliente: true, mecanico: true, tipoServicio: true, estado: true, ventas: { include: { productos: {include: {producto: true}}, estado: true } } } });
+    const item = await prisma.servicio.findFirst({ where: { id: id, estadoId: { not: estados().inactivo } }, include: { imagen: true, servicioItems: {include: {inventario: true}}, productosCliente: true, moto: {include: { modelo: true}}, sucursal: true,cliente: true, mecanico: true, tipoServicio: {include: {opcionServicios: true}} , estado: true, proximoServicioItems: true , ventas: { include: { productos: {include: {producto: true}}, estado: true } } } });
     if (!item) { const error = new Error('DATA_NOT_FOUND'); error.code = 'DATA_NOT_FOUND'; throw error; }
     return item;
 }
@@ -161,7 +161,6 @@ const putServicio = async (id, data) => {
     }
 }
 
-
 const deleteServicio = async (id) => {
     const existing = await prisma.servicio.findFirst({ where: { id: id } });
     if (!existing) { const error = new Error('DATA_NOT_FOUND'); error.code = 'DATA_NOT_FOUND'; throw error; }
@@ -170,23 +169,37 @@ const deleteServicio = async (id) => {
 }
 
 const salidaServicio = async (id, data) => {
-    try {
-        const result = await prisma.servicio.update({
-            where: { id: id },
-            data: {
-                proximafecha: data.proximafecha,
-                descripcion: data.descripcion,
-                observaciones: data.observaciones,
-                total: data.total,
-                firmaSalida: data.firmaSalida,
-            },
-        });
+    const { proximoServicioItems, kilometrajeProximoServicio, ...base } = data;
 
-        if (!result) {
-            const error = new Error('DATA_NOT_FOUND');
-            error.code = 'DATA_NOT_FOUND';
-            throw error;
-        }
+    try {
+        const result = await prisma.$transaction(async (tx) => {
+            const updated = await tx.servicio.update({
+                where: { id: id },
+                data: {
+                    proximafecha: base.proximafecha,
+                    descripcion: base.descripcion,
+                    observaciones: base.observaciones,
+                    total: base.total,
+                    firmaSalida: base.firmaSalida,
+                    kilometrajeProximoServicio: kilometrajeProximoServicio,
+                },
+            });
+
+            // Handle proximoServicioItems
+            if (Array.isArray(proximoServicioItems) && proximoServicioItems.length > 0) {
+                await tx.servicioProductoProximo.deleteMany({ where: { servicioId: id } });
+                for (const item of proximoServicioItems) {
+                    await tx.servicioProductoProximo.create({
+                        data: {
+                            nombre: item.nombre,
+                            servicioId: id,
+                        },
+                    });
+                }
+            }
+
+            return updated;
+        });
 
         return result;
     } catch (err) {

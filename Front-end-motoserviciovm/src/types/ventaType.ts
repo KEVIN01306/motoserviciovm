@@ -19,6 +19,7 @@ export type VentaGetType = VentaType & {
     costo: number;
     precioTotal: number;
     gananciaTotal: number;
+    descuentoTotal: number;
 };
 
 export type VentaProductoType = z.infer<typeof ventaProductoSchema>;
@@ -29,6 +30,7 @@ export type VentaProductoGetType = VentaProductoType & {
     precio: number;
     costo: number;
     ganancia: number;
+    descuento: boolean
 };
 
 export const VentaInitialState: VentaType = {
@@ -44,6 +46,7 @@ export const VentaProductoInitialState: VentaProductoType = {
     productoId: 0,
     cantidad: 0,
     totalProducto: 0,
+    descuento: false,
 };
 
 /** Normaliza los datos recibidos desde la API para que el formulario pueda usar `reset` sin fallas
@@ -66,5 +69,6 @@ export const mergeVentaProductoDataWithDefaults = (apiData: Partial<VentaProduct
         productoId: apiData.productoId ?? VentaProductoInitialState.productoId,
         cantidad: apiData.cantidad ?? VentaProductoInitialState.cantidad,
         totalProducto: apiData.totalProducto ?? VentaProductoInitialState.totalProducto,
+        descuento: apiData.descuento ?? VentaProductoInitialState.descuento,
     };
 }

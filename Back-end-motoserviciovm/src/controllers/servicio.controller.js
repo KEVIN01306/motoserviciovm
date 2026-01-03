@@ -1,7 +1,8 @@
+import z from "zod";
 import { responseError, responseSucces, responseSuccesAll } from "../helpers/response.helper.js";
-import { getServicios, getServicio, postServicio, putServicio, deleteServicio } from "../services/servicio.service.js";
+import { getServicios, getServicio, postServicio, putServicio, deleteServicio, salidaServicio } from "../services/servicio.service.js";
 import { estados } from "../utils/estados.js";
-import { servicioSchema } from "../zod/servicio.schema.js";
+import { servicioSchema, servicioProductoProximoSchema } from "../zod/servicio.schema.js";
 
 const directorio = '/uploads/servicios/';
 
@@ -206,15 +207,31 @@ const salidaServicioHandler = async (req, res) => {
 
         // Parse numeric fields
         if (body.total !== undefined) body.total = parseFloat(body.total);
+        if (body.kilometrajeProximoServicio !== undefined) {
+            body.kilometrajeProximoServicio = parseInt(body.kilometrajeProximoServicio);
+        }
 
         // Parse date fields
         if (typeof body.proximaFechaServicio === 'string' && body.proximaFechaServicio) {
             body.proximaFechaServicio = new Date(body.proximaFechaServicio);
         }
 
-        // Validate required fields
-        if ( !body.observaciones || !body.total || !body.firmaSalida) {
-            return res.status(400).json(responseError('Missing required fields'));
+        // Parse JSON fields
+        if (typeof body.proximoServicioItems === 'string') {
+            try {
+                body.proximoServicioItems = JSON.parse(body.proximoServicioItems);
+            } catch (e) {
+                return res.status(400).json(responseError('Invalid JSON format for proximoServicioItems'));
+            }
+        }
+
+        // Validate proximoServicioItems with Zod
+        if (body.proximoServicioItems) {
+            const validation = z.array(servicioProductoProximoSchema).safeParse(body.proximoServicioItems);
+            if (!validation.success) {
+                const msgs = validation.error.issues.map(i => `${i.path.join('.')}: ${i.message}`);
+                return res.status(400).json(responseError(msgs));
+            }
         }
 
         // Prepare data for service
@@ -224,11 +241,11 @@ const salidaServicioHandler = async (req, res) => {
             observaciones: body.observaciones,
             total: body.total,
             firmaSalida: body.firmaSalida,
-            estadoId: estados().entregado,
-            fechaSalida: new Date(),
+            kilometrajeProximoServicio: body.kilometrajeProximoServicio,
+            proximoServicioItems: body.proximoServicioItems,
         };
 
-        const updated = await putServicio(parseInt(id), dataToSend);
+        const updated = await salidaServicio(parseInt(id), dataToSend);
         return res.status(200).json(responseSucces('Salida registrada', updated));
     } catch (err) {
         console.error('Salida servicio error:', err);

@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Grid, TextField, Button, MenuItem, Box, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Autocomplete } from '@mui/material';
+import { Grid, TextField, Button, MenuItem, Box, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Autocomplete, FormControlLabel, Checkbox } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import FormEstructure from '../../../components/utils/FormEstructure';
 import { errorToast } from '../../../utils/toast';
 import type { VentaType, VentaProductoType, VentaProductoGetType } from '../../../types/ventaType';
@@ -85,7 +85,7 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
     const precio = Number(prod?.precio ?? 0);
     const cantidad = Number(linea.cantidad ?? 0);
     const totalCalc = precio * cantidad;
-    const lineaToAdd: VentaProductoGetType = { ...(linea as any), totalProducto: totalCalc, producto: prod } as any;
+    const lineaToAdd: VentaProductoGetType = { ...(linea as any), totalProducto: totalCalc, producto: prod, descuento: linea.descuento } as any;
     setItems((s) => [...s, lineaToAdd]);
     setLinea(VentaProductoInitialState);
   };
@@ -119,6 +119,10 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
         if (patch.productoId) {
           updated.producto = productosList.find((p) => p.id === patch.productoId) ?? undefined;
         }
+        if (patch.descuento !== undefined) {
+          updated.descuento = patch.descuento;
+        }
+
         // compute totalProducto if productoId or cantidad changed
         const prodId = updated.productoId ?? it.productoId;
         const cantidad = Number(updated.cantidad ?? it.cantidad ?? 0);
@@ -147,7 +151,10 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
         productoId: it.productoId,
         cantidad: it.cantidad,
         totalProducto: it.totalProducto,
+        descuento: it.descuento,
       }) as VentaProductoType;
+
+      console.log('Mapping producto for payload:', it, 'to', base);
       return base;
     });
     console.log('Submitting Venta with productos:', { ...(merged as any), productos: productosPayload });
@@ -210,11 +217,19 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
             }} fullWidth />
           </Grid>
 
-          <Grid size={{ xs: 12, sm: 3 }}>
-            <TextField label="Total producto" type="number" variant="standard" value={linea.totalProducto} disabled fullWidth />
+          <Grid size={{ xs: 12, sm: 2 }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={!!linea.descuento}
+                  onChange={e => setLinea({ ...linea, descuento: e.target.checked })}
+                />
+              }
+              label="Descuento"
+            />
           </Grid>
 
-          <Grid size={{ xs: 12, sm: 4 }}>
+          <Grid size={{ xs: 12, sm: 2 }}>
             <Button startIcon={<AddIcon />} variant="contained" onClick={addLinea} fullWidth>Agregar</Button>
           </Grid>
         </Grid>
@@ -228,6 +243,7 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
               <TableCell>Precio</TableCell>
               <TableCell>Cantidad</TableCell>
               <TableCell>Total</TableCell>
+              <TableCell>Descuento</TableCell>
               <TableCell>Acciones</TableCell>
             </TableRow>
           </TableHead>
@@ -252,6 +268,12 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
                 </TableCell>
                 <TableCell>
                   <TextField type="number" value={it.totalProducto} variant="standard" disabled />
+                </TableCell>
+                <TableCell>
+                  <Checkbox
+                    checked={!!it.descuento}
+                    onChange={e => updateLinea(idx, { descuento: e.target.checked })}
+                  />
                 </TableCell>
                 <TableCell>
                   <IconButton onClick={() => removeLinea(idx)}><DeleteIcon /></IconButton>
