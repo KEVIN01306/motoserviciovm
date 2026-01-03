@@ -55,9 +55,16 @@ const postServicioHandler = async (req, res) => {
         body.kilometrajeProximoServicio = parseInt(body.kilometrajeProximoServicio) || 0; // Inicializamos para que Zod no de error de 'undefined'
         // 2. Parseo de campos numéricos
         const camposNumericos = ['estadoId', 'sucursalId', 'motoId', 'clienteId', 'mecanicoId', 'tipoServicioId', 'kilometraje'];
+
         camposNumericos.forEach(campo => {
-            if (body[campo] !== undefined && body[campo] !== null && body[campo] !== '') {
-                body[campo] = parseInt(body[campo]);
+            const valor = body[campo];
+            
+            // Si el valor es "null" (string), null, o vacío, lo seteamos como null explícito
+            if (valor === 'null' || valor === '' || valor === null || valor === undefined) {
+                body[campo] = null;
+            } else {
+                const parsed = parseInt(valor);
+                body[campo] = isNaN(parsed) ? null : parsed;
             }
         });
         if (body.total) body.total = parseFloat(body.total);
@@ -131,9 +138,16 @@ const postServicioHandler = async (req, res) => {
 
         // 2. Parseo de campos numéricos (solo si vienen en el body)
         const camposNumericos = ['estadoId', 'sucursalId', 'motoId', 'clienteId', 'mecanicoId', 'tipoServicioId', 'kilometraje'];
+
         camposNumericos.forEach(campo => {
-            if (body[campo] !== undefined && body[campo] !== null && body[campo] !== '') {
-                body[campo] = parseInt(body[campo]);
+            const valor = body[campo];
+            
+            // Si el valor es "null" (string), null, o vacío, lo seteamos como null explícito
+            if (valor === 'null' || valor === '' || valor === null || valor === undefined) {
+                body[campo] = null;
+            } else {
+                const parsed = parseInt(valor);
+                body[campo] = isNaN(parsed) ? null : parsed;
             }
         });
         if (body.total !== undefined) body.total = parseFloat(body.total);
