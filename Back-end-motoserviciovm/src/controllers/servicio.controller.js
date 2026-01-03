@@ -136,6 +136,10 @@ const postServicioHandler = async (req, res) => {
             }
         }
 
+                console.log('Body after file handling:', body);
+
+    
+
         // 2. Parseo de campos numéricos (solo si vienen en el body)
         const camposNumericos = ['estadoId', 'sucursalId', 'motoId', 'clienteId', 'mecanicoId', 'tipoServicioId', 'kilometraje'];
 

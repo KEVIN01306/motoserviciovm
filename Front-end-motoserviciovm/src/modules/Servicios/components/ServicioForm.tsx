@@ -259,7 +259,7 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
           value={clienteSelected}
           onChange={(_, newVal) => {
             setClienteSelected(newVal ?? null);
-            setValue('clienteId' as any, newVal?.id ?? 0);
+            setValue('clienteId' as any, newVal?.id ?? null);
           }}
           isOptionEqualToValue={(option: any, value: any) => Number(option?.id) === Number(value?.id)}
           renderInput={(params) => <TextField {...params} label="Cliente" variant="standard" fullWidth />}
