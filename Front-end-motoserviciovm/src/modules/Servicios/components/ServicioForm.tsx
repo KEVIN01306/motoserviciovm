@@ -57,6 +57,8 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
   // Puede ser File (nuevo) o string (url/base64)
   const [imagenGuardada, setImagenGuardada] = useState<any>(initial?.firmaEntrada ? initial.firmaEntrada : null);
 /*
+
+
   useEffect(() => {
     // load draft from localStorage
     const draft = localStorage.getItem(LOCAL_KEY);

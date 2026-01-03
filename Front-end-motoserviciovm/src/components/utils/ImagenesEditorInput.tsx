@@ -27,15 +27,58 @@ const ImagenesEditorInput: React.FC<Props> = ({ value, onChange }) => {
   const files = value.files;
   const metas = value.metas;
 
+  // Redimensiona la imagen a 1280px antes de guardar, calidad mínima en móvil
+  const resizeImage = (file: File, maxDim = 1280): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const img = new window.Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((maxDim / width) * height);
+            width = maxDim;
+          } else {
+            width = Math.round((maxDim / height) * width);
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return reject('No se pudo crear el contexto de canvas');
+        ctx.drawImage(img, 0, 0, width, height);
+        // Calidad mínima en móvil
+        const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+        const quality = isMobile ? 0.3 : 0.8;
+        canvas.toBlob(blob => {
+          if (blob) {
+            resolve(new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' }));
+          } else {
+            reject('No se pudo redimensionar la imagen');
+          }
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
   // Maneja la selección de archivo desde input file
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const filesArr = e.target.files ? Array.from(e.target.files) : [];
     if (filesArr.length === 0) return;
-    // Solo una imagen a la vez
     metas.forEach(m => { if (m.preview) URL.revokeObjectURL(m.preview); });
     const f = filesArr[0];
-    const meta = { descripcion: '', preview: URL.createObjectURL(f) };
-    onChange({ files: [...files, f], metas: [...metas, meta] });
+    try {
+      const resized = await resizeImage(f);
+      const meta = { descripcion: '', preview: URL.createObjectURL(resized) };
+      onChange({ files: [...files, resized], metas: [...metas, meta] });
+    } catch {
+      // fallback: usar original
+      const meta = { descripcion: '', preview: URL.createObjectURL(f) };
+      onChange({ files: [...files, f], metas: [...metas, meta] });
+    }
     e.target.value = '';
   };
 
@@ -111,8 +154,15 @@ const ImagenesEditorInput: React.FC<Props> = ({ value, onChange }) => {
     setAnchorEl(null);
     const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
     if (isMobile) {
+      // Forzar capture sólo en móviles
+      if (cameraInputRef.current) {
+        cameraInputRef.current.setAttribute('capture', 'environment');
+      }
       cameraInputRef.current?.click();
     } else {
+      if (cameraInputRef.current) {
+        cameraInputRef.current.removeAttribute('capture');
+      }
       handleOpenCameraModal();
     }
   };
@@ -135,7 +185,7 @@ const ImagenesEditorInput: React.FC<Props> = ({ value, onChange }) => {
           <CloudUploadIcon sx={{ mr: 1 }} /> Subir archivo
         </MenuItem>
       </Menu>
-      {/* Input para archivo */}
+      {/* Input para archivo o cámara, con capture sólo en móviles */}
       <input
         hidden
         type="file"
@@ -143,12 +193,10 @@ const ImagenesEditorInput: React.FC<Props> = ({ value, onChange }) => {
         ref={fileInputRef}
         onChange={handleFileChange}
       />
-      {/* Input para cámara móvil */}
       <input
         hidden
         type="file"
         accept="image/*"
-        capture="environment"
         ref={cameraInputRef}
         onChange={handleFileChange}
       />
