@@ -182,6 +182,8 @@ const salidaServicio = async (id, data) => {
                     total: base.total,
                     firmaSalida: base.firmaSalida,
                     kilometrajeProximoServicio: kilometrajeProximoServicio,
+                    estadoId: estados().confirmado,
+                    fechaSalida: new Date(),
                 },
             });
 

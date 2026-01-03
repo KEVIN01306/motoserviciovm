@@ -52,7 +52,7 @@ const postServicioHandler = async (req, res) => {
                 imagenesParaPrisma = req.files['imagenes'];
             }
         }
-
+        body.kilometrajeProximoServicio = parseInt(body.kilometrajeProximoServicio) || 0; // Inicializamos para que Zod no de error de 'undefined'
         // 2. Parseo de campos numéricos
         const camposNumericos = ['estadoId', 'sucursalId', 'motoId', 'clienteId', 'mecanicoId', 'tipoServicioId', 'kilometraje'];
         camposNumericos.forEach(campo => {
@@ -243,6 +243,7 @@ const salidaServicioHandler = async (req, res) => {
             firmaSalida: body.firmaSalida,
             kilometrajeProximoServicio: body.kilometrajeProximoServicio,
             proximoServicioItems: body.proximoServicioItems,
+            estadoId: estados().finalizado,
         };
 
         const updated = await salidaServicio(parseInt(id), dataToSend);

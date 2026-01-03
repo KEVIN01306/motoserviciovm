@@ -20,7 +20,6 @@ export const issueAccessToken = async({ sub, role, extra = {}}) => {
         .setAudience(jwtAUD)
         .setSubject(String(sub))
         .setIssuedAt()
-        .setExpirationTime(jwtAccessTTL)
         .setExpirationTime(jwtRefreshTTL)
         .sign(secretKey)
 }

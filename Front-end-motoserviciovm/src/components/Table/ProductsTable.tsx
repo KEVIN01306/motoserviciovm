@@ -44,7 +44,7 @@ export default function ProductsTable<T>({ columns, rows, footerRow, headerColor
                   if (column.id === 'actions') {
                     const actionsForRow = typeof column.actions === 'function' ? column.actions(row) : column.actions;
                     return (
-                      <TableCell key={`actions-${rowIndex}`} align="center" sx={{ border: '1px solid rgba(0,0,0,0.12)' }}>
+                      <TableCell  key={`actions-${rowIndex}`} align="center" sx={{ border: '1px solid rgba(0,0,0,0.12)', padding: '8px 16px'  }}>
                         {/* reuse any passed ActionsMenu by rendering nodes or simple buttons */}
                         {Array.isArray(actionsForRow) ? (
                           actionsForRow.map((a, i) => (

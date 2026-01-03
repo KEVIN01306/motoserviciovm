@@ -111,13 +111,17 @@ const ServicioDetailSalida = () => {
                 return "primary";
         }
     };
-
+    const totalVentasDescuentos = data?.ventas
+    ?.filter(venta => venta.estadoId === estados().confirmado) // Filtra solo las confirmadas
+    ?.reduce((acc, venta) => {
+        return acc + (venta.descuentoTotal || 0); // Suma el descuento acumulado
+    }, 0) || 0;
     const totalServicio = (data.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0) || 0) + (data.total || 0);
 
     const dataTableTotales = [
         { label: 'Total Servicio', value: `Q ${data.total?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? '0.00'}` },
-        { label: 'Repuestos', value: `Q ${data.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? '0.00'}` },
-        { label: 'Gran Total', value: `Q ${totalServicio.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+        { label: 'Repuestos', value: `Q ${data.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0 - totalVentasDescuentos).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? '0.00'}` },
+        { label: 'Gran Total', value: `Q ${(Number(totalServicio)-Number(totalVentasDescuentos)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
     ]
 
 
@@ -129,8 +133,8 @@ const ServicioDetailSalida = () => {
                     <PiExportDuotone />
                 </Fab>
             </Grid>
-            <Container maxWidth="md" sx={{ mt: 4, mb: 4 }} id="servicio-detail-container">
-                <Card >
+            <Container maxWidth="md" sx={{ mt: 4, mb: 4, boxShadow: 'none' }} id="servicio-detail-container">
+                <Card sx={{ boxShadow: 'none' }}>
                     <Grid size={12}>
                         <Box display={'flex'} width={'100%'} justifyContent={'space-around'}>
                             <Avatar variant='square' sx={{ width: '22%', height: 'auto' }} src="/public/icons/logo_corto.png" alt="Logo Moto Servicio VM" />
@@ -213,6 +217,7 @@ const ServicioDetailSalida = () => {
                             <>
                                 <Typography variant="h6" display={'flex'} justifyContent={'center'} gutterBottom>REVISION</Typography>
                                 <ProductsTable
+                                    maxHeight={'none'}
                                     columns={[
                                         { id: 'itemName', label: 'Inventario', minWidth: 120, format: (v: any) => v ?? '' },
                                         { id: 'checked', label: 'Presente', minWidth: 80, align: 'center', format: (v: any) => v ? 'Sí' : 'No' },
@@ -252,6 +257,7 @@ const ServicioDetailSalida = () => {
                                         <>
 
                                             <ProductsTable
+                                                maxHeight={'none'}
                                                 columns={[
                                                     { id: 'nombre', label: 'CAMBIOS REALIZADOS DURANTE SERVICIO', minWidth: 180, format: (v: any) => v ?? '', align: 'center' },
                                                 ] as any}
@@ -273,6 +279,7 @@ const ServicioDetailSalida = () => {
                                         <>
 
                                             <ProductsTable
+                                            maxHeight={'none'}
                                                 columns={[
                                                     { id: 'nombre', label: 'CAMBIOS POR REALIZAR EN SIGUIENTE SERVICIO', minWidth: 180, format: (v: any) => v ?? '', align: 'center' },
                                                 ] as any}
