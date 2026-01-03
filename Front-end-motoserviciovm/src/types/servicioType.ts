@@ -40,6 +40,7 @@ export type ServicioGetType = ServicioType & {
   cliente: UserGetType
   fechaEntrada: Date;
   fechaSalida: Date,
+  descuentosServicio?: number;
   proximoServicioItems?: servicioProductoProximoType[];
 };
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Grid, Fab, Chip } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
@@ -17,6 +17,8 @@ import { PiDeviceTabletFill, PiUserCheckBold } from 'react-icons/pi';
 import { estados } from '../../../utils/estados';
 import type { EstadoType } from '../../../types/estadoType';
 import { MdBikeScooter } from 'react-icons/md';
+import { FaBarsProgress } from "react-icons/fa6";
+
 
 const ServiciosList = () => {
   const [items, setItems] = useState<ServicioGetType[]>([]);
@@ -85,9 +87,12 @@ const ServiciosList = () => {
       if (!isEnEspera) {
         if (user?.permisos.includes('servicios:detail')) {
           actions.push({ label: (<><PiDeviceTabletFill /><span className="ml-1.5">Detalle</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}`), permiso: 'ingresos-egresos:detail' });
-          actions.push({ label: (<><PiDeviceTabletFill /><span className="ml-1.5">Detalle Salida</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/salidaDetalle`), permiso: 'ingresos-egresos:detail' });
         }
-        return actions;
+
+        if (user?.permisos.includes('servicios:salidaDetalle')) {
+          actions.push({ label: (<><MdBikeScooter /><span className="ml-1.5">Detalle Salida</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/salidaDetalle`), permiso: 'servicios:salidaDetalle' });
+        }
+          return actions;
       }
       if (user?.permisos.includes('servicios:detail')) {
           actions.push({ label: (<><PiDeviceTabletFill /><span className="ml-1.5">Detalle</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}`), permiso: 'servicios:detail' });
@@ -98,6 +103,10 @@ const ServiciosList = () => {
 
       if (user?.permisos.includes('servicios:salida')) {
         actions.push({ label: (<><MdBikeScooter /><span className="ml-1.5">Salida</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/salida`), permiso: 'servicios:edit' });
+      }
+
+      if (user?.permisos.includes('servicios:progreso')) {
+        actions.push({ label: (<><FaBarsProgress /><span className="ml-1.5">Progreso</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/progreso`), permiso: 'servicios:progreso' });
       }
 
 

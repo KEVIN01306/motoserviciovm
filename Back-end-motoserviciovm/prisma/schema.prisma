@@ -162,6 +162,8 @@ model Modelo {
 
   motos           Moto[]
 
+  description     String?
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -201,6 +203,8 @@ model Moto {
 
   placa           String @unique
   avatar          String?
+
+  calcomania      String?
   
   modeloId        Int
   modelo          Modelo @relation(fields: [modeloId], references: [id])
@@ -248,6 +252,8 @@ model OpcionServicio {
   estadoId        Int
   estado          Estado @relation(fields: [estadoId], references: [id])
 
+  servicioOpcionesTipoServicio ServicioOpcionesTipoServicio[]
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -275,6 +281,8 @@ model Servicio {
 
   descripcionProximoServicio String?
 
+  descuentosServicio Float?
+
   sucursalId     Int
   sucursal       Sucursal @relation(fields: [sucursalId], references: [id])
 
@@ -301,8 +309,29 @@ model Servicio {
 
   proximoServicioItems ServicioProductoProximo[]
 
+  servicioOpcionesTipoServicio ServicioOpcionesTipoServicio[]
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+model ServicioOpcionesTipoServicio {
+  id              Int @id @default(autoincrement())
+
+  servicioId      Int
+  servicio        Servicio @relation(fields: [servicioId], references: [id])
+
+  opcionServicioId Int
+  opcionServicio  OpcionServicio @relation(fields: [opcionServicioId], references: [id])
+
+  checked         Boolean @default(false)
+
+  observaciones   String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([servicioId, opcionServicioId])
 }
 
 model Imagen {

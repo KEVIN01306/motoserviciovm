@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Grid, TextField, Button, MenuItem, Box, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Autocomplete, FormControlLabel, Checkbox } from '@mui/material';
+import { Grid, TextField, Button, MenuItem, Box, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Autocomplete, FormControlLabel, Checkbox, TableContainer } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { Controller, useForm } from 'react-hook-form';
@@ -236,6 +236,7 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
       </Grid>
 
       <Grid size={{ xs: 12 }}>
+        <TableContainer sx={{ width: '100%', overflowX: 'auto' }}>
         <Table size="small">
           <TableHead>
             <TableRow>
@@ -282,6 +283,7 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
             ))}
           </TableBody>
         </Table>
+        </TableContainer>
       </Grid>
 
       <Grid size={{ xs: 12 }}>

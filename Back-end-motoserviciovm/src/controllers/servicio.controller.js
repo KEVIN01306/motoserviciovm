@@ -261,7 +261,7 @@ const salidaServicioHandler = async (req, res) => {
             firmaSalida: body.firmaSalida,
             kilometrajeProximoServicio: body.kilometrajeProximoServicio,
             proximoServicioItems: body.proximoServicioItems,
-            estadoId: estados().finalizado,
+            estadoId: estados().entregado,
         };
 
         const updated = await salidaServicio(parseInt(id), dataToSend);

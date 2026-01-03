@@ -76,7 +76,9 @@ const Contabilidad: React.FC = () => {
       format: (value, row) => row?.moto?.placa || '',
     },
     { id: 'updatedAt', label: 'Fecha', format: (value, row) => formatDate(row.updatedAt) },
-    { id: 'total', label: 'Total', format: (value) => `Q ${(value).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+    { id: 'descuentosServicio', label: 'Descuento', format: (value, row) => row?.descuentosServicio ? `Q ${row.descuentosServicio.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` : '' },
+    { id: 'Subtotal', label: 'Subtotal', format: (value,row) => `Q ${(row?.total || 0).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+    { id: 'total', label: 'Total', format: (value,row) => `Q ${((row?.total || 0) - (row?.descuentosServicio || 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
   ];
 
   const columnsVentas: Column<VentaGetType>[] = [
@@ -340,8 +342,10 @@ const Contabilidad: React.FC = () => {
             rows={data.serviciosDetalle}
             columns={columnsServicios}
             footerRow={{
-              placa: 'Totales',
-              total: "Q " + (data.serviciosDetalle.reduce((sum, row) =>  sum + (row.total || 0), 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
+              id: 'Totales',
+              descuentosServicio: "Q " + (data.serviciosDetalle.reduce((sum, row) =>  sum + (row.descuentosServicio || 0), 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
+              Subtotal: "Q " + (data.serviciosDetalle.reduce((sum, row) =>  sum + (row.total || 0), 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
+              total: "Q " + (data.serviciosDetalle.reduce((sum, row) =>  sum + ((row.total || 0) - (row.descuentosServicio || 0)), 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
             }}
           />
 

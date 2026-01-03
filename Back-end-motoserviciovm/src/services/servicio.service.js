@@ -173,6 +173,15 @@ const salidaServicio = async (id, data) => {
 
     try {
         const result = await prisma.$transaction(async (tx) => {
+            const totalDescuentos = await tx.venta.aggregate({
+                where: {
+                    servicioId: id
+                },
+                _sum: {
+                    descuentoTotal: true 
+                }
+            });
+
             const updated = await tx.servicio.update({
                 where: { id: id },
                 data: {
@@ -182,8 +191,9 @@ const salidaServicio = async (id, data) => {
                     total: base.total,
                     firmaSalida: base.firmaSalida,
                     kilometrajeProximoServicio: kilometrajeProximoServicio,
-                    estadoId: estados().confirmado,
+                    estadoId: estados().entregado,
                     fechaSalida: new Date(),
+                    descuentosServicio: totalDescuentos._sum.descuentoTotal || 0,
                 },
             });
 

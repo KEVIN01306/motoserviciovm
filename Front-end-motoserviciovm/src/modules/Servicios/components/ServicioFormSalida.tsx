@@ -277,7 +277,18 @@ const totalVentasDescuentos = initial?.ventas
             <TableBody>
               {servicioProductoProximo.map((row, idx) => (
                 <TableRow key={idx}>
-                  <TableCell>{row.nombre}</TableCell>
+                  <TableCell>
+                    <TextField
+                      value={row.nombre}
+                      onChange={e => {
+                        const val = e.target.value;
+                        setServicioProductoProximo(arr => arr.map((item, i) => i === idx ? { ...item, nombre: val } : item));
+                      }}
+                      size="small"
+                      fullWidth
+                      variant="standard"
+                    />
+                  </TableCell>
                   <TableCell align="right">
                     <IconButton size="small" color="error" onClick={() => setServicioProductoProximo(arr => arr.filter((_, i) => i !== idx))}>
                       <DeleteIcon fontSize="small" />

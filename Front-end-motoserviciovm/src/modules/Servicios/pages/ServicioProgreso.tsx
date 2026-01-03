@@ -21,7 +21,7 @@ import type { OpcionServicioType } from '../../../types/opcionServicioType';
 
 const API_URL = import.meta.env.VITE_DOMAIN;
 
-const ServicioDetailSalida = () => {
+const ServicioProgreso = () => {
     const { id } = useParams();
     const [data, setData] = useState<ServicioGetType | null>(null);
     const [loading, setLoading] = useState(true);
@@ -212,6 +212,14 @@ const ServicioDetailSalida = () => {
 
                         <Divider sx={{ my: 2 }} />
 
+                        <Box >
+            
+                            {/* Invocación del componente */}
+                            <ImageGallery imagenes={data.imagen ?? []} />
+                        </Box>
+
+                        <Divider sx={{ my: 2 }} />
+
                         {
                             data.tipoServicio?.servicioCompleto &&
                             <>
@@ -229,22 +237,21 @@ const ServicioDetailSalida = () => {
                                 />
                             </>
                         }
-                        <Grid size={{ xs: 12, md: 6 }} mt={2} textAlign="center">
-                            <Avatar sx={{ width: 200, height: 120, mx: 'auto', borderRadius: 2, justifyContent: 'center', display: 'flex', alignItems: 'center' }} src={`${API_URL}/${data.firmaEntrada ?? ''}`} alt="Firma Cliente Entrada" />
-                            <Typography variant="body2" color="textSecondary" align="center" sx={{ mt: 2 }}>
-                                {'firma cliente (Entrada)'}
-                            </Typography>
-                        </Grid>
 
-                        <Typography variant="h5" m={2} gutterBottom>{data.tipoServicio?.tipo ?? ''}</Typography>
 
-                        <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
-                            {data.tipoServicio?.opcionServicios?.map((item: OpcionServicioType) => (
-                                <li key={item.id}>
-                                    <Typography variant="body1">{item.opcion}</Typography>
-                                </li>
-                            ))}
-                        </ul>
+                        <Divider sx={{ my: 2 }} />
+
+                        <Typography variant="h5" textAlign={'center'} m={2} gutterBottom>{data.tipoServicio?.tipo ?? ''}</Typography>
+
+                        <ProductsTable
+                                    maxHeight={'none'}
+                                    columns={[
+                                        { id: 'opcion', label: 'Opción', minWidth: 120, format: (v: any) => v ?? '' },
+                                    ] as any}
+                                    rows={data.tipoServicio?.opcionServicios ?? []}
+                                    headerColor="#1565c0"
+                                />
+                    
 
 
                         <Divider sx={{ my: 2 }} />
@@ -295,35 +302,10 @@ const ServicioDetailSalida = () => {
                         </Box>
 
 
-                        <Box sx={{ mb: 2 }}>
-                            {dataTableTotales.map((item, index) => (
-                                <Box key={index} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, borderTop: index === 0 ? '1px solid #e0e0e0' : 'none', pt: index === 0 ? 1 : 0 }}>
-                                    <Typography sx={{ color: '#6b7280', fontWeight: 600 }}>{item.label}</Typography>
-                                    <Typography>{item.value}</Typography>
-                                </Box>
-                            ))}
-                        </Box>
-
-
                         <Grid size={10}>
-                            <Box sx={{ mb: 1, justifyContent: 'start', display: 'flex', gap: 1 }}><Typography sx={{ color: '#0517b', fontWeight: 600 }}>{`Observaciones detalladas: `}</Typography><Typography>{data.observaciones ?? '-'}</Typography></Box>
+                            <Box sx={{ mb: 1, justifyContent: 'start', display: 'flex' }}><Typography sx={{ color: '#0517b', fontWeight: 600 }}>{`Observaciones detalladas: `}</Typography><Typography>{data.observaciones ?? '-'}</Typography></Box>
                         </Grid>
 
-
-                        <Grid container spacing={2} mt={4} justifyContent="center" alignItems="center">
-
-                            {
-                                data.firmaSalida &&
-                                <Grid size={{ xs: 12, md: 6 }} textAlign="center">
-                                    <Avatar sx={{ width: 200, height: 120, mx: 'auto', borderRadius: 2, justifyContent: 'center', display: 'flex', alignItems: 'center' }} src={`${API_URL}/${data.firmaSalida ?? ''}`} alt="Firma Cliente Salida" />
-                                    <Typography variant="body2" color="textSecondary" align="center" sx={{ mt: 2 }}>
-                                        {'firma cliente (Salida)'}
-                                    </Typography>
-                                </Grid>
-                            }
-                        </Grid>
-
-                        <Typography mt={6} display={'flex'} justifyContent={'center'} color='red' fontWeight={400} variant='body2'>Este no es un documento contable</Typography>
                     </CardContent>
                 </Card>
             </Container>
@@ -333,4 +315,4 @@ const ServicioDetailSalida = () => {
     );
 };
 
-export default ServicioDetailSalida;
+export default ServicioProgreso;
