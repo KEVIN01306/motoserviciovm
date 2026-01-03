@@ -133,8 +133,8 @@ const ServicioDetailSalida = () => {
                     <PiExportDuotone />
                 </Fab>
             </Grid>
-            <Container maxWidth="md" sx={{ mt: 4, mb: 4, boxShadow: 'none' }} id="servicio-detail-container">
-                <Card sx={{ boxShadow: 'none' }}>
+            <Container maxWidth="md" sx={{ mt: 4, mb: 4, boxShadow: 'none' }} >
+                <Card sx={{ boxShadow: 'none' }} id="servicio-detail-container">
                     <Grid size={12}>
                         <Box display={'flex'} width={'100%'} justifyContent={'space-around'}>
                             <Avatar variant='square' sx={{ width: '22%', height: 'auto' }} src="/public/icons/logo_corto.png" alt="Logo Moto Servicio VM" />
