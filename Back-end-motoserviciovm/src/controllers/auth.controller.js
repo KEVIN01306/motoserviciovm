@@ -2,6 +2,7 @@ import { verifyAccessToken } from "../helpers/auth.helper.js"
 import { responseError, responseSucces } from "../helpers/response.helper.js"
 import { schemaAuth } from "../zod/auth.schema.js"
 import { login } from "../services/auth.services.js"
+import { motoLogin } from "../services/authMotoLogin.service.js";
 import prisma from "../configs/db.config.js"
 
 
@@ -107,6 +108,28 @@ const meHandler = (getMeService) => {
   }
 }
 
+const motoLoginHandler = async (req, res) => {
+    try {
+        const { identifier, placa, userType } = req.body;
+
+        if (!identifier || !placa || !userType) {
+            return res.status(400).json(responseError("INVALID_REQUEST", "Missing required fields."));
+        }
+
+        const user = await motoLogin({ identifier, placa, userType });
+
+        return res.status(200).json(responseSucces("Login successful", { user }));
+    } catch (err) {
+        console.error("Error in motoLoginHandler:", err);
+        let code = 500;
+        let msg = "INTERNAL_SERVER_ERROR";
+        if (err.code === "AUTH_ERROR") {
+            code = 401;
+            msg = "AUTHENTICATION_ERROR";
+        }
+        return res.status(code).json(responseError(msg));
+    }
+};
 
 
 
@@ -114,4 +137,5 @@ export {
     loginHandler,
     verifyTokenHandler,
   meHandler,
+  motoLoginHandler,
 };
