@@ -287,6 +287,40 @@ const putProximoServicioItems = async (id, proximoServicioItems) => {
     }
 };
 
+const addServicioImages = async (id, imagenFiles, imagenesMeta) => {
+    const uploaded = Array.isArray(imagenFiles) ? imagenFiles : [];
+
+    console.log("addServicioImages called with imagenesMeta:", imagenesMeta);
+
+    try {
+        await prisma.$transaction(async (tx) => {
+            // Add new images
+            if (uploaded.length > 0) {
+                const metas = Array.isArray(imagenesMeta) ? imagenesMeta : [];
+                for (let i = 0; i < uploaded.length; i++) {
+                    const f = uploaded[i];
+                    const meta = metas[i] ?? {};
+                    const descripcion = typeof meta === "string" ? meta : meta.descripcion ?? "";
+                    const ruta = "/uploads/servicios/" + f.filename;
+                    await tx.imagen.create({
+                        data: {
+                            imagen: ruta,
+                            descripcion: descripcion,
+                            servicioId: id,
+                        },
+                    });
+                    await pause(30);
+                }
+            }
+        });
+
+        return { success: true };
+    } catch (err) {
+        console.error("Error in addServicioImages:", err);
+        throw err;
+    }
+};
+
 export {
     getServicios,
     getServicio,
@@ -296,4 +330,5 @@ export {
     salidaServicio,
     putProgreso,
     putProximoServicioItems,
+    addServicioImages,
 }

@@ -10,7 +10,6 @@ const postAIDiagnostic = async (payload: AiDiagnosticRequest): Promise<AiDiagnos
   try {
     const response = await axios.post<apiResponse<AiDiagnosticData>>(AI_API_URL+"/diagnostic", payload, {
       headers: { "Content-Type": "application/json" },
-      timeout: 15000,
     });
 
     const body = response.data;

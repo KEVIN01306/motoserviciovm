@@ -1,6 +1,6 @@
 import z from "zod";
 import { responseError, responseSucces, responseSuccesAll } from "../helpers/response.helper.js";
-import { getServicios, getServicio, postServicio, putServicio, deleteServicio, salidaServicio, putProgreso, putProximoServicioItems } from "../services/servicio.service.js";
+import { getServicios, getServicio, postServicio, putServicio, deleteServicio, salidaServicio, putProgreso, putProximoServicioItems, addServicioImages } from "../services/servicio.service.js";
 import { estados } from "../utils/estados.js";
 import { servicioSchema, servicioProductoProximoSchema } from "../zod/servicio.schema.js";
 
@@ -136,7 +136,7 @@ const postServicioHandler = async (req, res) => {
             }
         }
 
-                console.log('Body after file handling:', body);
+        console.log('Body after file handling:', body);
 
     
 
@@ -325,6 +325,28 @@ const updateProximoServicioItemsHandler = async (req, res) => {
     }
 };
 
+const addServicioImagesHandler = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const imagenFiles = req.files?.imagenes || [];
+        const imagenesMeta = req.body.imagenesMeta || [];
+        const parsedImagenesMeta = typeof imagenesMeta === "string" ? JSON.parse(imagenesMeta) : imagenesMeta;
+
+        console.log("Received imagenesMeta:", parsedImagenesMeta);
+        const result = await addServicioImages(parseInt(id), imagenFiles, parsedImagenesMeta);
+        return res.status(200).json(responseSucces("Images added successfully", result));
+    } catch (err) {
+        console.error("Error in addServicioImagesHandler:", err);
+        let code = 500;
+        let msg = "INTERNAL_SERVER_ERROR";
+        if (err.code === "DATA_NOT_FOUND") {
+            code = 404;
+            msg = err.code;
+        }
+        return res.status(code).json(responseError(msg));
+    }
+};
+
 export {
     getServiciosHandler,
     getServicioHandler,
@@ -334,4 +356,5 @@ export {
     salidaServicioHandler,
     putProgresoHandler,
     updateProximoServicioItemsHandler,
+    addServicioImagesHandler,
 }

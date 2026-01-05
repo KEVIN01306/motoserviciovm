@@ -1,3 +1,22 @@
+// PUT /:id/imagenes para agregar imágenes al servicio en progreso
+export const putServicioImagenes = async (
+  id: string | number,
+  files: File[],
+  metas: { descripcion?: string }[]
+) => {
+  const form = new FormData();
+  files.forEach((file) => {
+    form.append('imagenes', file);
+  });
+  // Enviar todas las metas como un solo campo JSON
+  const metasWithPost = metas.map(m => ({ ...m, descripcion: m.descripcion ? `post: ${m.descripcion}` : 'post:' }));
+  form.append('imagenesMeta', JSON.stringify(metasWithPost));
+  const response = await api.put(`/servicios/${id}/imagenes`, form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 60_000,
+  });
+  return response.data.data;
+};
 import axios from 'axios';
 import { api } from '../axios/axios';
 import type { apiResponse } from '../types/apiResponse';
@@ -39,7 +58,7 @@ const compressImage = async (file: File, maxSizeMB = 2, quality = 0.7): Promise<
 
 const getServicios = async (): Promise<ServicioGetType[]> => {
   try {
-    const response = await api.get<apiResponse<ServicioGetType[]>>(API_SERVICIOS, { timeout: 20000 });
+    const response = await api.get<apiResponse<ServicioGetType[]>>(API_SERVICIOS);
     const items = response.data.data;
     if (!items) return [];
     if (!Array.isArray(items)) throw new Error('INVALID_API_RESPONSE_FORMAT');
@@ -65,7 +84,7 @@ const getServicios = async (): Promise<ServicioGetType[]> => {
 
 const getServicio = async (id: string): Promise<ServicioGetType> => {
   try {
-    const response = await api.get<apiResponse<ServicioGetType>>(`${API_SERVICIOS}/${id}`, { timeout: 20000 });
+    const response = await api.get<apiResponse<ServicioGetType>>(`${API_SERVICIOS}/${id}`);
     const item = response.data.data;
     if (!item) throw new Error('DATA_NOT_FOUND');
     return item;
@@ -114,7 +133,7 @@ const postServicio = async (payload: Partial<ServicioType> & { imagenesFiles?: F
     }
     const response = await api.post<apiResponse<ServicioGetType>>(API_SERVICIOS, form, {
       headers: { 'Content-Type': 'multipart/form-data' },
-      timeout: 20000,
+
     });
 
     if (response.data && response.data.data) {
@@ -191,7 +210,6 @@ const putServicio = async (id: string, payload: Partial<ServicioType> & { imagen
 
     const response = await api.put<apiResponse<ServicioGetType>>(`${API_SERVICIOS}/${id}`, form, {
       headers: { 'Content-Type': 'multipart/form-data' },
-      timeout: 20000,
     });
     if (response.data && response.data.data) {
       return response.data.data;

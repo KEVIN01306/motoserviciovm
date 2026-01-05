@@ -5,7 +5,9 @@ import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiToolsLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';
 import ErrorCard from '../../../components/utils/ErrorCard';
-import { getServicio, putServicioOpcionesTipoServicio, putProximoServicioItems } from '../../../services/servicios.services';
+import { getServicio, putServicioOpcionesTipoServicio, putProximoServicioItems, putServicioImagenes } from '../../../services/servicios.services';
+import ImagenesProgresoForm from '../components/ImagenesProgresoForm';
+
 import ProximoServicioItemsForm from '../components/ProximoServicioItemsForm';
 import ServicioOpcionesTipoServicioForm from '../components/ServicioOpcionesTipoServicioForm';
 import type { ServicioGetType, ServicioItemType, ProgresoItemType, ProgresoItemGetType } from '../../../types/servicioType';
@@ -24,6 +26,20 @@ import type { OpcionServicioType } from '../../../types/opcionServicioType';
 const API_URL = import.meta.env.VITE_DOMAIN;
 
 const ServicioProgreso = () => {
+
+        const [savingImagenes, setSavingImagenes] = useState(false);
+    const handleSaveImagenes = async ({ files, metas }: { files: File[]; metas: { descripcion?: string }[] }) => {
+        if (!data?.id) return;
+        setSavingImagenes(true);
+        try {
+            await putServicioImagenes(data.id, files, metas);
+            await fetch();
+        } catch (e: any) {
+            setError(e?.message ?? 'Error subiendo imágenes');
+        } finally {
+            setSavingImagenes(false);
+        }
+    };
     const [savingProximo, setSavingProximo] = useState(false);
     const handleSaveProximoServicioItems = async (items: any[]) => {
         if (!data?.id) return;
@@ -162,7 +178,7 @@ const ServicioProgreso = () => {
                     <PiExportDuotone />
                 </Fab>
             </Grid>
-            <Container maxWidth="md" sx={{ mt: 4, mb: 4, boxShadow: 'none' }} >
+            <Container maxWidth="lg" sx={{ mt: 4, mb: 4, boxShadow: 'none' }} >
                 <Card sx={{ boxShadow: 'none' }} id="servicio-detail-container">
                     <Grid size={12}>
                         <Box display={'flex'} width={'100%'} justifyContent={'space-around'}>
@@ -192,7 +208,7 @@ const ServicioProgreso = () => {
 
                     </Grid>
 
-                    <CardContent sx={{ padding: 6 }}>
+                    <CardContent sx={{ padding: 2 }}>
                         <Typography variant="h6" display={'flex'} justifyContent={'end'} alignContent={'center'} sx={{ fontWeight: 700, mb: 2, color: "red" }}>{`ORDEN NO.${data.id}`}</Typography>
 
                         <Grid size={10}>
@@ -240,19 +256,15 @@ const ServicioProgreso = () => {
                         </Grid>
 
                         <Divider sx={{ my: 2 }} />
-                        {/* Tabla editable de proximoServicioItems para mecánico */}
-                        {data.proximoServicioItems && (
-                            <ProximoServicioItemsForm
-                                initial={data.proximoServicioItems}
-                                onSubmit={handleSaveProximoServicioItems}
-                                loading={savingProximo}
-                            />
-                        )}
 
-                        <Box >
-            
-                            {/* Invocación del componente */}
+
+                        <Box>
+                            {/* Galería de imágenes actuales */}
                             <ImageGallery imagenes={data.imagen ?? []} />
+                        </Box>
+                        <Box>
+                            {/* Formulario para agregar imágenes nuevas */}
+                            <ImagenesProgresoForm onSubmit={handleSaveImagenes} loading={savingImagenes} />
                         </Box>
 
                         <Divider sx={{ my: 2 }} />
@@ -288,6 +300,17 @@ const ServicioProgreso = () => {
                                 loading={savingOpciones}
                             />
                         )}
+
+
+                        <Divider sx={{ my: 2 }} />
+                        {/* Tabla editable de proximoServicioItems para mecánico */}
+                        {data.proximoServicioItems && (
+                            <ProximoServicioItemsForm
+                                initial={data.proximoServicioItems}
+                                onSubmit={handleSaveProximoServicioItems}
+                                loading={savingProximo}
+                            />
+                        )}
                     
 
 
@@ -303,7 +326,7 @@ const ServicioProgreso = () => {
                                             <ProductsTable
                                                 maxHeight={'none'}
                                                 columns={[
-                                                    { id: 'nombre', label: 'CAMBIOS REALIZADOS DURANTE SERVICIO', minWidth: 180, format: (v: any) => v ?? '', align: 'center' },
+                                                    { id: 'nombre', label: 'REPUESTOS PARA SERVICIO', minWidth: 180, format: (v: any) => v ?? '', align: 'center' },
                                                 ] as any}
                                                 rows={dataTableCambiosServicio ?? []}
                                                 headerColor="#1565c0"

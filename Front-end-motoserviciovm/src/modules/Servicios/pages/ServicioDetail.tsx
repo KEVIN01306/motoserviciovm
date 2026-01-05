@@ -6,7 +6,7 @@ import { RiToolsLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';
 import ErrorCard from '../../../components/utils/ErrorCard';
 import { getServicio } from '../../../services/servicios.services';
-import type { ServicioGetType, ServicioItemType } from '../../../types/servicioType';
+import type { ProgresoItemGetType, ProgresoItemType, ServicioGetType, ServicioItemType } from '../../../types/servicioType';
 import ProductsTable from '../../../components/Table/ProductsTable';
 import { formatDate } from '../../../utils/formatDate';
 import type { VentaProductoGetType } from '../../../types/ventaType';
@@ -15,9 +15,11 @@ import { useGoTo } from '../../../hooks/useGoTo';
 import LinkStylesNavigate from '../../../components/utils/links';
 import { exportarAPDF } from '../../../utils/exportarPdf';
 import { ExposureTwoTone } from '@mui/icons-material';
+import Checkbox from '@mui/material/Checkbox';
 import { PiExportDuotone } from 'react-icons/pi';
 import ImageGallery from '../../../components/utils/GaleryImagenes';
 import { useAuthStore } from '../../../store/useAuthStore';
+import { da } from 'zod/v4/locales';
 
 const API_URL = import.meta.env.VITE_DOMAIN;
 
@@ -142,7 +144,7 @@ const ServicioDetail = () => {
 
             {
               data.productosCliente?.length !== 0 &&
-                <>|
+                <>
                  <Typography variant="h6" gutterBottom>Productos del cliente</Typography>
                   <ProductsTable
                     columns={[
@@ -198,6 +200,22 @@ const ServicioDetail = () => {
                 ))
               )
             }
+
+             {data.servicioOpcionesTipoServicio && data.servicioOpcionesTipoServicio.length > 0 && (
+
+                  <Box  sx={{ mb: 4 }} >
+                    <Typography variant="h6" gutterBottom>{data.tipoServicio?.tipo}</Typography>
+                    <ProductsTable
+                    columns={[
+                      { id: 'opcion', label: 'Opcion', minWidth: 120, format: (v:any, row: ProgresoItemGetType) => row.opcionServicio.opcion ?? '' },
+                      { id: 'checked', label: 'Check', minWidth: 100, align: 'right', format: (_v: boolean, row: ProgresoItemGetType) => <Checkbox color="primary" checked={!!row.checked} disabled /> },
+                      { id: 'observaciones', label: 'observaciones', minWidth: 80, align: 'center', format: (v: string) => v ?? '' },
+                    ] as any}
+                    rows={data.servicioOpcionesTipoServicio ?? []}
+                    headerColor="#1565c0"
+                      />
+                  </Box>
+                )}
 
             <Grid container spacing={2} mt={4} justifyContent="center" alignItems="center">
               <Grid size={{xs: 12, md: 6}} textAlign="center">
