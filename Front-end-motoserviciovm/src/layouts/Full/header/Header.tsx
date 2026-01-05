@@ -12,9 +12,11 @@ import MenuActions from "./MenuActions";
 interface HeaderProps {
     drawerWidth: number;
     handleDrawerToggle: () => void;
+    handleDrawerOpen: () => void;
+    drawerOpen: boolean;
 }
 
-const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
+const Header = ({ drawerWidth, handleDrawerToggle, handleDrawerOpen, drawerOpen }: HeaderProps) => {
     const user = useAuthStore((state) => state.user);
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -33,8 +35,8 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
         <AppBar
             position="fixed"
             sx={{
-                width: { sm: `calc(100% - ${drawerWidth}px)` },
-                ml: { sm: `${drawerWidth}px` },
+                width: { sm: drawerOpen ? `calc(100% - ${drawerWidth}px)` : '100%' },
+                ml: { sm: drawerOpen ? `${drawerWidth}px` : 0 },
                 mr: { sm: 1 },
                 boxShadow: "none",
                 backgroundColor: "transparent",
@@ -45,9 +47,11 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
                 display: "flex",
                 flexDirection: "row",
                 justifyContent: "space-between",
+                transition: 'width 0.3s, margin-left 0.3s',
             }}
         >
             <Toolbar>
+                {/* Botón menú móvil */}
                 <IconButton
                     color="inherit"
                     aria-label="open drawer"
@@ -57,6 +61,18 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
                 >
                     <MenuIcon />
                 </IconButton>
+                {/* Botón menú desktop (solo si el drawer está cerrado) */}
+                {!drawerOpen && (
+                    <IconButton
+                        color="inherit"
+                        aria-label="open drawer"
+                        edge="start"
+                        onClick={handleDrawerOpen}
+                        sx={{ mr: 2, display: { xs: 'none', sm: 'inline-flex' } }}
+                    >
+                        <MenuIcon />
+                    </IconButton>
+                )}
                 <Typography variant="h6" noWrap component="div"></Typography>
             </Toolbar>
 

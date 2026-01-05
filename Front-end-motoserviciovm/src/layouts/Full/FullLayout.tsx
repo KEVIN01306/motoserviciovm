@@ -7,48 +7,40 @@ import Toolbar from '@mui/material/Toolbar';
 import { useState } from 'react';
 import Footer from './sider/Footer';
 
-const drawerWidth = 200
+const drawerWidth = 200;
 
 const FullLayout = () => {
+    // drawerOpen controla ambos: PC y móvil
+    const [drawerOpen, setDrawerOpen] = useState(true);
     const [mobileOpen, setMobileOpen] = useState(false);
-    const [isClosing, setIsClosing] = useState(false);
 
-    const handleDrawerClose = () => {
-        setIsClosing(true);
-        setMobileOpen(false);
-    };
-
-    const handleDrawerTransitionEnd = () => {
-        setIsClosing(false);
-    };
-
-    const handleDrawerToggle = () => {
-        if (!isClosing) {
-            setMobileOpen(!mobileOpen);
-        }
-    };
+    // Para móvil
+    const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
+    // Para PC
+    const handleDrawerOpen = () => setDrawerOpen(true);
+    const handleDrawerClose = () => setDrawerOpen(false);
     
     return (
         <>
             <Box sx={{ display: 'flex', bgcolor: "rgb(251, 251, 252)",minHeight: "100vh"
              }}>
                 <CssBaseline />
-                <Header drawerWidth={drawerWidth} handleDrawerToggle={handleDrawerToggle} />
+                <Header drawerWidth={drawerWidth} handleDrawerToggle={handleDrawerToggle} handleDrawerOpen={handleDrawerOpen} drawerOpen={drawerOpen} />
                 <Box
                     component="nav"
-                    sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+                    sx={{ width: { sm: drawerOpen ? drawerWidth : 0 }, flexShrink: { sm: 0 }, transition: 'width 0.3s' }}
                     aria-label="mailbox folders"
                 >
                     <Sider
                         handleDrawerClose={handleDrawerClose}
-                        handleDrawerTransitionEnd={handleDrawerTransitionEnd}
                         mobileOpen={mobileOpen}
+                        drawerOpen={drawerOpen}
+                        setMobileOpen={setMobileOpen}
                     />
-
                 </Box>
                 <Box
                     component="main"
-                    sx={{ flexGrow: 1, p: 3, width: {xs: '100%', sm: `calc(100% - ${drawerWidth}px)`} }}
+                    sx={{ flexGrow: 1, p: 3, width: { xs: '100%', sm: drawerOpen ? `calc(100% - ${drawerWidth}px)` : '100%' }, transition: 'width 0.3s' }}
                 >
                     <Toolbar />
                     <Box display={"flex"} width={"100%"} flexWrap={"wrap"} justifyContent={"center"} flexDirection={'column'} alignContent={"center"}position={"relative"}>
