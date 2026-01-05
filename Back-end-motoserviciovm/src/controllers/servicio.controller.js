@@ -1,6 +1,6 @@
 import z from "zod";
 import { responseError, responseSucces, responseSuccesAll } from "../helpers/response.helper.js";
-import { getServicios, getServicio, postServicio, putServicio, deleteServicio, salidaServicio } from "../services/servicio.service.js";
+import { getServicios, getServicio, postServicio, putServicio, deleteServicio, salidaServicio, putProgreso, putProximoServicioItems } from "../services/servicio.service.js";
 import { estados } from "../utils/estados.js";
 import { servicioSchema, servicioProductoProximoSchema } from "../zod/servicio.schema.js";
 
@@ -275,6 +275,56 @@ const salidaServicioHandler = async (req, res) => {
     }
 };
 
+const putProgresoHandler = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { progresoItems } = req.body;
+        console.log("Received progresoItems:", progresoItems);
+
+        if (!Array.isArray(progresoItems)) {
+            return res.status(400).json(responseError("Invalid data format. Expected an array of progreso items."));
+        }
+
+        const updated = await putProgreso(parseInt(id), progresoItems);
+        return res.status(200).json(responseSucces("Progreso actualizado", updated));
+    } catch (err) {
+        console.error("Error in putProgresoHandler:", err);
+        let code = 500;
+        let msg = "INTERNAL_SERVER_ERROR";
+        if (err.code === "DATA_NOT_FOUND") {
+            code = 404;
+            msg = err.code;
+        }
+        return res.status(code).json(responseError(msg));
+    }
+};
+
+const updateProximoServicioItemsHandler = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const proximoServicioItems = req.body;
+
+        if (!Array.isArray(proximoServicioItems)) {
+            return res.status(400).json(responseError("Invalid data format. Expected an array of proximoServicioItems."));
+        }
+
+        console.log("Received proximoServicioItems:", proximoServicioItems);
+
+        // Delete existing items for the service and recreate them
+        const updated = await putProximoServicioItems(parseInt(id), proximoServicioItems);
+        return res.status(200).json(responseSucces("ProximoServicioItems updated successfully", updated));
+    } catch (err) {
+        console.error("Error in updateProximoServicioItemsHandler:", err);
+        let code = 500;
+        let msg = "INTERNAL_SERVER_ERROR";
+        if (err.code === "DATA_NOT_FOUND") {
+            code = 404;
+            msg = err.code;
+        }
+        return res.status(code).json(responseError(msg));
+    }
+};
+
 export {
     getServiciosHandler,
     getServicioHandler,
@@ -282,4 +332,6 @@ export {
     putServicioHandler,
     deleteServicioHandler,
     salidaServicioHandler,
+    putProgresoHandler,
+    updateProximoServicioItemsHandler,
 }

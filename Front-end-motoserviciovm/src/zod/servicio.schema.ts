@@ -1,4 +1,4 @@
-import z from "zod";
+import z, { number } from "zod";
 
 export const servicioItemSchema = z.object({
     inventarioId: z.number(),
@@ -24,6 +24,13 @@ export const servicioProductoProximoSchema = z.object({
     nombre: z.string().min(1, 'El nombre es obligatorio'),
 });
 
+export const servicioOpcionesTipoServicio = z.object({
+    id: z.number().optional(),
+    servicioId: z.number(),
+    opcionServicioId: z.number(),
+    checked: z.boolean(),
+    observaciones: z.string().optional(),
+})
 
 export const servicioSchema = z.object({
     id: z.string().optional(),

@@ -15,7 +15,7 @@ const getServicios = async () => {
 }
 
 const getServicio = async (id) => {
-    const item = await prisma.servicio.findFirst({ where: { id: id, estadoId: { not: estados().inactivo } }, include: { imagen: true, servicioItems: {include: {inventario: true}}, productosCliente: true, moto: {include: { modelo: true}}, sucursal: true,cliente: true, mecanico: true, tipoServicio: {include: {opcionServicios: true}} , estado: true, proximoServicioItems: true , ventas: { include: { productos: {include: {producto: true}}, estado: true } } } });
+    const item = await prisma.servicio.findFirst({ where: { id: id, estadoId: { not: estados().inactivo } }, include: { imagen: true, servicioItems: {include: {inventario: true}}, productosCliente: true, moto: {include: { modelo: true}}, sucursal: true,cliente: true, mecanico: true, servicioOpcionesTipoServicio: {include: {opcionServicio: true}} , tipoServicio: {include: {opcionServicios: true}} , estado: true, proximoServicioItems: true , ventas: { include: { productos: {include: {producto: true}}, estado: true } } } });
     if (!item) { const error = new Error('DATA_NOT_FOUND'); error.code = 'DATA_NOT_FOUND'; throw error; }
     return item;
 }
@@ -58,14 +58,30 @@ const postServicio = async (data) => {
                 }
             }
 
+            // create ServicioOpcionesTipoServicio
+            const opciones = await tx.opcionServicio.findMany({
+                where: { tipoServicios: { some: { id: base.tipoServicioId } } },
+            });
+
+            for (const opcion of opciones) {
+                await tx.servicioOpcionesTipoServicio.create({
+                    data: {
+                        servicioId: created.id,
+                        opcionServicioId: opcion.id,
+                        checked: false,
+                        observaciones: "",
+                    },
+                });
+            }
+
             // create imagen records from files + metas
             if (uploaded.length > 0) {
                 const metas = Array.isArray(imagenesMeta) ? imagenesMeta : [];
                 for (let i = 0; i < uploaded.length; i++) {
                     const f = uploaded[i];
                     const meta = metas[i] ?? {};
-                    const descripcion = (typeof meta === 'string') ? meta : (meta.descripcion ?? '');
-                    const ruta = '/uploads/servicios/' + f.filename;
+                    const descripcion = typeof meta === "string" ? meta : meta.descripcion ?? "";
+                    const ruta = "/uploads/servicios/" + f.filename;
                     await tx.imagen.create({ data: { imagen: ruta, descripcion: descripcion, servicioId: created.id } });
                     await pause(30);
                 }
@@ -220,6 +236,57 @@ const salidaServicio = async (id, data) => {
     }
 };
 
+const putProgreso = async (id, progresoItems) => {
+    try {
+        const updates = progresoItems.map((item) =>
+            prisma.servicioOpcionesTipoServicio.update({
+                where: {
+                    servicioId_opcionServicioId: {
+                        servicioId: id,
+                        opcionServicioId: item.opcionServicioId,
+                    },
+                },
+                data: {
+                    checked: item.checked,
+                    observaciones: item.observaciones,
+                },
+            })
+        );
+
+        // Execute updates in parallel without a transaction
+        await Promise.all(updates);
+
+        return { success: true };
+    } catch (err) {
+        console.error("Error in putProgreso:", err);
+        throw err;
+    }
+};
+
+const putProximoServicioItems = async (id, proximoServicioItems) => {
+    try {
+        await prisma.$transaction(async (tx) => {
+            // Delete existing items for the service
+            await tx.servicioProductoProximo.deleteMany({ where: { servicioId: id } });
+
+            // Recreate items for the service
+            for (const item of proximoServicioItems) {
+                await tx.servicioProductoProximo.create({
+                    data: {
+                        nombre: item.nombre,
+                        servicioId: id,
+                    },
+                });
+            }
+        });
+
+        return { success: true };
+    } catch (err) {
+        console.error("Error in putProximoServicioItems:", err);
+        throw err;
+    }
+};
+
 export {
     getServicios,
     getServicio,
@@ -227,4 +294,6 @@ export {
     putServicio,
     deleteServicio,
     salidaServicio,
+    putProgreso,
+    putProximoServicioItems,
 }

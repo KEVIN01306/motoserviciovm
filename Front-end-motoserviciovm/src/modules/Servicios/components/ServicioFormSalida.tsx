@@ -311,8 +311,6 @@ const totalVentasDescuentos = initial?.ventas
         />
       </Grid>
 
-      
-
       <Grid size={{ xs: 12 }}>
         <Button type="submit" variant="contained" fullWidth disabled={isSubmitting}>{submitLabel}</Button>
       </Grid>

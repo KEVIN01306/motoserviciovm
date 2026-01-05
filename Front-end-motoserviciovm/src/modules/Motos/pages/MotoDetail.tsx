@@ -64,12 +64,12 @@ const MotoDetail = () => {
                                     sx={{ width: "100%", maxHeight: 400, objectFit: "contain", borderRadius: 1 }}
                                 />
                             ) : (
-                                <Box sx={{ width: "100%", height: 200, bgcolor: "#f3f4f6", borderRadius: 1 }} />
+                                <Box   sx={{ width: "100%", height: 200, bgcolor: "#f3f4f6", borderRadius: 1 }} />
                             )}
                         </Box>
                     </Grid>
 
-                    <Grid size={{ xs: 12, md: 6 }}>
+                    <Grid size={{ xs: 12, md: (moto?.avatar ? 6 : 12) }}>
                         <Box>
                             <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 1 }}>
                                 <Typography sx={{ minWidth: 120, color: "#6b7280", fontWeight: 600 }}>Placa</Typography>

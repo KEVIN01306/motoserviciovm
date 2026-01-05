@@ -1,6 +1,6 @@
 import type z from "zod";
 import { estados } from "../utils/estados";
-import { servicioItemSchema, servicioProductoProximoSchema, servicioSchema } from "../zod/servicio.schema";
+import { servicioItemSchema, servicioOpcionesTipoServicio, servicioProductoProximoSchema, servicioSchema } from "../zod/servicio.schema";
 import { servicioProductoClienteSchema } from "../zod/servicio.schema";
 import { imagenMetaSchema } from "../zod/servicio.schema";
 import type { motoGetType } from "./motoType";
@@ -9,6 +9,7 @@ import type { TipoServicioGetType } from "./tipoServicioType";
 import type { VentaGetType } from "./ventaType";
 import type { EstadoType } from "./estadoType";
 import type { UserGetType } from "./userType";
+import type { OpcionServicioType } from "./opcionServicioType";
 
 export type ServicioItemType = z.infer<typeof servicioItemSchema>;
 
@@ -42,7 +43,33 @@ export type ServicioGetType = ServicioType & {
   fechaSalida: Date,
   descuentosServicio?: number;
   proximoServicioItems?: servicioProductoProximoType[];
+  servicioOpcionesTipoServicio?: ProgresoItemType[];
 };
+
+
+export type ProgresoItemType = z.infer<typeof servicioOpcionesTipoServicio>;
+
+export type ProgresoItemGetType = ProgresoItemType & {
+  opcionServicio: OpcionServicioType
+};
+
+export const ProgresoItemInitialState: ProgresoItemType = {
+  servicioId: 0,
+  opcionServicioId: 0,
+  checked: false,
+  observaciones: '',
+};
+
+
+export const mergeProgresoItemType = (apiData: Partial<ProgresoItemType>): Partial<ProgresoItemType> => {
+  return {
+    servicioId: apiData.servicioId ?? ProgresoItemInitialState.servicioId,
+    opcionServicioId: apiData.opcionServicioId ?? ProgresoItemInitialState.opcionServicioId,
+    checked: apiData.checked ?? ProgresoItemInitialState.checked,
+    observaciones: apiData.observaciones ?? ProgresoItemInitialState.observaciones,
+  };
+};
+
 
 export type servicioProductoProximoType = z.infer<typeof servicioProductoProximoSchema>;
 

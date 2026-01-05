@@ -1,3 +1,13 @@
+import axios from 'axios';
+import { api } from '../axios/axios';
+import type { apiResponse } from '../types/apiResponse';
+import type { ServicioType, ServicioGetType } from '../types/servicioType';
+import type { ServicioSalidaPayloadType } from '../types/servicioType';
+
+const API_URL = import.meta.env.VITE_DOMAIN;
+const API_SERVICIOS = `${API_URL}servicios`;
+
+
 // Comprime imágenes grandes antes de subirlas (máx 2MB, calidad 0.7)
 const compressImage = async (file: File, maxSizeMB = 2, quality = 0.7): Promise<File> => {
   if (file.size / 1024 / 1024 <= maxSizeMB) return file;
@@ -26,14 +36,6 @@ const compressImage = async (file: File, maxSizeMB = 2, quality = 0.7): Promise<
     img.src = URL.createObjectURL(file);
   });
 };
-import axios from 'axios';
-import { api } from '../axios/axios';
-import type { apiResponse } from '../types/apiResponse';
-import type { ServicioType, ServicioGetType } from '../types/servicioType';
-import type { ServicioSalidaPayloadType } from '../types/servicioType';
-
-const API_URL = import.meta.env.VITE_DOMAIN;
-const API_SERVICIOS = `${API_URL}servicios`;
 
 const getServicios = async (): Promise<ServicioGetType[]> => {
   try {
@@ -148,7 +150,7 @@ export const putFirmaSalida = async (
   const form = new FormData();
   form.append('total', String(data.total));
   if (data.observaciones) form.append('observaciones', data.observaciones);
-  if (data.proximaFechaServicio) form.append('proximaFechaServicio', data.proximaFechaServicio);
+  if (data.proximaFechaServicio) form.append('proximaFechaServicio', typeof data.proximaFechaServicio === 'string' ? data.proximaFechaServicio : data.proximaFechaServicio.toISOString());
   if (data.descripcionProximoServicio) form.append('descripcionProximoServicio', data.descripcionProximoServicio);
   if (data.kilometrajeProximoServicio !== undefined) form.append('kilometrajeProximoServicio', String(data.kilometrajeProximoServicio));
   form.append('firmaSalida', data.firmaSalida);
@@ -215,4 +217,37 @@ const putServicio = async (id: string, payload: Partial<ServicioType> & { imagen
   }
 };
 
-export { getServicios, getServicio, postServicio, putServicio };
+
+
+import type { ProgresoItemType } from '../types/servicioType';
+
+// PUT /servicios/progreso/:id para actualizar progresoItems
+const putServicioOpcionesTipoServicio = async (
+  id: string | number,
+  progresoItems: ProgresoItemType[]
+) => {
+  // Enviar como JSON simple
+  const response = await api.put<apiResponse<any>>(
+    `${API_SERVICIOS}/progreso/${id}`,
+    { progresoItems },
+  );
+  return response.data.data;
+};
+
+import type { servicioProductoProximoType } from '../types/servicioType';
+// PUT /proximosServiciosItems/:id para actualizar proximoServicioItems
+export const putProximoServicioItems = async (
+  id: string | number,
+  proximoServicioItems: servicioProductoProximoType[]
+) => {
+  // El backend espera un array como body, no un objeto
+  const response = await api.put<apiResponse<any>>(
+    `${API_SERVICIOS}/proximosServiciosItems/${id}`,
+    proximoServicioItems,
+    { headers: { 'Content-Type': 'application/json' } }
+  );
+  return response.data.data;
+};
+
+
+export { getServicios, getServicio, postServicio, putServicio, putServicioOpcionesTipoServicio };

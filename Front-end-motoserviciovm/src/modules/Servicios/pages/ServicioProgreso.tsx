@@ -5,8 +5,10 @@ import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiToolsLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';
 import ErrorCard from '../../../components/utils/ErrorCard';
-import { getServicio } from '../../../services/servicios.services';
-import type { ServicioGetType, ServicioItemType } from '../../../types/servicioType';
+import { getServicio, putServicioOpcionesTipoServicio, putProximoServicioItems } from '../../../services/servicios.services';
+import ProximoServicioItemsForm from '../components/ProximoServicioItemsForm';
+import ServicioOpcionesTipoServicioForm from '../components/ServicioOpcionesTipoServicioForm';
+import type { ServicioGetType, ServicioItemType, ProgresoItemType, ProgresoItemGetType } from '../../../types/servicioType';
 import ProductsTable from '../../../components/Table/ProductsTable';
 import { formatDate } from '../../../utils/formatDate';
 import type { VentaGetType, VentaProductoGetType, VentaType } from '../../../types/ventaType';
@@ -22,7 +24,34 @@ import type { OpcionServicioType } from '../../../types/opcionServicioType';
 const API_URL = import.meta.env.VITE_DOMAIN;
 
 const ServicioProgreso = () => {
+    const [savingProximo, setSavingProximo] = useState(false);
+    const handleSaveProximoServicioItems = async (items: any[]) => {
+        if (!data?.id) return;
+        setSavingProximo(true);
+        try {
+            await putProximoServicioItems(data.id, items);
+            await fetch();
+        } catch (e: any) {
+            setError(e?.message ?? 'Error actualizando próximos servicios');
+        } finally {
+            setSavingProximo(false);
+        }
+    };
     const { id } = useParams();
+    const [savingOpciones, setSavingOpciones] = useState(false);
+    // Handler para guardar opcionesTipoServicio
+    const handleSaveOpcionesTipoServicio = async (opciones: any[]) => {
+        if (!data?.id) return;
+        setSavingOpciones(true);
+        try {
+            await putServicioOpcionesTipoServicio(data.id, opciones); // opciones es la lista, el servicio espera progresoItems
+            await fetch(); // Refrescar datos
+        } catch (e: any) {
+            setError(e?.message ?? 'Error actualizando opciones');
+        } finally {
+            setSavingOpciones(false);
+        }
+    };
     const [data, setData] = useState<ServicioGetType | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -34,7 +63,7 @@ const ServicioProgreso = () => {
             setLoading(true);
             const res = await getServicio(id);
             setData(res);
-
+            console.log(res);
         } catch (err: any) {
             setError(err?.message ?? 'Error cargando servicio');
         } finally { setLoading(false); }
@@ -211,6 +240,14 @@ const ServicioProgreso = () => {
                         </Grid>
 
                         <Divider sx={{ my: 2 }} />
+                        {/* Tabla editable de proximoServicioItems para mecánico */}
+                        {data.proximoServicioItems && (
+                            <ProximoServicioItemsForm
+                                initial={data.proximoServicioItems}
+                                onSubmit={handleSaveProximoServicioItems}
+                                loading={savingProximo}
+                            />
+                        )}
 
                         <Box >
             
@@ -243,14 +280,14 @@ const ServicioProgreso = () => {
 
                         <Typography variant="h5" textAlign={'center'} m={2} gutterBottom>{data.tipoServicio?.tipo ?? ''}</Typography>
 
-                        <ProductsTable
-                                    maxHeight={'none'}
-                                    columns={[
-                                        { id: 'opcion', label: 'Opción', minWidth: 120, format: (v: any) => v ?? '' },
-                                    ] as any}
-                                    rows={data.tipoServicio?.opcionServicios ?? []}
-                                    headerColor="#1565c0"
-                                />
+                        {/* Tabla editable de opcionesTipoServicio para mecánico */}
+                        {data.servicioOpcionesTipoServicio && data.servicioOpcionesTipoServicio.length > 0 && (
+                            <ServicioOpcionesTipoServicioForm
+                                initial={data.servicioOpcionesTipoServicio}
+                                onSubmit={handleSaveOpcionesTipoServicio}
+                                loading={savingOpciones}
+                            />
+                        )}
                     
 
 
