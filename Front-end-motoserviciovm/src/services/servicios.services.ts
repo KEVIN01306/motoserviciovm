@@ -56,9 +56,17 @@ const compressImage = async (file: File, maxSizeMB = 2, quality = 0.7): Promise<
   });
 };
 
-const getServicios = async (): Promise<ServicioGetType[]> => {
+const getServicios = async (params?: { placa?: string; startDate?: string; endDate?: string }): Promise<ServicioGetType[]> => {
   try {
-    const response = await api.get<apiResponse<ServicioGetType[]>>(API_SERVICIOS);
+    let url = API_SERVICIOS;
+    if (params) {
+      const search = new URLSearchParams();
+      if (params.placa) search.append('placa', params.placa);
+      if (params.startDate) search.append('startDate', params.startDate);
+      if (params.endDate) search.append('endDate', params.endDate);
+      url += `?${search.toString()}`;
+    }
+    const response = await api.get<apiResponse<ServicioGetType[]>>(url);
     const items = response.data.data;
     if (!items) return [];
     if (!Array.isArray(items)) throw new Error('INVALID_API_RESPONSE_FORMAT');

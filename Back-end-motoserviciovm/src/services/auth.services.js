@@ -38,6 +38,7 @@ const login = async (data) => {
             primerNombre: userValied.primerNombre,
             email: userValied.email,
             roles: roleNames,
+            tipo: userValied.tipo,
             permisos: permisoNames,
             sucursales: userValied.sucursales,
         },
@@ -78,6 +79,7 @@ const getMe = async (userId) => {
         primerNombre: user.primerNombre,
         email: user.email,
         roles: roleNames,
+        tipo: user.tipo,
         permisos: permisoNames,
         sucursales: user.sucursales,
     }
@@ -157,6 +159,7 @@ const motoLogin = async ({ identifier, placa, userType }) => {
                 email: user.email,
                 roles: roleNames,
                 permisos: permisoNames,
+                tipo: user.tipo,
             },
             motos: user.motos,
         };

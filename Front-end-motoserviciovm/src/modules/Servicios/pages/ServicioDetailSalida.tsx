@@ -18,6 +18,7 @@ import { ExposureTwoTone } from '@mui/icons-material';
 import { PiExportDuotone } from 'react-icons/pi';
 import ImageGallery from '../../../components/utils/GaleryImagenes';
 import type { OpcionServicioType } from '../../../types/opcionServicioType';
+import { useAuthStore } from '../../../store/useAuthStore';
 
 const API_URL = import.meta.env.VITE_DOMAIN;
 
@@ -28,6 +29,7 @@ const ServicioDetailSalida = () => {
     const [error, setError] = useState<string | null>(null);
     const goTo = useGoTo();
     const { hash } = useLocation();
+    const userlogged = useAuthStore(state => state.user);
 
     const fetch = async () => {
         try {
@@ -95,7 +97,7 @@ const ServicioDetailSalida = () => {
     if (!data) return <ErrorCard errorText={'Servicio no encontrado'} restart={fetch} />;
 
     const breadcrumbs = [
-        { label: 'Servicios', href: '/admin/servicios', icon: <RiToolsLine fontSize="inherit" /> },
+        { label: 'Servicios', href: `${userlogged.tipo != "" ? `/admin/historial-servicio/${data.motoId}`  : '/admin/servicios'}`, icon: <RiToolsLine fontSize="inherit" /> },
         { label: `Servicio #${data.id}`, icon: <RiToolsLine fontSize="inherit" /> },
     ];
 

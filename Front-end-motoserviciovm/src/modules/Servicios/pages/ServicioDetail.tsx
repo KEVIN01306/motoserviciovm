@@ -65,7 +65,7 @@ const ServicioDetail = () => {
   if (!data) return <ErrorCard errorText={'Servicio no encontrado'} restart={fetch} />;
 
   const breadcrumbs = [
-    { label: 'Servicios', href: '/admin/servicios', icon: <RiToolsLine fontSize="inherit" /> },
+    { label: 'Servicios', href:  '/admin/servicios', icon: <RiToolsLine fontSize="inherit" /> },
     { label: `Servicio #${data.id}`, icon: <RiToolsLine fontSize="inherit" /> },
   ];
 
