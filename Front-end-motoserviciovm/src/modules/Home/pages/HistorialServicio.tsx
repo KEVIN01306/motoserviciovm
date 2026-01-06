@@ -109,7 +109,7 @@ const HistorialServicio = () => {
                                         component="img"
                                         boxShadow={2}
                                         
-                                        src={"https://api.motoserviciovm.com/" + moto.avatar}
+                                        src={API_URL + moto.avatar}
                                         alt={moto?.placa ?? "avatar"}
                                         sx={{ width: "100%", maxHeight: 400, objectFit: "cover", borderRadius: "24px",display: 'flex', marginLeft: 'auto', marginRight: 'auto', justifyContent: 'center' }}
                                     />
