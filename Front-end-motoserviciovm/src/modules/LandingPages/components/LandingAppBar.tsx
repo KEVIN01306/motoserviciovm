@@ -55,7 +55,7 @@ const handleClick = (href: string) => {
               </IconButton>
             )}
 
-            <Button variant="outlined" onClick={() => goTo('/public/auth/login')} sx={{ textTransform: 'none', fontWeight: 700 }}>
+            <Button variant="outlined" onClick={() => goTo('/public/auth/login-clientes')} sx={{ textTransform: 'none', fontWeight: 700 }}>
               Iniciar sesión
             </Button>
 

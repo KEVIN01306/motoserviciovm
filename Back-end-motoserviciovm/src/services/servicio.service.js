@@ -4,13 +4,27 @@ import { deleteImage } from "../utils/fileUtils.js";
 
 const pause = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-const getServicios = async () => {
+const getServicios = async (filters = {}) => {
+    const { placa, startDate, endDate } = filters;
+
+    const whereClause = {
+        estadoId: { not: estados().inactivo },
+        ...(placa && { moto: { placa: placa } }),
+        ...(startDate && endDate && { createdAt: { gte: new Date(startDate), lte: new Date(endDate) } }),
+    };
+
     const items = await prisma.servicio.findMany({
-        where: { estadoId: { not: estados().inactivo } },
+        where: whereClause,
         orderBy: { createdAt: 'desc' },
-        include: { moto: true, sucursal: true,cliente: true, mecanico: true,estado: true },
+        include: { moto: true, sucursal: true, cliente: true, mecanico: true, estado: true },
     });
-    if (!items) { const error = new Error('DATA_NOT_FOUND'); error.code = 'DATA_NOT_FOUND'; throw error; }
+
+    if (!items || items.length === 0) {
+        const error = new Error('DATA_NOT_FOUND');
+        error.code = 'DATA_NOT_FOUND';
+        throw error;
+    }
+
     return items;
 }
 

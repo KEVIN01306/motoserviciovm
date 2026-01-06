@@ -1,16 +1,18 @@
 import { create } from "zustand";
-import type { AuthType } from "../types/authType";
+import type { AuthClienteType, AuthType } from "../types/authType";
 import { persist } from "zustand/middleware";
-import { getMe, postLogin } from "../services/auth.services";
+import { getMe, postLogin, postLoginCliente } from "../services/auth.services";
 
 interface AuthState {
     user: any;
+    motos: any;
     token: string | null;
     error: null | string;
 
     login: (data: AuthType) => Promise<void>;
     logout: () => void;
     refreshMe: () => Promise<void>;
+    loginCliente: (data: AuthClienteType) => Promise<void>;
 
     isAuthReady: boolean;
 
@@ -23,6 +25,7 @@ export const useAuthStore = create<AuthState>()(
             user: null,
             token: null,
             error: null,
+            motos: null,
             _hasHydrated: false,
             isAuthReady: false,
 
@@ -31,6 +34,17 @@ export const useAuthStore = create<AuthState>()(
                     set({ error: null });
                     const { user, token } = await postLogin(data);
                     set({ user, token, isAuthReady: true });
+                } catch (error: any) {
+                    set({ error: error.message, isAuthReady: true });
+                    throw error;
+                }
+            },
+            loginCliente: async (data: AuthClienteType) => {
+                try {
+                    set({ error: null });
+                    const { user, token, motos } = await postLoginCliente(data);
+                    console.log('LoginCliente successful:', { user, token, motos });
+                    set({ user, token, motos, isAuthReady: true });
                 } catch (error: any) {
                     set({ error: error.message, isAuthReady: true });
                     throw error;

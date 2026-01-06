@@ -1,10 +1,12 @@
-import { Box, Container, Typography, List, ListItem, ListItemText } from "@mui/material";
+import { Box, Container, Typography, List, ListItem, ListItemText, Grid } from "@mui/material";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { useEffect, useState } from "react";
 import Loading from "../../../components/utils/Loading";
 import ErrorCard from "../../../components/utils/ErrorCard";
 import { getUser } from "../../../services/users.services";
 import type { UserGetType } from "../../../types/userType";
+import MotoCard from "../components/MotoCard";
+import { useGoTo } from "../../../hooks/useGoTo";
 
 const HomePages = () => {
 	const storedUser = useAuthStore((state) => state.user);
@@ -13,6 +15,7 @@ const HomePages = () => {
 	const [user, setUser] = useState<UserGetType | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const goTo = useGoTo()
 
 	useEffect(() => {
 		const fetch = async () => {
@@ -38,6 +41,7 @@ const HomePages = () => {
 			</Container>
 		);
 	}
+	
 
 	if (loading) return <Loading />;
 	if (error) return <ErrorCard errorText={error} restart={() => window.location.reload()} />;
@@ -72,6 +76,27 @@ const HomePages = () => {
 						</List>
 					)}
 				</Box>
+
+				{
+					user?.motos && (
+						<Grid container spacing={2} flexDirection="column" >
+							<Typography variant="subtitle1" fontWeight={600} sx={{ mb: 1 }}>
+								Motos asignadas
+							</Typography>
+							{user.motos.length === 0 ? (
+								<Typography variant="body2" color="text.secondary">No tienes motos asignadas.</Typography>
+							) : (
+									
+									user.motos.map((moto) => (
+										<Grid size={{xs: 12, md: 4	}}  key={moto.id}>
+											<MotoCard data={moto} onclikkHistorial={() => goTo(`/admin/historial-servicio/${moto.id}`)} />
+										</Grid>
+									))
+							)}
+						</Grid>
+					)
+				}
+
 			</Box>
 		</Container>
 	)

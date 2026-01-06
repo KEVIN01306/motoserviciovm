@@ -73,7 +73,14 @@ const Login = () => {
                                     ¿Olvidaste tu contraseña?
                                 </Link>
                             </Box>*/}
-
+                             <Box>
+                                <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+                                    ¿Eres Cliente?{' '}
+                                    <Button variant="text" onClick={() => goTo('/public/auth/login-clientes')}>
+                                        Inicia Sesion aquí
+                                    </Button>
+                                </Typography>
+                            </Box>
                             <Button
                                 type="submit"
                                 variant="contained"

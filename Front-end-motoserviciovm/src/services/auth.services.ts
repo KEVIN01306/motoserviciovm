@@ -2,6 +2,7 @@ import axios from "axios";
 import type { AuthResponse, AuthType } from "../types/authType";
 import type { apiResponse } from "../types/apiResponse";
 import { api } from "../axios/axios";
+import type { AuthClienteType } from "../types/authType";
 
 const API_URL = import.meta.env.VITE_DOMAIN
 const API_AUTH = API_URL + "auth"
@@ -100,13 +101,46 @@ const getMe = async () => {
 
 }
 
+const postLoginCliente = async (data: AuthClienteType): Promise<AuthResponse> => {
+    try {
+        const response = await axios.post<apiResponse<AuthResponse>>(API_URL + 'auth/moto-login', data);
+        if (!response.data.data) {
+            throw new Error('INVALID RESPONSE FROM THE API');
+        }
+        const { user, token, motos } = response.data.data;
+        return { user, token, motos };
+    } catch (error) {
+        console.log(error);
+        if (axios.isAxiosError(error)) {
+            const status = error.response?.status;
+            if (status === 404) {
+                throw new Error('NOT FOUND API OR NOT EXISTED IN THE SERVER');
+            }
+            if (status == 500) {
+                throw new Error('INTERNAL ERROR SERVER');
+            }
+            const serverMessage = error.response?.data?.message;
+            if (status == 400 && serverMessage == 'AUTH_ERROR') {
+                throw new Error('DPI/NIT o placa incorrectos');
+            }
+            if (status == 423) {
+                throw new Error('USUARIO BLOQUEADO');
+            }
+            if (serverMessage) {
+                throw new Error(serverMessage);
+            }
+            throw new Error('CONNECTION ERROR');
+        }
+        throw new Error((error as Error).message);
+    }
+};
 
 export {
     postLogin,
-    getMe
+    getMe,
+    postLoginCliente,
+    postRegister
 }
-
-export { postRegister };
 
 const postRegister = async (user: any) => {
     try {

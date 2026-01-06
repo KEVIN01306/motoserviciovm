@@ -8,12 +8,23 @@ const directorio = '/uploads/servicios/';
 
 const getServiciosHandler = async (req, res) => {
     try {
-        const items = await getServicios();
-        return res.status(200).json(responseSuccesAll('Servicios obtenidos', items));
+        const { placa, startDate, endDate } = req.query;
+
+        const filters = {
+            ...(placa && { placa }),
+            ...(startDate && endDate && { startDate, endDate }),
+        };
+
+        const items = await getServicios(filters);
+        return res.status(200).json(responseSuccesAll("Servicios obtenidos", items));
     } catch (err) {
-        console.error('Get servicios error:', err);
-        let code = 500; let msg = 'INTERNAL_SERVER_ERROR';
-        if (err.code === 'DATA_NOT_FOUND') { code = 404; msg = err.code; }
+        console.error("Get servicios error:", err);
+        let code = 500;
+        let msg = "INTERNAL_SERVER_ERROR";
+        if (err.code === "DATA_NOT_FOUND") {
+            code = 404;
+            msg = err.code;
+        }
         return res.status(code).json(responseError(msg));
     }
 }

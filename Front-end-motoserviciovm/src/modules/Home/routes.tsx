@@ -4,6 +4,8 @@ import { lazy } from 'react';
 
 const HomePages = lazy(() => import('../Home/pages/HomePages'));
 const ContabilidadView = lazy(() => import('./pages/Contabilidad'));
+const HistorialServicio = lazy(() => import('../Home/pages/HistorialServicio'));
+
 
 const homeRoutes: RouteObject[] = [
   {
@@ -24,7 +26,14 @@ const homeRoutes: RouteObject[] = [
                     <ContabilidadView />
                 </ProtectedRoute>
             )
-        }
+        },
+        { path: 'historial-servicio/:id',
+        element: (
+          <ProtectedRoute allowedPermisos={['home:view']}>
+            <HistorialServicio />
+          </ProtectedRoute>
+        ),
+        },
     ],
   },
 ];

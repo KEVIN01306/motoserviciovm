@@ -3,12 +3,14 @@ import z from 'zod';
 import type { RolType } from './rolType';
 import type { SucursalType } from './sucursalType';
 import { estados } from '../utils/estados';
+import type { motoGetType } from './motoType';
 
 export type UserType = z.infer<typeof userSchema>;
 
 export type UserGetType = Omit<UserType, 'roles' | 'sucursales'> & {
   roles: RolType[];
   sucursales: SucursalType[];
+  motos?: motoGetType[];
 };
 
 

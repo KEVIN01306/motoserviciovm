@@ -1,8 +1,7 @@
 import { verifyAccessToken } from "../helpers/auth.helper.js"
 import { responseError, responseSucces } from "../helpers/response.helper.js"
 import { schemaAuth } from "../zod/auth.schema.js"
-import { login } from "../services/auth.services.js"
-import { motoLogin } from "../services/authMotoLogin.service.js";
+import { login, motoLogin } from "../services/auth.services.js"
 import prisma from "../configs/db.config.js"
 
 
@@ -116,9 +115,9 @@ const motoLoginHandler = async (req, res) => {
             return res.status(400).json(responseError("INVALID_REQUEST", "Missing required fields."));
         }
 
-        const user = await motoLogin({ identifier, placa, userType });
+        const auth = await motoLogin({ identifier, placa, userType });
 
-        return res.status(200).json(responseSucces("Login successful", { user }));
+        return res.status(200).json(responseSucces("Login successful",auth ));
     } catch (err) {
         console.error("Error in motoLoginHandler:", err);
         let code = 500;
