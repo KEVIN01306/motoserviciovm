@@ -1,5 +1,6 @@
 ﻿import React, { useEffect, useState } from 'react';
-import { Grid, TextField, Button, MenuItem, Box, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Paper, Checkbox, Autocomplete, Fab, FormControlLabel, Typography, Alert } from '@mui/material';
+import RepuestosReparacionForm from './RepuestosReparacionForm';
+import { Grid, TextField, Button, MenuItem, Box, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Paper, Checkbox, Autocomplete, Fab, FormControlLabel, Typography, Alert, FormControl, RadioGroup, Radio, Divider } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useForm } from 'react-hook-form';
@@ -22,6 +23,8 @@ import { estados } from '../../../utils/estados';
 import ProductsTable from '../../../components/Table/ProductsTable';
 import LinkStylesNavigate from '../../../components/utils/links';
 import { useGoTo } from '../../../hooks/useGoTo';
+import { de } from 'zod/v4/locales';
+const API_URL = import.meta.env.VITE_DOMAIN;
 
 type Props = {
   initial?: Partial<ServicioGetType>;
@@ -169,6 +172,8 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
       firmaSalidaFile,
       kilometrajeProximoServicio: data.kilometrajeProximoServicio,
       proximoServicioItems: servicioProductoProximo.length > 0 ? servicioProductoProximo : undefined,
+      accionSalida: data.accionSalida,
+      descripcionAccion: data.descripcionAccion
     };
     await onSubmit(payload);
   };
@@ -195,6 +200,8 @@ const totalVentasDescuentos = initial?.ventas
     { label: 'Total Ventas', value: `Q ${((totalVentas - totalVentasDescuentos).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})) ?? '0.00'}` },
     { label: 'Gran Total', value: `Q ${((totalVentas + (Number(total) ?? 0) - totalVentasDescuentos).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}))}` },
   ]
+
+  const accionSalida = watch('accionSalida');
   return (
     <FormEstructure handleSubmit={handleSubmit(internalSubmit)} pGrid={2}>
 
@@ -306,13 +313,81 @@ const totalVentasDescuentos = initial?.ventas
         </Typography>
         <SignatureField
           onSaveSignature={(data: any) => setImagenGuardada(data)}
-          initialValue={typeof imagenGuardada === 'string' ? imagenGuardada : undefined}
+          initialValue={typeof imagenGuardada === 'string' ? `${API_URL}/${imagenGuardada}` : undefined}
           text={'Firma de Salida'}
         />
       </Grid>
 
-      <Grid size={{ xs: 12 }}>
-        <Button type="submit" variant="contained" fullWidth disabled={isSubmitting}>{submitLabel}</Button>
+      {
+        initial?.enReparaciones && initial.enReparaciones.length > 0 && (
+          <>
+          <Divider sx={{ width: '100%', my: 2 }} />
+          <Grid size={{ xs: 12 }} textAlign="center" >
+              <Typography variant="h4" >
+                EN REPARACION
+              </Typography>
+              <Typography variant="body1" >
+                {initial.enReparaciones[0].descripcion}
+              </Typography>
+              {/* Aqui van los repuestos */}
+              <RepuestosReparacionForm initial={initial} />
+          </Grid>
+          </>
+        )
+      }
+
+        <FormControl required component="fieldset" sx={{ mb: 2 }}>
+            <RadioGroup
+                row
+                onChange={e => setValue('accionSalida', e.target.value as any)}
+            >
+              {
+                !initial?.enReparaciones || (initial?.enReparaciones && initial.enReparaciones.length == 0) && (
+                  <FormControlLabel value="REPARAR" control={<Radio />} label="REPARAR" />
+                )
+              }
+                
+                <FormControlLabel value="PARQUEAR" control={<Radio />} label="PARQUEAR" />
+                <FormControlLabel value="SOLOSALIDA" control={<Radio />} label="SOLO SALIDA" />
+            </RadioGroup>
+        </FormControl>
+      {
+          accionSalida === 'REPARAR' && initial?.enReparaciones && initial.enReparaciones.length == 0 && (
+            <>
+            <Alert severity="info" sx={{ mb: 2, width: '100%' }}>
+              El servicio se marcará para reparación. Por favor, asegúrese de que todos los detalles estén correctos.
+            </Alert>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField {...register('descripcionAccion' as any)} label="Descripcion de la reparacion" type="text"  fullWidth variant="standard" />
+            </Grid>
+            </>
+          )
+        }
+      {
+          accionSalida === 'PARQUEAR' && (
+            <>
+              <Alert severity="info"  sx={{ mb: 2, width: '100%' }}>
+                El vehículo se marcará para parqueo. Por favor, asegúrese de que todos los detalles estén correctos.
+              </Alert>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField {...register('descripcionAccion' as any)} label="Descripcion del Parqueo" type="text"  fullWidth variant="standard" />
+            </Grid>
+            </>
+          )
+      }
+
+      {
+        initial?.enReparaciones && initial.enReparaciones.length > 0 && (
+          <Alert severity="warning" sx={{ width: '100%' }}>
+            Este servicio tiene reparaciones activas. Asegúrese de completar o cerrar las reparaciones antes de proceder.
+          </Alert>
+        )
+      }
+      
+      <Grid container  size={{ xs: 12 }}>
+        <Grid size={12}>
+          <Button type="submit" variant="contained"  color='primary' fullWidth disabled={isSubmitting}>{submitLabel}</Button>
+        </Grid>
       </Grid>
 
     </FormEstructure>

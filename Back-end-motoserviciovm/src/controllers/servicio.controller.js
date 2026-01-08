@@ -229,6 +229,8 @@ const salidaServicioHandler = async (req, res) => {
         const { id } = req.params;
         const body = req.body || {};
 
+        console.log('Salida servicio body:', body);
+
         // Handle file uploads
         if (req.files && req.files['firmaSalida'] && req.files['firmaSalida'][0]) {
             body.firmaSalida = directorio + req.files['firmaSalida'][0].filename;
@@ -263,6 +265,14 @@ const salidaServicioHandler = async (req, res) => {
             }
         }
 
+        if (body.accionSalida == '' || body.accionSalida == null || typeof body.accionSalida === 'undefined') {
+            return res.status(400).json(responseError('Accion de salida no definida'));
+        }
+
+        if ((body.accionSalida == "REPARAR" || body.accionSalida == "PARQUEAR") && (body.descripcionAccion == '' || body.descripcionAccion == null || typeof body.descripcionAccion === 'undefined')) {
+            return res.status(400).json(responseError('Descripcion de accion no definida'));
+        }
+
         // Prepare data for service
         const dataToSend = {
             proximaFechaServicio: body.proximaFechaServicio,
@@ -273,6 +283,8 @@ const salidaServicioHandler = async (req, res) => {
             kilometrajeProximoServicio: body.kilometrajeProximoServicio,
             proximoServicioItems: body.proximoServicioItems,
             estadoId: estados().entregado,
+            accionSalida: body.accionSalida,
+            descripcionAccion: body.descripcionAccion,
         };
 
         const updated = await salidaServicio(parseInt(id), dataToSend);

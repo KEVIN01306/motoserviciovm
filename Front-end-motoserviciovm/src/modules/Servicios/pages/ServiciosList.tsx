@@ -84,7 +84,7 @@ const ServiciosList = () => {
       const isEnEspera = row.estadoId === estados().enEspera;
       const actions: { label: any; onClick: (r: ServicioGetType) => void; permiso: string }[] = [];
 
-      if (!isEnEspera) {
+      if (row.estadoId === estados().entregado) {
         if (user?.permisos.includes('servicios:detail')) {
           actions.push({ label: (<><PiDeviceTabletFill /><span className="ml-1.5">Detalle</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}`), permiso: 'ingresos-egresos:detail' });
         }
@@ -94,35 +94,41 @@ const ServiciosList = () => {
         }
           return actions;
       }
-      if (user?.permisos.includes('servicios:detail')) {
+      if (row.estadoId === estados().enReparacion || row.estadoId === estados().enParqueo) {
+         if (user?.permisos.includes('servicios:detail')) {
           actions.push({ label: (<><PiDeviceTabletFill /><span className="ml-1.5">Detalle</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}`), permiso: 'servicios:detail' });
-        }
-      if (user?.permisos.includes('servicios:edit')) {
-        actions.push({ label: (<><RiMoneyDollarCircleLine /><span className="ml-1.5">Editar</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/edit`), permiso: 'servicios:edit' });
+            }
+          
+          if (user?.permisos.includes('servicios:salida')) {
+            actions.push({ label: (<><MdBikeScooter /><span className="ml-1.5">Salida</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/salida`), permiso: 'servicios:edit' });
+          }
+
+          if (user?.permisos.includes('servicios:progreso')) {
+            actions.push({ label: (<><FaBarsProgress /><span className="ml-1.5">Progreso</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/progreso`), permiso: 'servicios:progreso' });
       }
 
-      if (user?.permisos.includes('servicios:salida')) {
-        actions.push({ label: (<><MdBikeScooter /><span className="ml-1.5">Salida</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/salida`), permiso: 'servicios:edit' });
+      return actions;
+          
       }
 
-      if (user?.permisos.includes('servicios:progreso')) {
-        actions.push({ label: (<><FaBarsProgress /><span className="ml-1.5">Progreso</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/progreso`), permiso: 'servicios:progreso' });
+       if (user?.permisos.includes('servicios:detail')) {
+          actions.push({ label: (<><PiDeviceTabletFill /><span className="ml-1.5">Detalle</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}`), permiso: 'servicios:detail' });
+            }
+          if (user?.permisos.includes('servicios:edit')) {
+            actions.push({ label: (<><RiMoneyDollarCircleLine /><span className="ml-1.5">Editar</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/edit`), permiso: 'servicios:edit' });
+          }
+
+          if (user?.permisos.includes('servicios:salida')) {
+            actions.push({ label: (<><MdBikeScooter /><span className="ml-1.5">Salida</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/salida`), permiso: 'servicios:edit' });
+          }
+
+          if (user?.permisos.includes('servicios:progreso')) {
+            actions.push({ label: (<><FaBarsProgress /><span className="ml-1.5">Progreso</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/progreso`), permiso: 'servicios:progreso' });
       }
+      
 
 
-      if (user?.permisos.includes('servicios:finalize')) {
-        actions.push({ label: (<><PiUserCheckBold /><span className="ml-1.5">Finalizar</span></>), onClick: async (r) => {
-          if (!window.confirm(`¿Finalizar el registro #${r.id}?`)) return;
-          alert('Funcionalidad no implementada aún');
-        }, permiso: 'servicios:finalize' });
-      }
-
-      if (user?.permisos.includes('servicios:cancel')) {
-        actions.push({ label: (<><RiMoneyDollarCircleLine /><span className="ml-1.5">Cancelar</span></>), onClick: async (r) => {
-          if (!window.confirm(`¿Cancelar el registro #${r.id}?`)) return;
-          alert('Funcionalidad no implementada aún');
-        }, permiso: 'servicios:cancel' });
-      }
+      
 
       return actions.filter(a => user?.permisos.includes(a.permiso));
     };

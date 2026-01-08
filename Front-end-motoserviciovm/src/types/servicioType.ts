@@ -10,6 +10,7 @@ import type { VentaGetType } from "./ventaType";
 import type { EstadoType } from "./estadoType";
 import type { UserGetType } from "./userType";
 import type { OpcionServicioType } from "./opcionServicioType";
+import type { EnReparacionGetType } from "./enReparacionType";
 
 export type ServicioItemType = z.infer<typeof servicioItemSchema>;
 
@@ -29,6 +30,8 @@ export type ImagenGetType = ImagenMetaType & {
 
 export type ServicioType = Omit<z.infer<typeof servicioSchema>, 'firmaSalida'> & {
   firmaSalida: string | File | null;
+  accionSalida?: string;
+  descripcionAccion?: string;
 }
 
 export type ServicioGetType = ServicioType & {
@@ -44,6 +47,7 @@ export type ServicioGetType = ServicioType & {
   descuentosServicio?: number;
   proximoServicioItems?: servicioProductoProximoType[];
   servicioOpcionesTipoServicio?: ProgresoItemType[];
+  enReparaciones?: EnReparacionGetType[];
 };
 
 
@@ -84,6 +88,8 @@ export type ServicioSalidaPayloadType = Pick<
 > & {
   firmaSalida: File;
   proximoServicioItems?: servicioProductoProximoType[];
+  accionSalida?: string;
+  descripcionAccion?: string;
 };
 
 export const ServicioInitialState: ServicioType = {
@@ -105,6 +111,8 @@ export const ServicioInitialState: ServicioType = {
   imagenesMeta: [],
   estadoId: estados().enEspera,
   kilometrajeProximoServicio: 0,
+  accionSalida: "",
+  descripcionAccion: "",
 };
 
 export const ServicioItemInitialState: ServicioItemType = {

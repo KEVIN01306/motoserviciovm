@@ -56,7 +56,7 @@ const EnReparacionList = () => {
       return (
         String(it.id ?? "").toLowerCase().includes(lower) ||
         (it.descripcion ?? "").toLowerCase().includes(lower) ||
-        (it.moto?.placa ?? "").toLowerCase().includes(lower)
+        (it.servicio?.moto?.placa ?? "").toLowerCase().includes(lower)
       );
     });
     setFiltered(filteredItems);
@@ -132,7 +132,7 @@ const EnReparacionList = () => {
     const base: Column<EnReparacionGetType>[] = [
       { id: "descripcion", label: "Descripción", minWidth: 200 },
       { id: "fechaEntrada", label: "Entrada", minWidth: 150, format: (v) => (v ? new Date(v).toLocaleString() : "-") },
-      { id: "moto", label: "Moto", minWidth: 120, format: (v) => (v ? (v as any).placa : "-") },
+      { id: "servicio", label: "Moto", minWidth: 120, format: (v) => (v ? (v as any).moto?.placa : "-") },
       { id: "estado", label: "Estado", minWidth: 100, format: (v) => (v ? <Chip label={(v as any).estado} color={chipColorByEstado((v as any).estado)} variant="outlined" /> : "-") },
     ];
     const actions = getActions();

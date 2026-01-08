@@ -205,7 +205,7 @@ model Moto {
   avatar          String?
 
   calcomania      String?
-  
+
   modeloId        Int
   modelo          Modelo @relation(fields: [modeloId], references: [id])
 
@@ -215,8 +215,6 @@ model Moto {
   estado          Estado @relation(fields: [estadoId], references: [id])
 
   servicios       Servicio[]
-  enParqueos      EnParqueo[]
-  enReparaciones  EnReparacion[]
   citas           Cita[]
 
 
@@ -310,6 +308,9 @@ model Servicio {
   proximoServicioItems ServicioProductoProximo[]
 
   servicioOpcionesTipoServicio ServicioOpcionesTipoServicio[]
+
+  enParqueos      EnParqueo[]
+  enReparaciones  EnReparacion[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -446,7 +447,6 @@ model Producto {
   updatedAt       DateTime @updatedAt
 }
 
-
 model Venta {
   id              Int @id @default(autoincrement())
 
@@ -518,8 +518,8 @@ model EnParqueo {
 
   observaciones    String?
 
-  motoId          Int
-  moto            Moto @relation(fields: [motoId], references: [id])  
+  servicioId      Int?
+  servicio        Servicio? @relation(fields: [servicioId], references: [id])
 
   estadoId        Int
   estado          Estado @relation(fields: [estadoId], references: [id])
@@ -544,8 +544,8 @@ model EnReparacion {
 
   observaciones    String?
 
-  motoId          Int
-  moto            Moto @relation(fields: [motoId], references: [id])  
+  servicioId      Int?
+  servicio        Servicio? @relation(fields: [servicioId], references: [id])
 
   repuestos       RepuestosReparacion[]
 

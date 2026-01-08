@@ -174,21 +174,44 @@ export const putFirmaSalida = async (
   data: ServicioSalidaPayloadType
 ) => {
   console.log('Submitting firma de salida with data:', data);
-  const form = new FormData();
-  form.append('total', String(data.total));
-  if (data.observaciones) form.append('observaciones', data.observaciones);
-  if (data.proximaFechaServicio) form.append('proximaFechaServicio', typeof data.proximaFechaServicio === 'string' ? data.proximaFechaServicio : data.proximaFechaServicio.toISOString());
-  if (data.descripcionProximoServicio) form.append('descripcionProximoServicio', data.descripcionProximoServicio);
-  if (data.kilometrajeProximoServicio !== undefined) form.append('kilometrajeProximoServicio', String(data.kilometrajeProximoServicio));
-  form.append('firmaSalida', data.firmaSalida);
-  // Enviar la lista como proximoServicioItems
-  if (data.proximoServicioItems && Array.isArray(data.proximoServicioItems) && data.proximoServicioItems.length > 0) {
-    form.append('proximoServicioItems', JSON.stringify(data.proximoServicioItems));
+  try {
+    const form = new FormData();
+    form.append('total', String(data.total));
+    if (data.observaciones) form.append('observaciones', data.observaciones);
+    if (data.proximaFechaServicio) form.append('proximaFechaServicio', typeof data.proximaFechaServicio === 'string' ? data.proximaFechaServicio : data.proximaFechaServicio.toISOString());
+    if (data.descripcionProximoServicio) form.append('descripcionProximoServicio', data.descripcionProximoServicio);
+    if (data.kilometrajeProximoServicio !== undefined) form.append('kilometrajeProximoServicio', String(data.kilometrajeProximoServicio));
+    form.append('firmaSalida', data.firmaSalida);
+    if (data.accionSalida) form.append('accionSalida', data.accionSalida);
+    // Enviar la lista como proximoServicioItems
+    if (data.proximoServicioItems && Array.isArray(data.proximoServicioItems) && data.proximoServicioItems.length > 0) {
+      form.append('proximoServicioItems', JSON.stringify(data.proximoServicioItems));
+    }
+
+    if (data.descripcionAccion) form.append('descripcionAccion', data.descripcionAccion);
+      
+    const response = await api.put(`/servicios/salida/${id}`, form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (!error.response) {
+        throw new Error('No se pudo conectar con el servidor (timeout o red).');
+      }
+      if (error.response) {
+        const status = error.response.status;
+        if (status === 404) throw new Error('NOT FOUND API OR NOT EXISTED IN THE SERVER');
+        if (status === 500) throw new Error('INTERNAL ERROR SERVER');
+        const serverMessage = error.response.data?.message;
+        if (serverMessage) throw new Error(serverMessage);
+        throw new Error('CONNECTION ERROR');
+      } else {
+        throw new Error('No se pudo conectar con el servidor (timeout o red).');
+      }
+    }
+    throw new Error((error as Error).message);
   }
-  const response = await api.put(`/servicios/salida/${id}`, form, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
-  return response.data.data;
 };
 
 const putServicio = async (id: string, payload: Partial<ServicioType> & { imagenesFiles?: File[], firmaEntradaFile?: File}) => {

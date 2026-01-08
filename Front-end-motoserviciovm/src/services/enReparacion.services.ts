@@ -2,6 +2,7 @@ import axios from "axios";
 import { api } from "../axios/axios";
 import type { apiResponse } from "../types/apiResponse";
 import type { EnReparacionType, EnReparacionGetType } from "../types/enReparacionType";
+import type { repuestoReparacionType } from "../types/repuestoReparacionType";
 
 const API_URL = import.meta.env.VITE_DOMAIN;
 const API_ENREPARACION = API_URL + "enReparacion";
@@ -77,4 +78,31 @@ const putEnReparacionSalida = async (id: EnReparacionType["id"], payload: Partia
   }
 };
 
-export { getEnReparaciones, getEnReparacion, postEnReparacion, putEnReparacionSalida };
+
+// PUT /:id/repuestos para actualizar lista de repuestos de una reparación
+const putRepuestosReparacion = async (
+  id: number | string,
+  repuestos: Omit<repuestoReparacionType, 'imagen'>[]
+) => {
+  try {
+    const response = await api.put<apiResponse<any>>(
+      `${API_ENREPARACION}/${id}/repuestos`,
+      repuestos,
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+    return response.data.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
+      if (status === 404) throw new Error("NOT FOUND API OR NOT EXISTED IN THE SERVER");
+      if (status === 500) throw new Error("INTERNAL ERROR SERVER");
+      const serverMessage = error.response?.data?.message;
+      if (serverMessage) throw new Error(serverMessage);
+      throw new Error("CONNECTION ERROR");
+    }
+    throw new Error((error as Error).message);
+  }
+};
+
+
+export { getEnReparaciones, getEnReparacion, postEnReparacion, putEnReparacionSalida, putRepuestosReparacion };

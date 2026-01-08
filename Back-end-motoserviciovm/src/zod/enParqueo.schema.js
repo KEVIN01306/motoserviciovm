@@ -7,6 +7,6 @@ export const enParqueoSchema = z.object({
     fechaSalida: z.date({ invalid_type_error: "La fecha de salida debe ser una fecha válida" }).optional().nullable(),
     total: z.number().nonnegative({ message: "El total no puede ser negativo" }).optional(),
     observaciones: z.string().max(500, { message: "Las observaciones no pueden exceder los 500 caracteres" }).optional().nullable(),
-    motoId: z.number().int().positive({ message: "El ID de la moto debe ser un número positivo" }),
+    servicioId: z.number().int().positive({ message: "El ID del servicio debe ser un número positivo" }),
     estadoId: z.number().int().positive().optional(),
-}); 
+});

@@ -1,5 +1,5 @@
 import { responseError, responseSucces, responseSuccesAll } from "../helpers/response.helper.js";
-import { getEnReparaciones, getEnReparacion, postEnReparacion, putEnReparacion, putEnReparacionSalida } from "../services/enReparacion.service.js";
+import { getEnReparaciones, getEnReparacion, postEnReparacion, putEnReparacion, putEnReparacionSalida, putRepuestosReparacion } from "../services/enReparacion.service.js";
 import enReparacionSchema from "../zod/enReparacion.schema.js";
 
 const getEnReparacionesHandler = async (req, res) => {
@@ -120,10 +120,34 @@ const putEnReparacionSalidaHandler = async (req, res) => {
   }
 };
 
+const putRepuestosReparacionHandler = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const repuestos = req.body;
+
+        if (!Array.isArray(repuestos)) {
+            return res.status(400).json(responseError("INVALID_REQUEST", "Repuestos must be an array."));
+        }
+
+        const result = await putRepuestosReparacion(parseInt(id), repuestos);
+        return res.status(200).json(responseSucces("Repuestos updated successfully", result));
+    } catch (err) {
+        console.error("Error in putRepuestosReparacionHandler:", err);
+        let code = 500;
+        let msg = "INTERNAL_SERVER_ERROR";
+        if (err.code === "DATA_NOT_FOUND") {
+            code = 404;
+            msg = err.code;
+        }
+        return res.status(code).json(responseError(msg));
+    }
+};
+
 export {
   getEnReparacionesHandler,
   getEnReparacionHandler,
   postEnReparacionHandler,
   putEnReparacionHandler,
   putEnReparacionSalidaHandler,
+  putRepuestosReparacionHandler,
 };

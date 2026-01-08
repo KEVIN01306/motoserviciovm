@@ -2,14 +2,14 @@ import type z from "zod";
 import { estados } from "../utils/estados";
 import enReparacionSchema from "../zod/enReparacion.schema";
 import type { EstadoType } from "./estadoType";
-import type { motoGetType } from "./motoType";
 import type { repuestoReparacionType } from "./repuestoReparacionType";
+import type { ServicioGetType } from "./servicioType";
 
 
 export type EnReparacionType = z.infer<typeof enReparacionSchema>;
 
 export type EnReparacionGetType = EnReparacionType & {
-    moto: motoGetType;
+    servicio: ServicioGetType;
     estado: EstadoType;
     repuestos: repuestoReparacionType[];
 };
@@ -20,7 +20,7 @@ export const EnReparacionInitialState: EnReparacionType = {
     fechaSalida:  null,
     total:        0,
     observaciones: null,
-    motoId:       0,
+    servicioId:       0,
     estadoId:     estados().activo,
 };
 
@@ -33,7 +33,7 @@ export const mergeEnReparacionDataWithDefaults = (apiData: Partial<EnReparacionT
         fechaSalida:  apiData.fechaSalida ?? EnReparacionInitialState.fechaSalida,
         total:        apiData.total ?? EnReparacionInitialState.total,
         observaciones: apiData.observaciones ?? EnReparacionInitialState.observaciones,
-        motoId:       apiData.motoId ?? EnReparacionInitialState.motoId,
+        servicioId:       apiData.servicioId ?? EnReparacionInitialState.servicioId,
         estadoId:     apiData.estadoId ?? EnReparacionInitialState.estadoId,
     };
 }

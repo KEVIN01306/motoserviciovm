@@ -7,7 +7,7 @@ export const enReparacionSchema = z.object({
   fechaSalida: z.date().optional().nullable(),
   total: z.number().nonnegative().optional(),
   observaciones: z.string().max(500).optional().nullable(),
-  motoId: z.number().int().positive(),
+  servicioId: z.number().int().positive(),
   estadoId: z.number().int().positive().optional(),
 });
 

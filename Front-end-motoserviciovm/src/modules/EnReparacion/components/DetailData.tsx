@@ -27,10 +27,19 @@ const DetailData = ({ item }: { item: EnReparacionGetType }) => {
           </Grid>
           <Grid size={6}>
             <Typography variant="subtitle2">Moto</Typography>
-            <Typography>{item.moto?.placa ?? "-"}</Typography>
-            {item.moto?.id && (
-              <Button size="small" variant="outlined" sx={{ mt: 1 }} onClick={() => goTo(`/admin/motos/${item.moto.id}`)}>
+            <Typography>{item.servicio?.moto?.placa ?? "-"}</Typography>
+            {item.servicio?.moto?.id && (
+              <Button size="small" variant="outlined" sx={{ mt: 1 }} onClick={() => goTo(`/admin/motos/${item.servicio?.moto?.id}`)}>
                 Ver Moto
+              </Button>
+            )}
+          </Grid>
+          <Grid size={6}>
+            <Typography variant="subtitle2">Servicio</Typography>
+            <Typography>{item.servicio?.id ?? "-"}</Typography>
+            {item.servicio?.id && (
+              <Button size="small" variant="outlined" sx={{ mt: 1 }} onClick={() => goTo(`/admin/servicios/${item.servicio?.id}`)}>
+                Ver Servicio
               </Button>
             )}
           </Grid>

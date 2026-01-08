@@ -6,7 +6,7 @@ const getEnReparaciones = async () => {
         where: { estadoId: { not: estados().inactivo } },
         orderBy: { id: 'asc' },
         include: {
-            moto: { include: { modelo: true, users: true } },
+            servicio: { include: { moto: { include: { modelo: true, users: true } } } },
             estado: true,
         },
     });
@@ -21,7 +21,7 @@ const getEnReparaciones = async () => {
 const getEnReparacion = async (id) => {
     const item = await prisma.enReparacion.findUnique({
         where: { id: id, estadoId: { not: estados().inactivo } },
-        include: { moto: { include: { modelo: true, users: true } }, estado: true, repuestos: true },
+        include: { servicio: { include: { moto: { include: { modelo: true, users: true } } } }, estado: true, repuestos: true },
     });
     if (!item) {
         const error = new Error('DATA_NOT_FOUND');
@@ -42,12 +42,7 @@ const postEnReparacion = async (data) => {
         throw error;
     }
 
-    if (moto.estadoId === estados().enParqueo) {
-        const error = new Error('MOTO_IN_PARKING');
-        error.code = 'MOTO_IN_PARKING';
-        throw error;
-    }
-
+    
     if (moto.estadoId === estados().enReparacion) {
         const error = new Error('MOTO_ALREADY_IN_REPARATION');
         error.code = 'MOTO_ALREADY_IN_REPARATION';
@@ -60,10 +55,13 @@ const postEnReparacion = async (data) => {
         throw error;
     }
 
+    
     await prisma.moto.update({
         where: { id: data.motoId },
         data: { estadoId: estados().enReparacion },
     });
+
+    
 
     const created = await prisma.enReparacion.create({
         data
@@ -101,11 +99,47 @@ const putEnReparacionSalida = async (id, data) => {
     return updated;
 };
 
+const putRepuestosReparacion = async (enReparacionId, repuestos) => {
+    try {
+        await prisma.$transaction(async (tx) => {
+            // Delete existing repuestos for the given enReparacionId
+            await tx.repuestosReparacion.deleteMany({
+                where: { reparacionId: enReparacionId },
+            });
+
+            // Insert new repuestos
+            for (const repuesto of repuestos) {
+                await tx.repuestosReparacion.create({
+                    data: {
+                        nombre: repuesto.nombre,
+                        descripcion: repuesto.descripcion,
+                        refencia: repuesto.refencia || "",
+                        cantidad: repuesto.cantidad,
+                        checked: repuesto.checked || false,
+                        reparacion: {
+                            connect: { id: enReparacionId },
+                        },
+                        estado: repuesto.estadoId
+                            ? { connect: { id: repuesto.estadoId } } 
+                            : { connect: { id: estados().activo } }
+                    },
+                });
+            }
+        });
+
+        return { success: true };
+    } catch (err) {
+        console.error("Error in putRepuestosReparacion:", err);
+        throw err;
+    }
+};
+
 export {
     getEnReparaciones,
     getEnReparacion,
     postEnReparacion,
     putEnReparacion,
     putEnReparacionSalida,
+    putRepuestosReparacion,
     
 };

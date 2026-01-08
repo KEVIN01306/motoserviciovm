@@ -29,7 +29,7 @@ const getServicios = async (filters = {}) => {
 }
 
 const getServicio = async (id) => {
-    const item = await prisma.servicio.findFirst({ where: { id: id, estadoId: { not: estados().inactivo } }, include: { imagen: true, servicioItems: {include: {inventario: true}}, productosCliente: true, moto: {include: { modelo: true}}, sucursal: true,cliente: true, mecanico: true, servicioOpcionesTipoServicio: {include: {opcionServicio: true}} , tipoServicio: {include: {opcionServicios: true}} , estado: true, proximoServicioItems: true , ventas: { include: { productos: {include: {producto: true}}, estado: true } } } });
+    const item = await prisma.servicio.findFirst({ where: { id: id, estadoId: { not: estados().inactivo } }, include: { imagen: true, servicioItems: {include: {inventario: true}}, productosCliente: true, moto: {include: { modelo: true}}, sucursal: true,cliente: true, mecanico: true, servicioOpcionesTipoServicio: {include: {opcionServicio: true}} , tipoServicio: {include: {opcionServicios: true}} , estado: true, proximoServicioItems: true , ventas: { include: { productos: {include: {producto: true}}, estado: true } },enReparaciones: {include: {repuestos: true, estado: true}} } });
     if (!item) { const error = new Error('DATA_NOT_FOUND'); error.code = 'DATA_NOT_FOUND'; throw error; }
     return item;
 }
@@ -75,6 +75,11 @@ const postServicio = async (data) => {
             // create ServicioOpcionesTipoServicio
             const opciones = await tx.opcionServicio.findMany({
                 where: { tipoServicios: { some: { id: base.tipoServicioId } } },
+            });
+
+            await tx.moto.update({
+                where: { id: base.motoId },
+                data: { estadoId: estados().enServicio },
             });
 
             for (const opcion of opciones) {
@@ -202,6 +207,10 @@ const salidaServicio = async (id, data) => {
     const { proximoServicioItems, kilometrajeProximoServicio, ...base } = data;
 
     try {
+        if (base.accionSalida === 'REPARAR' && !base.descripcionAccion) {
+            throw new Error("Missing descripcionAccion for REPARAR action");
+        }
+
         const result = await prisma.$transaction(async (tx) => {
             const totalDescuentos = await tx.venta.aggregate({
                 where: {
@@ -221,11 +230,27 @@ const salidaServicio = async (id, data) => {
                     total: base.total,
                     firmaSalida: base.firmaSalida,
                     kilometrajeProximoServicio: kilometrajeProximoServicio,
-                    estadoId: estados().entregado,
+                    estadoId: estados().enReparacion,
                     fechaSalida: new Date(),
                     descuentosServicio: totalDescuentos._sum.descuentoTotal || 0,
                 },
             });
+
+            if (base.accionSalida === 'REPARAR') {
+                await tx.moto.update({
+                    where: { id: updated.motoId },
+                    data: { estadoId: estados().enReparacion },
+                });
+
+                await tx.enReparacion.create({
+                    data: {
+                        servicioId: id,
+                        fechaEntrada: new Date(),
+                        estadoId: estados().activo,
+                        descripcion: base.descripcionAccion,
+                    },
+                });
+            }
 
             // Handle proximoServicioItems
             if (Array.isArray(proximoServicioItems) && proximoServicioItems.length > 0) {
@@ -241,7 +266,7 @@ const salidaServicio = async (id, data) => {
             }
 
             return updated;
-        });
+        },{ maxWait: 20000, timeout: 120000 });
 
         return result;
     } catch (err) {

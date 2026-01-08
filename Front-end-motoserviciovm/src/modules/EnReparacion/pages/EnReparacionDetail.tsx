@@ -10,10 +10,11 @@ import BreadcrumbsRoutes from "../../../components/utils/Breadcrumbs";
 import { RiBikeFill, RiEdit2Line } from "react-icons/ri";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { Grid, Button } from "@mui/material";
+import type { EnReparacionGetType } from "../../../types/enReparacionType";
 
 const EnReparacionDetail = () => {
   const { id } = useParams();
-  const [item, setItem] = useState<any | null>(null);
+  const [item, setItem] = useState<EnReparacionGetType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const goTo = useGoTo();
