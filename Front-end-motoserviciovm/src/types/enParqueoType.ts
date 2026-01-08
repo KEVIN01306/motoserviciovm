@@ -1,13 +1,13 @@
 import z from "zod";
 import { enParqueoSchema } from "../zod/enParqueo.schema";
 import { estados } from "../utils/estados";
-import type { motoGetType } from "./motoType";
 import type { EstadoType } from "./estadoType";
+import type { ServicioGetType } from "./servicioType";
 
 export type EnParqueoType = z.infer<typeof enParqueoSchema>;
 
 export type EnParqueoGetType = EnParqueoType & {
-    moto: motoGetType;
+    servicio: ServicioGetType;
     estado: EstadoType;
 }
 
@@ -17,7 +17,7 @@ export const EnParqueoInitialState = {
     fechaSalida: null as Date | null,
     total: 0,
     observaciones: "",
-    motoId: undefined as number | undefined,
+    servicioId: undefined as number | undefined,
     estadoId: estados().activo,
 }
 
@@ -30,7 +30,7 @@ export const mergeEnParqueoDataWithDefaults = (apiData: Partial<EnParqueoType>):
         fechaSalida: apiData.fechaSalida ?? EnParqueoInitialState.fechaSalida,
         total: apiData.total ?? EnParqueoInitialState.total,
         observaciones: apiData.observaciones ?? EnParqueoInitialState.observaciones,
-        motoId: apiData.motoId ?? EnParqueoInitialState.motoId,
+        servicioId: apiData.servicioId ?? EnParqueoInitialState.servicioId,
         estadoId: apiData.estadoId ?? EnParqueoInitialState.estadoId,
     };
 }

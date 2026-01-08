@@ -3,13 +3,17 @@ import { estados } from "../utils/estados.js";
 
 const getEnParqueos = async () => {
     const enParqueo = await prisma.enParqueo.findMany({
-        where: { estadoId: {not: estados().inactivo} },
+        where: { estadoId: { not: estados().inactivo } },
         orderBy: { id: 'asc' },
         include: {
-            moto: {
+            servicio: {
                 include: {
-                    modelo: true,
-                    users: true,
+                    moto: {
+                        include: {
+                            modelo: true,
+                            users: true,
+                        }
+                    },
                 }
             },
             estado: true,
@@ -25,12 +29,16 @@ const getEnParqueos = async () => {
 
 const getEnParqueo = async (id) => {
     const enParqueo = await prisma.enParqueo.findUnique({
-        where: { id: id ,estadoId: {not: estados().inactivo} },
+        where: { id: id, estadoId: { not: estados().inactivo } },
         include: {
-            moto: {
+            servicio: {
                 include: {
-                    modelo: true,
-                    users: true,
+                    moto: {
+                        include: {
+                            modelo: true,
+                            users: true,
+                        }
+                    },
                 }
             },
             estado: true,
@@ -42,7 +50,7 @@ const getEnParqueo = async (id) => {
         error.code = 'DATA_NOT_FOUND';
         throw error;
     }
-    return  enParqueo ;
+    return enParqueo;
 }
 
 const postEnParqueo = async (data) => {
@@ -86,37 +94,64 @@ const postEnParqueo = async (data) => {
 }
 
 const putEnParqueoSalida = async (id, data) => {
-    const existingEnParqueo = await prisma.enParqueo.findUnique({
-        where: { id: id },
-    });
 
-    if (!existingEnParqueo) {
-        const error = new Error('DATA_NOT_FOUND');
-        error.code = 'DATA_NOT_FOUND';
+    try {
+        await prisma.$transaction(async (tx) => {
+            const existingEnParqueo = await tx.enParqueo.findUnique({
+                where: { id: id },
+            });
+
+            if (!existingEnParqueo) {
+                const error = new Error('DATA_NOT_FOUND');
+                error.code = 'DATA_NOT_FOUND';
+                throw error;
+            }
+
+            const servicio = await tx.servicio.findUnique({ where: { id: existingEnParqueo.servicioId }, include: { enReparaciones: true } });
+            if (!servicio) {
+                const error = new Error('SERVICIO_NOT_FOUND');
+                error.code = 'SERVICIO_NOT_FOUND';
+                throw error;
+            }
+
+            const motoId = servicio.motoId;
+
+            const isTermino = servicio.enReparaciones.every(reparacion => reparacion.estadoId === estados().activo);
+
+            // Update servicio state
+            await tx.servicio.update({
+                where: { id: existingEnParqueo.servicioId },
+                data: { estadoId: isTermino ? estados().enReparacion : estados().enServicio },
+            });
+
+
+            await tx.moto.update({
+                where: { id: motoId },
+                data: { estadoId: isTermino ? estados().enReparacion : estados().enServicio },
+            });
+
+            const fechaSalida = new Date();
+            data.fechaSalida = fechaSalida;
+
+            const updatedEnParqueo = await tx.enParqueo.update({
+                where: { id: id },
+                data: {
+                    ...data,
+                    estadoId: estados().entregado,
+                },
+            });
+            return updatedEnParqueo;
+        }, { timeout: 30000, maxWait: 10000 }
+        );
+    } catch (error) {
         throw error;
     }
-
-    await prisma.moto.update({
-        where: { id: existingEnParqueo.motoId },
-        data: { estadoId: estados().activo },
-    });
-
-    const fechaSalida = new Date();
-    data.fechaSalida = fechaSalida;
-
-    const updatedEnParqueo = await prisma.enParqueo.update({
-        where: { id: id },
-        data: {
-            ...data,
-            estadoId: estados().entregado,
-        },
-    });
-    return updatedEnParqueo;
+    
 }
 
 export {
-    getEnParqueos,
-    getEnParqueo,
-    postEnParqueo, 
-    putEnParqueoSalida
-}
+        getEnParqueos,
+        getEnParqueo,
+        postEnParqueo,
+        putEnParqueoSalida
+    }

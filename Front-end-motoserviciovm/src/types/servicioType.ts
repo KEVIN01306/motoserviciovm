@@ -11,6 +11,7 @@ import type { EstadoType } from "./estadoType";
 import type { UserGetType } from "./userType";
 import type { OpcionServicioType } from "./opcionServicioType";
 import type { EnReparacionGetType } from "./enReparacionType";
+import type { EnParqueoGetType } from "./enParqueoType";
 
 export type ServicioItemType = z.infer<typeof servicioItemSchema>;
 
@@ -48,6 +49,7 @@ export type ServicioGetType = ServicioType & {
   proximoServicioItems?: servicioProductoProximoType[];
   servicioOpcionesTipoServicio?: ProgresoItemType[];
   enReparaciones?: EnReparacionGetType[];
+  enParqueos?: EnParqueoGetType[];
 };
 
 
@@ -109,10 +111,8 @@ export const ServicioInitialState: ServicioType = {
   servicioItems: [],
   productosCliente: [],
   imagenesMeta: [],
-  estadoId: estados().enEspera,
+  estadoId: estados().enServicio,
   kilometrajeProximoServicio: 0,
-  accionSalida: "",
-  descripcionAccion: "",
 };
 
 export const ServicioItemInitialState: ServicioItemType = {

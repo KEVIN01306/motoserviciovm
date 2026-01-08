@@ -17,5 +17,6 @@ export const userSchema = z.object({
     password:           z.string().optional(),
     roles:              z.array(z.number().int()).optional(),
     sucursales:         z.array(z.number().int()).optional(),
+    motos:              z.array(z.number().int()).optional(),
     estadoId:           z.number().int(),
 })

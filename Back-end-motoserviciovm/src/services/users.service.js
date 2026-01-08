@@ -104,7 +104,6 @@ const getUSer = async (id) => {
 	return user;
 }
 
-
 const postUser = async (data) => {
 	
 		const user = await prisma.user.findUnique({
@@ -116,7 +115,7 @@ const postUser = async (data) => {
 			error.code = 'CONFLICT';
 			throw error;
 		}
-		const { roles: rolIds, sucursales: sucursalIds, ...userData } = data;
+		const { roles: rolIds, sucursales: sucursalIds, motos: motoIds, ...userData } = data;
 
 		const rolesConnect = (rolIds || []).map(rolId => ({
 			id: rolId
@@ -124,6 +123,10 @@ const postUser = async (data) => {
 
 		const sucursalesConnect = (sucursalIds || []).map(sucursalId => ({
 			id: sucursalId
+		}))
+
+		const motosConnect = (motoIds || []).map(motoId => ({
+			id: motoId
 		}))
 		const newUser = await prisma.user.create({
 			data: {
@@ -133,11 +136,15 @@ const postUser = async (data) => {
 				},
 				sucursales:{
 					connect: sucursalesConnect
+				},
+				motos: {
+					connect: motosConnect
 				}
 			},
 			include:{
 				roles: true,
 				sucursales: true,	
+				motos: true,
 			}
 		});
 		//console.log(newUSer.email)
@@ -153,13 +160,15 @@ const putUser = async (id, data) => {
 			where: { id: id}
 		});
 
+		console.log(data)
+
 		if (!user) {
 			const error = new Error('DATA_NOT_FOUND');
 			error.code = 'DATA_NOT_FOUND';
 			throw error;
 		}
 
-		const { roles: rolIds, sucursales: sucursalIds, ...userData } = data;
+		const { roles: rolIds, sucursales: sucursalIds, motos: motoIds, ...userData } = data;
 
 		const rolesConnect = (rolIds || []).map(rolId => ({
 			id: rolId
@@ -167,6 +176,10 @@ const putUser = async (id, data) => {
 
 		const sucursalesConnect = (sucursalIds || []).map(sucursalId => ({
 			id: sucursalId
+		}))
+
+		const motosConnect = (motoIds || []).map(motoId => ({
+			id: motoId
 		}))
 		const newUser = await prisma.user.update({
 			where: { id: id },
@@ -177,11 +190,15 @@ const putUser = async (id, data) => {
 				},
 				sucursales:{
 					set: sucursalesConnect
+				},
+				motos: {
+					set: motosConnect
 				}
 			},
 			include:{
 				roles: true,
 				sucursales: true,
+				motos: true,
 			}
 		});
 

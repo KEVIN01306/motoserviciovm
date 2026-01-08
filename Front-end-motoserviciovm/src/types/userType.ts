@@ -7,10 +7,10 @@ import type { motoGetType } from './motoType';
 
 export type UserType = z.infer<typeof userSchema>;
 
-export type UserGetType = Omit<UserType, 'roles' | 'sucursales'> & {
+export type UserGetType = Omit<UserType, 'roles' | 'sucursales' | 'motos'> & {
   roles: RolType[];
   sucursales: SucursalType[];
-  motos?: motoGetType[];
+  motos: motoGetType[];
 };
 
 
@@ -28,6 +28,7 @@ export const UserInitialState = {
     numeroAuxTel: "",
     roles:[],
     sucursales:[],
+    motos: [],
     fechaNac: new Date(),
     activo: true,
     estadoId: estados().activo
@@ -58,6 +59,9 @@ export const mergeUserDataWithDefaults = (apiData: Partial<UserGetType>): Partia
             .filter((id): id is number => typeof id === 'number' && !Number.isNaN(id)),
         sucursales: (apiData.sucursales || [])
             .map((sucursal: SucursalType) => (sucursal.id !== undefined ? Number(sucursal.id) : undefined))
+            .filter((id): id is number => typeof id === 'number' && !Number.isNaN(id)),
+        motos: (apiData.motos || [])
+            .map((moto: motoGetType) => (moto.id !== undefined ? Number(moto.id) : undefined))
             .filter((id): id is number => typeof id === 'number' && !Number.isNaN(id)),
     };
 };              

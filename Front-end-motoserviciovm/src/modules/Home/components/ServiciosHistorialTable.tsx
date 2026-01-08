@@ -32,9 +32,16 @@ const getTableActions = () => {
         const isEnEspera = row.estadoId === estados().enEspera;
         const actions: { label: any; onClick: (r: ServicioGetType) => void; permiso: string }[] = [];
 
-            if (user?.permisos.includes('servicios:salidaDetalle')) {
-                actions.push({ label: (<><MdBikeScooter /><span className="ml-1.5">Detalle Salida</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/salidaDetalle`), permiso: 'servicios:salidaDetalle' });
-            }
+        
+        if (user?.permisos.includes('servicios:salidaDetalle')) {
+            actions.push({ label: (<><MdBikeScooter /><span className="ml-1.5">Detalle Salida</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/salidaDetalle`), permiso: 'servicios:salidaDetalle' });
+        }
+        
+        if (user?.permisos.includes('servicios:repuestos') && row.estadoId == estados().enReparacion) {
+            actions.push({ label: (<><PiDeviceTabletFill /><span className="ml-1.5">Repuestos</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/repuestos`), permiso: 'servicios:detail' });
+            return actions;
+        }
+        
 
         return actions.filter(a => user?.permisos.includes(a.permiso));
     };

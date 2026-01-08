@@ -18,6 +18,7 @@ export const userSchema = z.object({
   estadoId: z.number(),
   roles: z.array(z.number().int()).optional(),
   sucursales: z.array(z.number().int()).optional(),
+  motos: z.array(z.number().int()).optional(),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
 });

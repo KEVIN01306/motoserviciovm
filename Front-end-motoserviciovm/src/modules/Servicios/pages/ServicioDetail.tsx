@@ -91,9 +91,11 @@ const ServicioDetail = () => {
     }, 0) || 0
   ).reduce((acc, curr) => acc + curr, 0) || 0;
 
-  const totalServicio =( data.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0) || 0) + (data.total || 0) - totalVentasDescuentos;
+  const totalServicio =( data.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0) || 0) + (data.total || 0) + (data.enReparaciones?.[0]?.total || 0) + (data.enParqueos?.[0]?.total || 0) - totalVentasDescuentos;
 
   const dataTableTotales = [
+    { label: 'Total Reparacion', value: `Q ${data.enReparaciones?.[0]?.total ? data.enReparaciones[0].total.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00'}` },
+    { label: 'Total Parqueo', value: `Q ${data.enParqueos?.[0]?.total ? data.enParqueos[0].total.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00'}` },
     { label: 'Total Servicio', value: `Q ${data.total?.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? '0.00'}` },
     { label: 'Total Ventas', value: `Q ${(data.ventas?.reduce((acc, venta) => acc + (venta.total || 0) - totalVentasDescuentos, 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? '0.00'}` },
     { label: 'Gran Total', value: `Q ${totalServicio.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
@@ -184,6 +186,9 @@ const ServicioDetail = () => {
                   <Box  sx={{ mb: 4, mt: 3 }} >
                     <Typography variant="h6" gutterBottom>En Reparación</Typography>
                     <Typography variant='body2' gutterBottom>{data.enReparaciones[0].descripcion}</Typography>
+                    <Typography variant="h6" sx={{ mt: 2 }}>
+                        {`Total Reparacion ${data.enReparaciones[0].total ? `Q ${data.enReparaciones[0].total.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 'Q 0.00'}`}
+                    </Typography> 
                     <Chip label={data.enReparaciones[0]?.estado.estado ?? ''} color={chipColorByEstado(data.enReparaciones[0]?.estado.id)} sx={{ mb: 2 }} variant='outlined'/>
                   </Box>
 
@@ -200,6 +205,29 @@ const ServicioDetail = () => {
               </>
               )
             }
+
+            {
+              data.enParqueos && data.enParqueos.length > 0 && (
+                <>
+                  <Divider sx={{ my: 4 }} />
+                  <Box  sx={{ mb: 2, mt: 3 }} >
+                    <Typography textAlign={'center'} variant="h6" gutterBottom>En Parqueo</Typography>
+                    <Typography textAlign={'center'} variant='body2' gutterBottom>{data.enParqueos[0].descripcion}</Typography>
+                    <Typography textAlign={'center'} variant='body2' gutterBottom>{`Desde: ${data.enParqueos[0].fechaEntrada ? formatDate(data.enParqueos[0].fechaEntrada as any) : '-'}`}</Typography>
+                    <Typography textAlign={'center'} variant='body2' gutterBottom>{`Fecha Salida: ${data.enParqueos[0].fechaSalida ? formatDate(data.enParqueos[0].fechaSalida as any) : '-'}`}</Typography>
+                    <Typography variant="body2" >
+                      Dias en parqueo: {new Date().getDate() - new Date(data.enParqueos[0].createdAt ? data.enParqueos[0].createdAt : '').getDate()}
+                    </Typography>
+                    
+                    <Chip label={data.enParqueos[0]?.estado.estado ?? ''} color={chipColorByEstado(data.enParqueos[0]?.estado.id)} sx={{ mb: 2 }} variant='outlined'/>
+                    <Typography variant="h6" sx={{ mt: 2 }}>
+                        {`Total Parqueo ${data.enParqueos[0].total ? `Q ${data.enParqueos[0].total.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 'Q 0.00'}`}
+                    </Typography>                  </Box>
+                  <Divider sx={{ my: 4 }} />
+                </>
+              )
+            }
+            
 
             <Typography variant="h4" textAlign={'center'} mt={3} gutterBottom id="ventas">VENTAS</Typography>
             {
@@ -265,7 +293,7 @@ const ServicioDetail = () => {
             <Divider sx={{ my: 2 }} />
             <Grid container spacing={2} justifyContent="center" alignItems="center">
             {
-              userlogged?.permisos.includes('ventas:create') && (data.estadoId === estados().enEspera || data.estadoId === estados().enReparacion || data.estadoId === estados().enParqueo) && (
+              userlogged?.permisos.includes('ventas:create') && (data.estadoId === estados().enServicio || data.estadoId === estados().enReparacion || data.estadoId === estados().enParqueo) && (
                   <Grid size={{xs: 5, md: 3}} textAlign="center">
                   <Button variant="contained" onClick={() => goTo(`/admin/ventas/create?servicioId=${data.id}`)}>Crear Venta</Button>
                   </Grid>
@@ -273,7 +301,7 @@ const ServicioDetail = () => {
 
             }
             {
-              userlogged?.permisos.includes('servicios:salida') && (data.estadoId === estados().enEspera || data.estadoId === estados().enReparacion || data.estadoId === estados().enParqueo) && (
+              userlogged?.permisos.includes('servicios:salida') && (data.estadoId === estados().enServicio || data.estadoId === estados().enReparacion || data.estadoId === estados().enParqueo) && (
                   <Grid size={{xs: 5, md: 3}} textAlign="center">
                   <Button variant="outlined" color='success'  onClick={() => goTo(`/admin/servicios/${data.id}/salida`)}>Dar Salida</Button>
                   </Grid>

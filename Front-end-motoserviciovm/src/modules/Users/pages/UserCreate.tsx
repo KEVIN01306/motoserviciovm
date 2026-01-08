@@ -14,12 +14,15 @@ import { getRoles } from "../../../services/rol.services";
 import type { RolGetType } from "../../../types/rolType";
 import type { SucursalType } from "../../../types/sucursalType";
 import { getSucursales } from "../../../services/sucursal.services";
+import { getMotos } from "../../../services/moto.services";
+import type { motoGetType } from "../../../types/motoType";
 
 
 
 const UserCreate = () => {
     const [roles, setRoles] = useState<RolGetType[]>([])
     const [sucursales, setSucursales] = useState<SucursalType[]>([])
+    const [motos, setMotos] = useState<motoGetType[]>([])
 
 
     const getRolesList = async () => {
@@ -43,10 +46,21 @@ const UserCreate = () => {
             console.log(err)
         }
     }
+    const getMotosList = async () => {
+        try {
+            const response = await getMotos()
+            setMotos(response)
+            console.log(response)
 
+        } catch (err: any) {
+            console.log(err)
+        }
+    }
+    
     useEffect(() => {
         getRolesList()
         getSucursalesList()
+        getMotosList()
     }, [])
 
     const breadcrumbsData = [
@@ -86,7 +100,7 @@ const UserCreate = () => {
         <>
             <BreadcrumbsRoutes items={breadcrumbsData} />
             <FormEstructure handleSubmit={handleSubmit(handlerSubmitUser)}>
-                <InputsForm register={register} errors={errors} control={control} watch={watch} setValue={setValue} roles={roles}sucursales={sucursales} />
+                <InputsForm register={register} errors={errors} control={control} watch={watch} setValue={setValue} roles={roles} sucursales={sucursales} motos={motos} />
                 <Grid size={12}>
                     <Divider sx={{ my: 2 }} />
                 </Grid>

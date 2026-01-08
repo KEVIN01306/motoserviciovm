@@ -47,6 +47,8 @@ const ServicioSalida = () => {
         // ...otros
       } = payload;
       if (!firmaSalidaFile) throw new Error('Debe adjuntar la firma de salida');
+      if (accionSalida === "SOLOSALIDA" && data?.enReparaciones?.length ? data?.enReparaciones[0].estadoId == estados().activo : false) throw new Error('El servicio aun cuenta son reparaciones pendientes, no se puede registrar solo salida.');
+      if (accionSalida === "SOLOSALIDA" && data?.enParqueos?.length ? data?.enParqueos[0].estadoId == estados().activo : false) throw new Error('El servicio aun cuenta son parqueos pendientes, no se puede registrar solo salida.');
       await putFirmaSalida(id, {
         total,
         observaciones,
@@ -60,7 +62,14 @@ const ServicioSalida = () => {
       });
       console.log()
       successToast('Firma de salida registrada');payload
-      //goTo('/admin/servicios');
+
+      if (accionSalida === "SOLOSALIDA") {
+        successToast('Servicio dado de alta correctamente.');
+        goTo('/admin/servicios');
+      }
+
+      window.location.reload();
+
     } catch (err: any) {
       errorToast(err?.message ?? 'Error al actualizar');
     }

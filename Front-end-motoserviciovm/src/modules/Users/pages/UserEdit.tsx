@@ -18,6 +18,8 @@ import { getRoles } from "../../../services/rol.services";
 import type { RolGetType } from "../../../types/rolType";
 import type { SucursalType } from "../../../types/sucursalType";
 import { getSucursales } from "../../../services/sucursal.services";
+import { getMotos } from "../../../services/moto.services";
+import type { motoGetType } from "../../../types/motoType";
 
 
 
@@ -25,8 +27,18 @@ const UserEdit = () => {
 
     const [roles, setRoles] = useState<RolGetType[]>([])
     const [sucursales, setSucursales] = useState<SucursalType[]>([])
+    const [motos, setMotos] = useState<motoGetType[]>([])
     const [tipoUser, setTipoUser] = useState<boolean>(true);
 
+    const getMotosList = async () => {
+        try {
+            const response = await getMotos()
+            setMotos(response)
+            console.log(response)
+        } catch (err: any) {
+            console.log(err)
+        }
+    }
     const getRolesList = async () => {
         try {
             const response = await getRoles()
@@ -37,6 +49,7 @@ const UserEdit = () => {
             console.log(err)
         }
     }
+    
 
     const getSucursalesList = async () => {
         try {
@@ -52,6 +65,7 @@ const UserEdit = () => {
     useEffect(() => {
         getRolesList()
         getSucursalesList()
+        getMotosList()
     }, [])
 
     const { id } = useParams()
@@ -78,7 +92,7 @@ const UserEdit = () => {
 
 
     const handlerSubmitUser: SubmitHandler<UserType> = async (data) => {
-        console.log("users: dara: ", data)
+        console.log("users: data: ", data)
         try {
             const response = await putUser(id,data)
             successToast("User Update: " + response)
@@ -94,7 +108,7 @@ const UserEdit = () => {
 
     const breadcrumbsData = [
         { label: "Users", icon: <PiUsersFill fontSize="inherit" />, href: "/admin/users" },
-        { label: user?.primerNombre ? user?.primerNombre : "", icon: <PiUserCheck fontSize="inherit" />, href: `/users/${id}` },
+        { label: user?.primerNombre ? user?.primerNombre : "", icon: <PiUserCheck fontSize="inherit" />, href: `/admin/users/${id}` },
         { label: "Edit User", icon: <PiUserCheck fontSize="inherit" />, href: "/admin/users/"+id },
     ];
 
@@ -130,7 +144,7 @@ const UserEdit = () => {
         <>
             <BreadcrumbsRoutes items={breadcrumbsData} />
             <FormEstructure handleSubmit={handleSubmit(handlerSubmitUser)}>
-                <InputsForm register={register} errors={errors} control={control} watch={watch} setValue={setValue} roles={roles} tipoUser={tipoUser} sucursales={sucursales} />
+                <InputsForm register={register} errors={errors} control={control} watch={watch} setValue={setValue} roles={roles} tipoUser={tipoUser} sucursales={sucursales} motos={motos} />
                 <Grid size={12}>
                     <Divider sx={{ my: 2 }} />
                 </Grid>

@@ -7,10 +7,13 @@ const pause = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const getServicios = async (filters = {}) => {
     const { placa, startDate, endDate } = filters;
 
+    // Adjust endDate to include the entire day by adding one day
+    const adjustedEndDate = endDate ? new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)) : undefined;
+
     const whereClause = {
         estadoId: { not: estados().inactivo },
         ...(placa && { moto: { placa: placa } }),
-        ...(startDate && endDate && { createdAt: { gte: new Date(startDate), lte: new Date(endDate) } }),
+        ...(startDate && adjustedEndDate && { createdAt: { gte: new Date(startDate), lt: adjustedEndDate } }),
     };
 
     const items = await prisma.servicio.findMany({
@@ -29,7 +32,7 @@ const getServicios = async (filters = {}) => {
 }
 
 const getServicio = async (id) => {
-    const item = await prisma.servicio.findFirst({ where: { id: id, estadoId: { not: estados().inactivo } }, include: { imagen: true, servicioItems: {include: {inventario: true}}, productosCliente: true, moto: {include: { modelo: true}}, sucursal: true,cliente: true, mecanico: true, servicioOpcionesTipoServicio: {include: {opcionServicio: true}} , tipoServicio: {include: {opcionServicios: true}} , estado: true, proximoServicioItems: true , ventas: { include: { productos: {include: {producto: true}}, estado: true } },enReparaciones: {include: {repuestos: true, estado: true}} } });
+    const item = await prisma.servicio.findFirst({ where: { id: id, estadoId: { not: estados().inactivo } }, include: { imagen: true, servicioItems: {include: {inventario: true}}, productosCliente: true, moto: {include: { modelo: true}}, sucursal: true,cliente: true, mecanico: true, servicioOpcionesTipoServicio: {include: {opcionServicio: true}} , tipoServicio: {include: {opcionServicios: true}} , estado: true, proximoServicioItems: true , ventas: { include: { productos: {include: {producto: true}}, estado: true } },enReparaciones: {include: {repuestos: true, estado: true}}, enParqueos: {include: {estado: true}} } });
     if (!item) { const error = new Error('DATA_NOT_FOUND'); error.code = 'DATA_NOT_FOUND'; throw error; }
     return item;
 }
@@ -230,11 +233,22 @@ const salidaServicio = async (id, data) => {
                     total: base.total,
                     firmaSalida: base.firmaSalida,
                     kilometrajeProximoServicio: kilometrajeProximoServicio,
-                    estadoId: estados().enReparacion,
+                    estadoId: estados().entregado,
                     fechaSalida: new Date(),
                     descuentosServicio: totalDescuentos._sum.descuentoTotal || 0,
                 },
             });
+
+             if (base.accionSalida === 'SOLOSALIDA') {
+                await tx.moto.update({
+                    where: { id: updated.motoId },
+                    data: { estadoId: estados().activo },
+                });
+                await tx.servicio.update({
+                    where: { id: id },
+                    data: { estadoId: estados().entregado },
+                });
+             }
 
             if (base.accionSalida === 'REPARAR') {
                 await tx.moto.update({
@@ -242,7 +256,33 @@ const salidaServicio = async (id, data) => {
                     data: { estadoId: estados().enReparacion },
                 });
 
+                await tx.servicio.update({
+                    where: { id: id },
+                    data: { estadoId: estados().enReparacion },
+                });
+
                 await tx.enReparacion.create({
+                    data: {
+                        servicioId: id,
+                        fechaEntrada: new Date(),
+                        estadoId: estados().activo,
+                        descripcion: base.descripcionAccion,
+                    },
+                });
+            }
+
+            if (base.accionSalida === 'PARQUEAR') {
+                await tx.moto.update({
+                    where: { id: updated.motoId },
+                    data: { estadoId: estados().enParqueo },
+                });
+
+                await tx.servicio.update({
+                    where: { id: id },
+                    data: { estadoId: estados().enParqueo },
+                });
+
+                await tx.enParqueo.create({
                     data: {
                         servicioId: id,
                         fechaEntrada: new Date(),

@@ -6,6 +6,7 @@ import type { RolGetType, RolType } from "../../../types/rolType";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import type { SucursalType } from "../../../types/sucursalType";
+import type { motoGetType } from "../../../types/motoType";
 
 
 interface InputsFormProps {
@@ -16,12 +17,13 @@ interface InputsFormProps {
     setValue: UseFormSetValue<UserType>;
     roles: RolGetType[];
     sucursales: SucursalType[];
+    motos: motoGetType[];
     tipoUser?: boolean
 }
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
-const InputsForm = ({ register, errors, control, watch, setValue, roles, tipoUser = true, sucursales }: InputsFormProps) => {
+const InputsForm = ({ register, errors, control, watch, setValue, roles, tipoUser = true, sucursales, motos }: InputsFormProps) => {
 
     const [TipoUser, setTipoUser] = useState(tipoUser);
 
@@ -231,7 +233,7 @@ const InputsForm = ({ register, errors, control, watch, setValue, roles, tipoUse
 
                                 value={selectedRoleObjects}
 
-                                onChange={(event, newValue: RolGetType[]) => {
+                                onChange={(_event, newValue: RolGetType[]) => {
                                     const roleIds = newValue.map(role => role.id);
 
                                     field.onChange(roleIds);
@@ -287,7 +289,7 @@ const InputsForm = ({ register, errors, control, watch, setValue, roles, tipoUse
 
                                 value={selectedSucursalObjects}
 
-                                onChange={(event, newValue: SucursalType[]) => {
+                                onChange={(_event, newValue: SucursalType[]) => {
                                     const sucursalIds = newValue.map(sucursal => sucursal.id);
 
                                     field.onChange(sucursalIds);
@@ -314,6 +316,61 @@ const InputsForm = ({ register, errors, control, watch, setValue, roles, tipoUse
                                         label="Sucursales del Usuario"
                                         placeholder="Seleccionar sucursales"
                                         error={!!errors.sucursales}
+                                    />
+                                )}
+                            />
+                        );
+                    }}
+                />
+            </Grid>
+            <Grid size={{ xs: 12, md: 12 }}>
+                <Controller
+                    name="motos"
+                    control={control}
+                    render={({ field }) => {
+
+                        const selectedmotoObjects = (field.value as number[] || []).map(id =>
+                            motos.find((moto: motoGetType) => String(moto.id) === String(id))
+                        ).filter((moto): moto is motoGetType => !!moto);
+
+                        return (
+                            <Autocomplete
+                                multiple
+                                id="checkboxes-motos-tags"
+                                options={motos}
+                                disableCloseOnSelect
+
+                                getOptionLabel={(moto) => moto.placa}
+
+                                value={selectedmotoObjects}
+
+                                onChange={(_event, newValue: motoGetType[]) => {
+                                    const motoIds = newValue.map(moto => moto.id);
+
+                                    field.onChange(motoIds);
+                                }}
+
+                                renderOption={(props, option, { selected }) => {
+                                    return (
+                                        <li {...props}>
+                                            <Checkbox
+                                                icon={icon}
+                                                checkedIcon={checkedIcon}
+                                                style={{ marginRight: 8 }}
+                                                checked={selected}
+                                            />
+                                            {option.placa}
+                                        </li>
+                                    );
+                                }}
+
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        variant="standard"
+                                        label="Motos del Usuario"
+                                        placeholder="Seleccionar motos"
+                                        error={!!errors.motos}
                                     />
                                 )}
                             />

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab, Avatar, Paper, colors } from '@mui/material';
+import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab, Avatar, Paper, colors, Link } from '@mui/material';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiToolsLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';
@@ -19,6 +19,7 @@ import { PiExportDuotone } from 'react-icons/pi';
 import ImageGallery from '../../../components/utils/GaleryImagenes';
 import type { OpcionServicioType } from '../../../types/opcionServicioType';
 import { useAuthStore } from '../../../store/useAuthStore';
+import type { repuestoReparacionType } from '../../../types/repuestoReparacionType';
 
 const API_URL = import.meta.env.VITE_DOMAIN;
 
@@ -97,7 +98,7 @@ const ServicioDetailSalida = () => {
     if (!data) return <ErrorCard errorText={'Servicio no encontrado'} restart={fetch} />;
 
     const breadcrumbs = [
-        { label: 'Servicios', href: `${userlogged.tipo != "" ? `/admin/historial-servicio/${data.motoId}`  : '/admin/servicios'}`, icon: <RiToolsLine fontSize="inherit" /> },
+        { label: 'Servicios', href: `${userlogged.tipo != "" ? `/admin/historial-servicio/${data.motoId}` : '/admin/servicios'}`, icon: <RiToolsLine fontSize="inherit" /> },
         { label: `Servicio #${data.id}`, icon: <RiToolsLine fontSize="inherit" /> },
     ];
 
@@ -114,17 +115,21 @@ const ServicioDetailSalida = () => {
         }
     };
     const totalVentasDescuentos = data?.ventas
-    ?.filter(venta => venta.estadoId === estados().confirmado) // Filtra solo las confirmadas
-    ?.reduce((acc, venta) => {
-        return acc + (venta.descuentoTotal || 0); // Suma el descuento acumulado
-    }, 0) || 0;
+        ?.filter(venta => venta.estadoId === estados().confirmado) // Filtra solo las confirmadas
+        ?.reduce((acc, venta) => {
+            return acc + (venta.descuentoTotal || 0); // Suma el descuento acumulado
+        }, 0) || 0;
     const totalServicio = (data.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0) || 0) + (data.total || 0);
 
     const dataTableTotales = [
+        { label: 'Total Reparacion', value: `Q ${data.enReparaciones?.[0]?.total ? data.enReparaciones[0].total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}` },
+        { label: 'Total Parqueo', value: `Q ${data.enParqueos?.[0]?.total ? data.enParqueos[0].total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}` },
         { label: 'Total Servicio', value: `Q ${data.total?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? '0.00'}` },
         { label: 'Repuestos', value: `Q ${data.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0 - totalVentasDescuentos).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? '0.00'}` },
-        { label: 'Gran Total', value: `Q ${(Number(totalServicio)-Number(totalVentasDescuentos)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+        { label: 'Gran Total', value: `Q ${(Number(totalServicio) + (data.enReparaciones?.[0]?.total || 0) + (data.enParqueos?.[0]?.total || 0) - Number(totalVentasDescuentos)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
     ]
+
+
 
 
     return (
@@ -238,6 +243,54 @@ const ServicioDetailSalida = () => {
                             </Typography>
                         </Grid>
 
+                        {
+                            data.enReparaciones && data.enReparaciones.length > 0 && (
+                                <>
+                                    <Box sx={{ mb: 4, mt: 3 }} >
+                                        <Typography variant="h6" gutterBottom>En Reparación</Typography>
+                                        <Typography variant='body2' gutterBottom>{data.enReparaciones[0].descripcion}</Typography>
+                                        <Typography variant="h6" sx={{ mt: 2 }}>
+                                            {`Total Reparacion ${data.enReparaciones[0].total ? `Q ${data.enReparaciones[0].total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'Q 0.00'}`}
+                                        </Typography>
+                                        <Chip label={data.enReparaciones[0]?.estado.estado ?? ''} color={chipColorByEstado(data.enReparaciones[0]?.estado.id)} sx={{ mb: 2 }} variant='outlined' />
+                                    </Box>
+
+                                    <ProductsTable
+                                        columns={[
+                                            { id: 'repuesto', label: 'Repuesto', minWidth: 120, format: (v: any, row: repuestoReparacionType) => row.nombre ?? '' },
+                                            { id: 'descripcion', label: 'Descripción', minWidth: 180, format: (v: any, row: repuestoReparacionType) => row.descripcion ?? '' },
+                                            { id: 'refencia', label: 'Referencia', minWidth: 100, format: (v: any, row: repuestoReparacionType) => row.refencia ? (<Link href={row.refencia} target="_blank" rel="noopener noreferrer" underline="hover" >Link</Link>) : 'No hay' },
+                                            { id: 'cantidad', label: 'Cantidad', minWidth: 80, align: 'center', format: (v: any) => String(v) },
+                                        ] as any}
+                                        rows={data.enReparaciones[0].repuestos ?? []}
+                                        headerColor="#1565c0"
+                                    />
+                                </>
+                            )
+                        }
+
+                        {
+                            data.enParqueos && data.enParqueos.length > 0 && (
+                                <>
+                                    <Divider sx={{ my: 4 }} />
+                                    <Box sx={{ mb: 2, mt: 3 }} >
+                                        <Typography  variant="h6" gutterBottom>En Parqueo</Typography>
+                                        <Typography variant='body2' gutterBottom>{data.enParqueos[0].descripcion}</Typography>
+                                        <Typography  variant='body2' gutterBottom>{`Desde: ${data.enParqueos[0].fechaEntrada ? formatDate(data.enParqueos[0].fechaEntrada as any) : '-'}`}</Typography>
+                                        <Typography  variant='body2' gutterBottom>{`Fecha Salida: ${data.enParqueos[0].fechaSalida ? formatDate(data.enParqueos[0].fechaSalida as any) : '-'}`}</Typography>
+                                        <Typography variant="body2" >
+                                            Dias en parqueo: {new Date().getDate() - new Date(data.enParqueos[0].createdAt ? data.enParqueos[0].createdAt : '').getDate()}
+                                        </Typography>
+
+                                        <Chip label={data.enParqueos[0]?.estado.estado ?? ''} color={chipColorByEstado(data.enParqueos[0]?.estado.id)} sx={{ mb: 2 }} variant='outlined' />
+                                        <Typography variant="h6" sx={{ mt: 2 }}>
+                                            {`Total Parqueo ${data.enParqueos[0].total ? `Q ${data.enParqueos[0].total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'Q 0.00'}`}
+                                        </Typography>                  </Box>
+                                    <Divider sx={{ my: 4 }} />
+                                </>
+                            )
+                        }
+
                         <Typography variant="h5" m={2} gutterBottom>{data.tipoServicio?.tipo ?? ''}</Typography>
 
                         <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
@@ -281,7 +334,7 @@ const ServicioDetailSalida = () => {
                                         <>
 
                                             <ProductsTable
-                                            maxHeight={'none'}
+                                                maxHeight={'none'}
                                                 columns={[
                                                     { id: 'nombre', label: 'CAMBIOS POR REALIZAR EN SIGUIENTE SERVICIO', minWidth: 180, format: (v: any) => v ?? '', align: 'center' },
                                                 ] as any}

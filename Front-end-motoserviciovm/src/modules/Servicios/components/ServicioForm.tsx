@@ -19,6 +19,7 @@ import type { UserGetType } from '../../../types/userType';
 import SignatureField from '../../../components/utils/SignatureField';
 import { ModalForm } from '../../Motos/components';
 import ImagenesEditorInput from '../../../components/utils/ImagenesEditorInput';
+import ModalUserCreate from '../../Users/components/ModalUserCreate';
 
 
 const API_URL = import.meta.env.VITE_DOMAIN;
@@ -78,6 +79,11 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
         const m = await getMotos();
         setMotosList(m);
   }
+
+  const getUpdateClientes = async () => {
+        const cl = await getUsersClientes();
+        setClientes(cl)
+  }
   useEffect(() => {
     (async () => {
       try {
@@ -90,8 +96,7 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
         setTiposServicio(ts);
         const mn = await getUsersMecanicos();
         setMecanicos(mn)
-        const cl = await getUsersClientes();
-        setClientes(cl)
+        getUpdateClientes();
         // set default sucursal: prefer `initial.sucursalId`, otherwise use first sucursal of logged user (if any)
         const defaultId = (initial && initial.sucursalId) ? initial.sucursalId : undefined;
         if (defaultId) {
@@ -253,18 +258,22 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
         </Grid>
 
        <Grid size={{ xs: 12, sm: 6 }}>
-          <Autocomplete
-          options={clientes}
-          getOptionLabel={(opt: any) => `${opt?.primerNombre} ${opt?.primerApellido} - ${opt?.dpi || opt?.nit || ""}`}
-          value={clienteSelected}
-          onChange={(_, newVal) => {
-            setClienteSelected(newVal ?? null);
-            setValue('clienteId' as any, newVal?.id ?? null);
-          }}
-          isOptionEqualToValue={(option: any, value: any) => Number(option?.id) === Number(value?.id)}
-          renderInput={(params) => <TextField {...params} label="Cliente" variant="standard" fullWidth />}
-        />
-        </Grid>
+          <Grid size={{ xs: 10, sm: 10 }}>
+
+              <Autocomplete
+              options={clientes}
+              getOptionLabel={(opt: any) => `${opt?.primerNombre} ${opt?.primerApellido} - ${opt?.dpi || opt?.nit || ""}`}
+              value={clienteSelected}
+              onChange={(_, newVal) => {
+                setClienteSelected(newVal ?? null);
+                setValue('clienteId' as any, newVal?.id ?? null);
+              }}
+              isOptionEqualToValue={(option: any, value: any) => Number(option?.id) === Number(value?.id)}
+              renderInput={(params) => <TextField {...params} label="Cliente" variant="standard" fullWidth />}
+            />
+          </Grid> 
+            <ModalUserCreate onFinish={getUpdateClientes} />
+      </Grid>
 
       <Grid size={{ xs: 12, sm: 6 }}>
         <Autocomplete

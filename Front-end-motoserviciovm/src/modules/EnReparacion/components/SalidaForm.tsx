@@ -1,4 +1,4 @@
-import { Grid, TextField } from "@mui/material";
+import { Grid, TextField, Typography } from "@mui/material";
 import { Controller } from "react-hook-form";
 import type { EnReparacionGetType } from "../../../types/enReparacionType";
 
@@ -13,7 +13,7 @@ const SalidaForm = ({ control, register, errors, readOnlyValues }: Props) => {
   return (
     <>
       <Grid size={{ xs: 12 }}>
-        <TextField variant="standard" fullWidth label="Placa" value={readOnlyValues?.moto?.placa ?? ""} InputProps={{ readOnly: true }} />
+        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>{readOnlyValues?.servicio?.moto?.placa}</Typography>
       </Grid>
 
       <Grid size={{ xs: 12 }}>

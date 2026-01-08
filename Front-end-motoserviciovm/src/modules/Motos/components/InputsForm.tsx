@@ -8,6 +8,7 @@ import type { UserGetType } from "../../../types/userType";
 import type { modeloGetType } from "../../../types/modeloType";
 import { getUsers } from "../../../services/users.services";
 import { getModelos } from "../../../services/modelo.services";
+import ModalModeloCreate from "../../Modelos/components/ModalModeloCreate";
 
 type Props = {
   control: Control<motoType, any>;
@@ -142,6 +143,10 @@ const InputsForm = ({ control, register, errors }: Props) => {
       streamRef.current = null;
     }
   };
+
+  const updateModelos = async () => {
+    await setModelosOptions(await getModelos());
+  }
 
   useEffect(() => {
     const load = async () => {
@@ -302,23 +307,26 @@ const InputsForm = ({ control, register, errors }: Props) => {
         />
       </Grid>
 
-      <Grid size={12}>
-        <Controller
-          name="modeloId"
-          control={control}
-          render={({ field }) => (
-            <Autocomplete
-              options={modelosOptions}
-              getOptionLabel={(opt) => opt.modelo ?? ""}
-              value={modelosOptions.find((m) => String(m.id) === String(field.value)) ?? null}
-              onChange={(_, value) => field.onChange(value ? value.id : 0)}
-              isOptionEqualToValue={(opt, val) => String(opt.id) === String((val as any)?.id)}
-              renderInput={(params) => (
-                <TextField {...params} label="Modelo" variant="standard" />
-              )}
+      <Grid container size={12} alignItems="start">
+        <Grid size={10}>
+            <Controller
+            name="modeloId"
+            control={control}
+            render={({ field }) => (
+              <Autocomplete
+                options={modelosOptions}
+                getOptionLabel={(opt) => opt.modelo ?? ""}
+                value={modelosOptions.find((m) => String(m.id) === String(field.value)) ?? null}
+                onChange={(_, value) => field.onChange(value ? value.id : 0)}
+                isOptionEqualToValue={(opt, val) => String(opt.id) === String((val as any)?.id)}
+                renderInput={(params) => (
+                  <TextField {...params} label="Modelo" variant="standard" />
+                )}
+              />
+            )}
             />
-          )}
-        />
+        </Grid>
+          <ModalModeloCreate onFinish={() => updateModelos()} />
       </Grid>
 
       <Grid size={12}>
