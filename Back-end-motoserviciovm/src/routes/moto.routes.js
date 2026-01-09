@@ -10,10 +10,10 @@ const upload = configureMulter({destinationFolder: MOTO_UPLOAD});
 
 const router = Router();
 
-router.get("/",verifyTokenHandler(), getMotosHandler);
+router.get("/", verifyTokenHandler(), getMotosHandler);
 router.get("/:id", verifyTokenHandler(), getMotoHandler);
-router.post("/", verifyTokenHandler(),upload.single('avatar'), postMotoHandler);
-router.put("/:id", verifyTokenHandler(),upload.single('avatar'), putMotoHandler);
+router.post("/", verifyTokenHandler(), upload.fields([{ name: 'avatar', maxCount: 1 }, { name: 'calcomania', maxCount: 1 }]), postMotoHandler);
+router.put("/:id", verifyTokenHandler(), upload.fields([{ name: 'avatar', maxCount: 1 }, { name: 'calcomania', maxCount: 1 }]), putMotoHandler);
 router.delete("/:id", verifyTokenHandler(), deleteMotoHandler);
 
 export default router;

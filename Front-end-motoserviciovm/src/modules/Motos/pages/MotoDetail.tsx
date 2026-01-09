@@ -5,7 +5,7 @@ import Loading from "../../../components/utils/Loading";
 import ErrorCard from "../../../components/utils/ErrorCard";
 import { getMoto } from "../../../services/moto.services";
 import DetailData from "../components/DetailData";
-import { Grid, Button, Box, Typography, Divider } from "@mui/material";
+import { Grid, Button, Box, Typography, Divider, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { useGoTo } from "../../../hooks/useGoTo";
 import type { motoGetType } from "../../../types/motoType";
 import { RiBikeFill } from "react-icons/ri";
@@ -19,6 +19,7 @@ const MotoDetail = () => {
     const [moto, setMoto] = useState<motoGetType | undefined>();
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [openCalcomania, setOpenCalcomania] = useState(false);
 
     const breadcrumbsData = [
         { label: "Motos", icon: <RiBikeFill fontSize="inherit" />, href: "/admin/motos" },
@@ -55,7 +56,7 @@ const MotoDetail = () => {
                 {/* Top area: avatar left, info right (stack on mobile) */}
                 <Grid container spacing={2}>
                     <Grid size={{ xs: 12, md: 6 }}>
-                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
+                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", flexDirection: 'column', gap: 2 }}>
                             {moto?.avatar ? (
                                 <Box
                                     component="img"
@@ -65,6 +66,35 @@ const MotoDetail = () => {
                                 />
                             ) : (
                                 <Box   sx={{ width: "100%", height: 200, bgcolor: "#f3f4f6", borderRadius: 1 }} />
+                            )}
+
+                            {/* Calcomania: botón para ver imagen/pdf */}
+                            {typeof moto?.calcomania === 'string' && moto.calcomania && (
+                                (() => {
+                                    const calco = moto.calcomania;
+                                    const isPdf = calco.endsWith('.pdf') || calco.includes('application/pdf');
+                                    const src = calco.startsWith('http') ? calco : API_URL + calco;
+                                    if (isPdf) {
+                                        return (
+                                            <Button variant="outlined" onClick={() => window.open(src, '_blank')}>Ver calcomanía (PDF)</Button>
+                                        );
+                                    } else {
+                                        return (
+                                            <>
+                                                <Button variant="outlined" onClick={() => setOpenCalcomania(true)}>Ver calcomanía</Button>
+                                                <Dialog open={openCalcomania} onClose={() => setOpenCalcomania(false)} maxWidth="xs" fullWidth>
+                                                    <DialogTitle>Calcomanía</DialogTitle>
+                                                    <DialogContent>
+                                                        <Box component="img" src={src} alt="calcomania" sx={{ width: '100%', maxHeight: 400, objectFit: 'contain' }} />
+                                                    </DialogContent>
+                                                    <DialogActions>
+                                                        <Button onClick={() => setOpenCalcomania(false)}>Cerrar</Button>
+                                                    </DialogActions>
+                                                </Dialog>
+                                            </>
+                                        );
+                                    }
+                                })()
                             )}
                         </Box>
                     </Grid>

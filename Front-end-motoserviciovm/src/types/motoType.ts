@@ -14,6 +14,7 @@ export type motoGetType = Omit<motoType, "users"> & {
 
 export const MotoInitialState = {
     placa: "",
+    calcomania: "",
     avatar: "",
     modeloId: 0,
     estadoId: 1,
@@ -28,6 +29,7 @@ export const mergeMotoDataWithDefaults = (apiData: Partial<motoGetType>): Partia
     return {
         placa: apiData.placa ?? MotoInitialState.placa,
         avatar: apiData.avatar ?? MotoInitialState.avatar,
+        calcomania: apiData.calcomania ?? MotoInitialState.calcomania,
         modeloId: apiData.modeloId ?? MotoInitialState.modeloId,
         estadoId: apiData.estadoId ?? MotoInitialState.estadoId,
         users: (apiData.users || [])

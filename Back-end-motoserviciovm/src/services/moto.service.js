@@ -62,7 +62,9 @@ const getMotos = async () => {
         where: { estadoId: {
             not: estados().inactivo
         },
+    
      },
+     orderBy: { id: 'asc' },
     });
 
         const motosWithAvatars = motos.map((m) => ({ ...m, avatar: null }));

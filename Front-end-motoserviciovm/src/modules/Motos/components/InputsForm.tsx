@@ -2,7 +2,7 @@ import { Grid, TextField, Autocomplete, Box, IconButton, Button, Menu, MenuItem,
 import { Controller, type Control, type UseFormRegister } from "react-hook-form";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import type { motoType } from "../../../types/motoType";
 import type { UserGetType } from "../../../types/userType";
 import type { modeloGetType } from "../../../types/modeloType";
@@ -186,16 +186,15 @@ const InputsForm = ({ control, register, errors }: Props) => {
         </DialogActions>
       </Dialog>
 
+
       <Grid size={12}>
-            <Controller
+        <Controller
           name="avatar"
           control={control}
           render={({ field }) => {
             currentFieldRef.current = field;
             const API_URL = import.meta.env.VITE_DOMAIN;
             let srcToShow: string | undefined = undefined;
-
-            // If current value is a File -> show object URL
             if (field.value instanceof File) {
               try {
                 srcToShow = URL.createObjectURL(field.value);
@@ -204,18 +203,14 @@ const InputsForm = ({ control, register, errors }: Props) => {
               }
             } else if (typeof field.value === 'string' && field.value.trim()) {
               const v = String(field.value).trim();
-              // if it's a data URL, show as-is
               if (v.startsWith('data:')) {
                 srcToShow = v;
               } else if (v.startsWith('http://') || v.startsWith('https://')) {
-                // already full URL
                 srcToShow = v;
               } else {
-                // assume it's a path from the API, prefix domain for display
                 srcToShow = `${API_URL}${v}`;
               }
             }
-
             return (
               <Box display="flex" alignItems="center" gap={1}>
                 {srcToShow ? (
@@ -261,7 +256,6 @@ const InputsForm = ({ control, register, errors }: Props) => {
                       style={{ display: 'none' }}
                       onChange={(e) => handleFileChange(e, field)}
                     />
-
                     <Button
                       variant="outlined"
                       component="button"
@@ -270,7 +264,6 @@ const InputsForm = ({ control, register, errors }: Props) => {
                     >
                       Cargar imagen
                     </Button>
-
                     <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
                       <MenuItem
                         onClick={() => {
@@ -299,6 +292,231 @@ const InputsForm = ({ control, register, errors }: Props) => {
                 {errors.avatar && (
                   <Box component="span" color="error.main" fontSize={12}>
                     {errors.avatar?.message}
+                  </Box>
+                )}
+              </Box>
+            );
+          }}
+        />
+      </Grid>
+
+      {/* Campo calcomania, igual que avatar pero acepta PDF y pregunta si tomar foto o elegir archivo */}
+      <Grid size={12}>
+        <Controller
+          name="calcomania"
+          control={control}
+          render={({ field }) => {
+            // Refs y estado para inputs y menú
+            const calcomaniaCameraInputRef = React.useRef<HTMLInputElement>(null);
+            const calcomaniaFileInputRef = React.useRef<HTMLInputElement>(null);
+            const [calcomaniaAnchorEl, setCalcomaniaAnchorEl] = React.useState<null | HTMLElement>(null);
+            const [calcomaniaCameraModalOpen, setCalcomaniaCameraModalOpen] = React.useState(false);
+            const calcomaniaVideoRef = React.useRef<HTMLVideoElement | null>(null);
+            const calcomaniaStreamRef = React.useRef<MediaStream | null>(null);
+            const API_URL = import.meta.env.VITE_DOMAIN;
+            let srcToShow: string | undefined = undefined;
+            let isPdf = false;
+            if (field.value instanceof File) {
+              try {
+                if (field.value.type === 'application/pdf') {
+                  isPdf = true;
+                  srcToShow = URL.createObjectURL(field.value);
+                } else {
+                  srcToShow = URL.createObjectURL(field.value);
+                }
+              } catch (e) {
+                srcToShow = undefined;
+              }
+            } else if (typeof field.value === 'string' && field.value.trim()) {
+              const v = String(field.value).trim();
+              if (v.endsWith('.pdf') || v.startsWith('data:application/pdf')) {
+                isPdf = true;
+              }
+              if (v.startsWith('data:')) {
+                srcToShow = v;
+              } else if (v.startsWith('http://') || v.startsWith('https://')) {
+                srcToShow = v;
+              } else {
+                srcToShow = `${API_URL}${v}`;
+              }
+            }
+            // Lógica para tomar foto (solo imagen)
+            const handleCalcomaniaFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              field.onChange(file);
+            };
+
+            // Modal/canvas para tomar foto en PC
+            React.useEffect(() => {
+              if (!calcomaniaCameraModalOpen) return;
+              let cancelled = false;
+              const start = async () => {
+                try {
+                  const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                  if (cancelled) {
+                    s.getTracks().forEach((t) => t.stop());
+                    return;
+                  }
+                  if (calcomaniaVideoRef.current) {
+                    calcomaniaVideoRef.current.srcObject = s;
+                    await calcomaniaVideoRef.current.play();
+                  }
+                  calcomaniaStreamRef.current = s;
+                } catch (err) {
+                  setCalcomaniaCameraModalOpen(false);
+                }
+              };
+              start();
+              return () => {
+                cancelled = true;
+                if (calcomaniaStreamRef.current) {
+                  calcomaniaStreamRef.current.getTracks().forEach((t) => t.stop());
+                  calcomaniaStreamRef.current = null;
+                }
+                if (calcomaniaVideoRef.current) {
+                  try { calcomaniaVideoRef.current.pause(); } catch (e) {}
+                  // @ts-ignore
+                  calcomaniaVideoRef.current.srcObject = null;
+                }
+              };
+            }, [calcomaniaCameraModalOpen]);
+
+            const handleTakeCalcomaniaPhoto = (field: any) => {
+              const video = calcomaniaVideoRef.current;
+              if (!video) return;
+              const canvas = document.createElement('canvas');
+              const w = video.videoWidth || 640;
+              const h = video.videoHeight || 480;
+              const maxWidth = 1024;
+              let drawW = w;
+              let drawH = h;
+              if (w > maxWidth) {
+                const ratio = maxWidth / w;
+                drawW = Math.round(w * ratio);
+                drawH = Math.round(h * ratio);
+              }
+              canvas.width = drawW;
+              canvas.height = drawH;
+              const ctx = canvas.getContext('2d');
+              if (!ctx) return;
+              ctx.drawImage(video, 0, 0, drawW, drawH);
+              canvas.toBlob(async (blob) => {
+                if (!blob) return;
+                const file = new File([blob], 'calcomania.jpg', { type: 'image/jpeg' });
+                field.onChange(file);
+              }, 'image/jpeg', 0.8);
+              setCalcomaniaCameraModalOpen(false);
+              if (calcomaniaStreamRef.current) {
+                calcomaniaStreamRef.current.getTracks().forEach((t) => t.stop());
+                calcomaniaStreamRef.current = null;
+              }
+            };
+
+            const handleCloseCalcomaniaCameraModal = () => {
+              setCalcomaniaCameraModalOpen(false);
+              if (calcomaniaStreamRef.current) {
+                calcomaniaStreamRef.current.getTracks().forEach((t) => t.stop());
+                calcomaniaStreamRef.current = null;
+              }
+            };
+            return (
+              <Box display="flex" alignItems="center" gap={1}>
+                {srcToShow ? (
+                  <Box display="flex" alignItems="center" gap={1}>
+                    {isPdf ? (
+                      <Button variant="outlined" onClick={() => window.open(srcToShow, '_blank')}>Ver PDF</Button>
+                    ) : (
+                      <Box
+                        sx={{
+                          width: 160,
+                          height: 90,
+                          borderRadius: 1,
+                          overflow: 'hidden',
+                          bgcolor: 'grey.100',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <img
+                          src={srcToShow}
+                          alt="calcomania"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      </Box>
+                    )}
+                    <IconButton aria-label="eliminar archivo" onClick={() => field.onChange('')}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                ) : (
+                  <>
+                    <input
+                      accept="image/*"
+                      capture="environment"
+                      id="moto-calcomania-input-camera"
+                      ref={calcomaniaCameraInputRef}
+                      type="file"
+                      style={{ display: 'none' }}
+                      onChange={(e) => handleCalcomaniaFileChange(e, field)}
+                    />
+                    <input
+                      accept="image/*,application/pdf"
+                      id="moto-calcomania-input-file"
+                      ref={calcomaniaFileInputRef}
+                      type="file"
+                      style={{ display: 'none' }}
+                      onChange={(e) => handleCalcomaniaFileChange(e, field)}
+                    />
+                    <Button
+                      variant="outlined"
+                      component="button"
+                      startIcon={<CloudUploadIcon />}
+                      onClick={(e) => setCalcomaniaAnchorEl(e.currentTarget)}
+                    >
+                      Cargar calcomanía
+                    </Button>
+                    <Menu anchorEl={calcomaniaAnchorEl} open={Boolean(calcomaniaAnchorEl)} onClose={() => setCalcomaniaAnchorEl(null)}>
+                      <MenuItem
+                        onClick={() => {
+                          setCalcomaniaAnchorEl(null);
+                          const isMobile = /Mobi|Android/i.test(navigator.userAgent || '');
+                          if (isMobile) {
+                            calcomaniaCameraInputRef.current?.click();
+                          } else {
+                            setCalcomaniaCameraModalOpen(true);
+                          }
+                        }}
+                      >
+                        Tomar foto
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          setCalcomaniaAnchorEl(null);
+                          calcomaniaFileInputRef.current?.click();
+                        }}
+                      >
+                        Elegir archivo
+                      </MenuItem>
+                    </Menu>
+
+                    {/* Modal para tomar foto calcomania en PC */}
+                    <Dialog open={calcomaniaCameraModalOpen} onClose={handleCloseCalcomaniaCameraModal} maxWidth="xs" fullWidth>
+                      <DialogTitle>Tomar foto de calcomanía</DialogTitle>
+                      <DialogContent>
+                        <video ref={calcomaniaVideoRef} style={{ width: '100%' }} />
+                      </DialogContent>
+                      <DialogActions>
+                        <Button onClick={handleCloseCalcomaniaCameraModal}>Cancelar</Button>
+                        <Button onClick={() => handleTakeCalcomaniaPhoto(field)} variant="contained">Tomar foto</Button>
+                      </DialogActions>
+                    </Dialog>
+                  </>
+                )}
+                {errors.calcomania && (
+                  <Box component="span" color="error.main" fontSize={12}>
+                    {errors.calcomania?.message}
                   </Box>
                 )}
               </Box>

@@ -513,6 +513,7 @@ model EnParqueo {
   fechaEntrada    DateTime
 
   fechaSalida     DateTime?
+  firmaSalida     String?
 
   total           Float?
 
@@ -539,6 +540,8 @@ model EnReparacion {
   fechaEntrada    DateTime
 
   fechaSalida     DateTime?
+
+  firmaSalida     String?
 
   total           Float?
 

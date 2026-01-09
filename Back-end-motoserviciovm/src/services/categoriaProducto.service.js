@@ -17,6 +17,7 @@ const getCategoriasProducto = async () => {
 const getCategoriaProducto = async (id) => {
     const categoria = await prisma.categoriaProducto.findUnique({
         where: { id: id, estadoId: { not: estados().inactivo } },
+        include: { productos: true },
     });
     if (!categoria) {
         const error = new Error('DATA_NOT_FOUND');

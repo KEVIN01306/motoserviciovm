@@ -37,7 +37,7 @@ const configureMulter = ({ destinationFolder }) => {
         storage: storage,
         limits: { fileSize: 5 * 1024 * 1024 },
         fileFilter: function (req, file, cb) {
-            const allowedTypes = /jpeg|jpg|png|gif/;
+            const allowedTypes = /jpeg|jpg|png|gif|pdf/;
             const mimeType = allowedTypes.test(file.mimetype);
             const extName = allowedTypes.test(path.extname(file.originalname).toLowerCase());
             if (mimeType && extName) {

@@ -42,11 +42,16 @@ const getMotoHandler =  async (req, res) => {
     }
 }
 
-const postMotoHandler =  async (req, res) => {
+const postMotoHandler = async (req, res) => {
     try {
         const data = req.body;
-        if (req.file) {
-            data.avatar = directorio + req.file.filename;
+        if (req.files) {
+            if (req.files.avatar) {
+                data.avatar = directorio + req.files.avatar[0].filename;
+            }
+            if (req.files.calcomania) {
+                data.calcomania = directorio + req.files.calcomania[0].filename;
+            }
         }
         data.modeloId = parseInt(data.modeloId);
         data.estadoId = parseInt(data.estadoId);
@@ -55,50 +60,56 @@ const postMotoHandler =  async (req, res) => {
 
         if (!validationResult.success) {
             const errorMessages = validationResult.error.issues.map(issue =>
-            `${issue.path.join('.')}: ${issue.message}`);
+                `${issue.path.join('.')}: ${issue.message}`);
             return res.status(400).json(responseError(errorMessages));
         }
-        const { data: value } = validationResult;
-        const newMoto = await postMoto(value);
-        res.status(201).json(responseSucces("Moto creada exitosamente", newMoto));
+
+        const moto = await postMoto(data);
+        res.status(201).json(responseSucces("Moto creada exitosamente", moto));
     } catch (error) {
         console.error(error);
         let errorCode = 500;
-        let errorMessage = 'INTERNAL_SERVER_ERROR'
-        switch(error.code){
-            case 'CONFLICT':
-                errorCode = 409;
+        let errorMessage = 'INTERNAL_SERVER_ERROR';
+        switch (error.code) {
+            case 'DATA_NOT_FOUND':
+                errorCode = 404;
                 errorMessage = error.code;
                 break;
         }
         res.status(errorCode).json(responseError(errorMessage));
     }
-}
+};
 
-const putMotoHandler =  async (req, res) => {
+const putMotoHandler = async (req, res) => {
     try {
         const { id } = req.params;
         const data = req.body;
-        if (req.file) {
-            data.avatar = directorio + req.file.filename;
+        if (req.files) {
+            if (req.files.avatar) {
+                data.avatar = directorio + req.files.avatar[0].filename;
+            }
+            if (req.files.calcomania) {
+                data.calcomania = directorio + req.files.calcomania[0].filename;
+            }
         }
         data.modeloId = parseInt(data.modeloId);
         data.estadoId = parseInt(data.estadoId);
         data.users = parseArrayNumbers(data.users);
         const validationResult = motoSchema.safeParse(data);
+
         if (!validationResult.success) {
             const errorMessages = validationResult.error.issues.map(issue =>
-            `${issue.path.join('.')}: ${issue.message}`);
+                `${issue.path.join('.')}: ${issue.message}`);
             return res.status(400).json(responseError(errorMessages));
         }
-        const { data: value } = validationResult;
-        const updatedMoto = await putMoto(parseInt(id), value);
-        res.status(200).json(responseSucces("Moto actualizada exitosamente", updatedMoto));
+
+        const moto = await putMoto(parseInt(id), data);
+        res.status(200).json(responseSucces("Moto actualizada exitosamente", moto));
     } catch (error) {
         console.error(error);
         let errorCode = 500;
-        let errorMessage = 'INTERNAL_SERVER_ERROR'
-        switch(error.code){
+        let errorMessage = 'INTERNAL_SERVER_ERROR';
+        switch (error.code) {
             case 'DATA_NOT_FOUND':
                 errorCode = 404;
                 errorMessage = error.code;
