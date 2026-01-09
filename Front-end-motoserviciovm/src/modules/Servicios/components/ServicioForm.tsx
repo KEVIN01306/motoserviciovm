@@ -1,28 +1,22 @@
-﻿import React, { useEffect, useState } from 'react';
-import { Grid, TextField, Button, MenuItem, Box, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Paper, Checkbox, Autocomplete, Fab, FormControlLabel, Typography, TableContainer } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
+﻿import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuthStore } from '../../../store/useAuthStore';
 import FormEstructure from '../../../components/utils/FormEstructure';
 import { type ServicioType, ServicioInitialState, ServicioProductoClienteInitialState, type ServicioItemType, type ServicioGetType } from '../../../types/servicioType';
 import { getInventarios } from '../../../services/inventario.services';
-import { getProductos } from '../../../services/producto.services';
 import { getMotos } from '../../../services/moto.services';
 import { getSucursales } from '../../../services/sucursal.services';
-import { getUsers, getUsersClientes, getUsersMecanicos } from '../../../services/users.services';
+import { getUsersClientes, getUsersMecanicos } from '../../../services/users.services';
 import { errorToast } from '../../../utils/toast';
 import type { TipoServicioGetType } from '../../../types/tipoServicioType';
-import { getTipos } from '../../../services/tipoServicio.services';
 import type { SucursalType } from '../../../types/sucursalType';
 import type { UserGetType } from '../../../types/userType';
-import SignatureField from '../../../components/utils/SignatureField';
 import { ModalForm } from '../../Motos/components';
-import ImagenesEditorInput from '../../../components/utils/ImagenesEditorInput';
 import ModalUserCreate from '../../Users/components/ModalUserCreate';
+import MotoSearch from './MotoSearch';
+import MotoInfo from './MotoInfo';
+import ServicioDataForm from './ServicioDataForm';
 
-
-const API_URL = import.meta.env.VITE_DOMAIN;
 
 type Props = {
   initial?: Partial<ServicioGetType>;
@@ -32,24 +26,29 @@ type Props = {
   changeSeHaranVentas? : (value: boolean) => void;
 };
 
-const LOCAL_KEY = 'servicio.create.draft';
+// const LOCAL_KEY = 'servicio.create.draft';
 
 const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVentas, changeSeHaranVentas }: Props) => {
-  const { register, handleSubmit, setValue, reset, formState: { isSubmitting }, watch } = useForm<ServicioType>({ defaultValues: { ...(initial ?? ServicioInitialState) } as any });
+  const { register, handleSubmit, setValue, formState: { isSubmitting }, watch } = useForm<ServicioType>({ defaultValues: { ...(initial ?? ServicioInitialState) } as any });
   const [productosCliente, setProductosCliente] = useState<Array<{ nombre: string; cantidad: number }>>(initial?.productosCliente ?? []);
   const [productoTmp, setProductoTmp] = useState(ServicioProductoClienteInitialState);
-  const [productosList, setProductosList] = useState<any[]>([]);
+  // const [productosList, setProductosList] = useState<any[]>([]);
   const [imagenesFiles, setImagenesFiles] = useState<File[]>([]);
   const [imagenesMeta, setImagenesMeta] = useState<Array<{ descripcion?: string; preview?: string }>>(initial?.imagenesMeta?.map((m:any) => ({ descripcion: m.descripcion ?? '', preview: undefined })) ?? []);
   const [inventarioItems, setInventarioItems] = useState<any[]>([]);
   const [motosList, setMotosList] = useState<any[]>([]);
   const [motoSedected, setMotoSelected] = useState<any>(initial?.moto ?? null);
+  const [placaInput, setPlacaInput] = useState('');
+  const [buscandoPlaca, setBuscandoPlaca] = useState(false);
+  const [motoNoExiste, setMotoNoExiste] = useState(false);
+  const [showModalMoto, setShowModalMoto] = useState(false);
+  const [showModalUser, setShowModalUser] = useState(false);
   const [sucursalesList, setSucursalesList] = useState<any[]>([]);
   const [sucursalSelected, setSucursalSelected] = useState<SucursalType | null>(initial?.sucursal ?? null);
   const user = useAuthStore(state => state.user);
-  const [usersList, setUsersList] = useState<any[]>([]);
+  // const [usersList, setUsersList] = useState<any[]>([]);
   const [servicioItems, setServicioItems] = useState<ServicioItemType[]>(initial?.servicioItems ?? []);
-  const [tiposServicio,setTiposServicio]=useState<TipoServicioGetType[]>([]);
+  const [tiposServicio, setTiposServicio] = useState<TipoServicioGetType[]>([]);
   const [tipoServicioSelected,setTipoServicioSelected]=useState<TipoServicioGetType|null>(initial?.tipoServicio ? initial.tipoServicio : null);
   const [mecanicos,setMecanicos] = useState<UserGetType[]>([])
   const [mecanicoSelected,setMecanicoSelected] = useState<UserGetType|null>(initial?.mecanico? initial.mecanico : null )
@@ -61,7 +60,6 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
 
 
   useEffect(() => {
-    // load draft from localStorage
     const draft = localStorage.getItem(LOCAL_KEY);
     if (draft && !initial) {
       try {
@@ -92,6 +90,8 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
         setInventarioItems(inv);
         const suc = await getSucursales();
         setSucursalesList(suc);
+        // Cargar tipos de servicio
+        const { getTipos } = await import('../../../services/tipoServicio.services');
         const ts = await getTipos();
         setTiposServicio(ts);
         const mn = await getUsersMecanicos();
@@ -123,10 +123,10 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
           setServicioItems(inv.map((it: any) => ({ inventarioId: it.id, checked: false, itemName: it.item ?? undefined, itemDescripcion: '' })));
         }
 
-        const users = await getUsers();
-        const prods = await getProductos();
-        setProductosList(prods);
-        setUsersList(users);
+        if (motoSedected && Array.isArray(motoSedected.users) && motoSedected.users.length > 0) {
+          setClienteSelected(motoSedected.users[0]);
+          setValue('clienteId' as any, motoSedected.users[0].id);
+        }
       } catch (e) { console.error(e); }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -191,7 +191,8 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
       } else if (typeof imagenGuardada === 'string' && imagenGuardada.startsWith('data:image')) {
         // Convertir base64 a File
         const arr = imagenGuardada.split(',');
-        const mime = arr[0].match(/:(.*?);/)[1];
+        const mimeMatch = arr[0].match(/:(.*?);/);
+        const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
         const bstr = atob(arr[1]);
         let n = bstr.length;
         const u8arr = new Uint8Array(n);
@@ -202,230 +203,130 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
     }
     await onSubmit(payload);
   };
-  
+
   return (
-    <FormEstructure handleSubmit={handleSubmit(internalSubmit)} pGrid={2}>
-      <Grid size={{ xs: 12 }}>
-        <TextField {...register('descripcion' as any)} label="Descripción" fullWidth variant="standard" />
-      </Grid>
+    <FormEstructure handleSubmit={handleSubmit(internalSubmit)} sx={{}}>
+      <MotoSearch
+        placaInput={placaInput}
+        setPlacaInput={setPlacaInput}
+        onBuscar={async () => {
+          setBuscandoPlaca(true);
+          setMotoNoExiste(false);
+          const found = motosList.find((m: any) => m.placa === placaInput);
+          if (found) {
+            setMotoSelected(found);
+            setValue('motoId' as any, found.id);
+            if (found.users && found.users.length > 0) {
+              setClienteSelected(found.users[0]);
+              setValue('clienteId' as any, found.users[0].id);
+            } else {
+              setClienteSelected(null);
+              setValue('clienteId' as any, null);
+            }
+          } else {
+            setMotoSelected(null);
+            setValue('motoId' as any, null);
+            setMotoNoExiste(true);
+          }
+          setBuscandoPlaca(false);
+        }}
+        buscandoPlaca={buscandoPlaca}
+        motoSedected={motoSedected}
+        motoNoExiste={motoNoExiste}
+        onCrearMoto={() => setShowModalMoto(true)}
+        onCambiarPlaca={() => {
+          setMotoSelected(null);
+          setValue('motoId' as any, null);
+          setClienteSelected(null);
+          setValue('clienteId' as any, null);
+          setPlacaInput('');
+        }}
+      />
 
-      <Grid size={{ xs: 12, sm: 6 }} display={'flex'} flexDirection={'row'}>
-        <Grid size={{ xs: 10, sm: 10 }}>
-          <Autocomplete
-          options={motosList}
-          getOptionLabel={(opt: any) => opt?.placa ?? `Moto ${opt?.id}`}
-          value={motoSedected}
-          onChange={(_, newVal) => {
-            setMotoSelected(newVal ?? null);
-            setValue('motoId' as any, newVal?.id ?? 0);
+      {showModalMoto && (
+        <ModalForm
+          onFinish={async () => {
+            setShowModalMoto(false);
+            await getUpdateMotos();
+            const nueva = motosList.find((m: any) => m.placa === placaInput);
+            if (nueva) {
+              setMotoSelected(nueva);
+              setValue('motoId' as any, nueva.id);
+            }
           }}
-          isOptionEqualToValue={(option: any, value: any) => Number(option?.id) === Number(value?.id)}
-          renderInput={(params) => <TextField {...params} label="Moto" variant="standard" fullWidth />}
         />
-        </Grid>
-          <ModalForm onFinish={getUpdateMotos} />
-      </Grid>
+      )}
 
-       <Grid size={{ xs: 12, sm: 6 }}>
-        <TextField {...register('kilometraje' as any, { valueAsNumber: true})} label="Kilometraje" type="number" fullWidth variant="standard" />
-      </Grid>
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <Autocomplete
-          options={sucursalesList}
-          getOptionLabel={(opt: any) => opt?.nombre ?? `Sucursal ${opt?.id}`}
-          value={sucursalSelected}
-          onChange={(_, newVal) => {
-            setSucursalSelected(newVal ?? null);
-            setValue('sucursalId' as any, newVal?.id ?? 0);
+      <MotoInfo
+        motoSedected={motoSedected}
+        onCrearUser={() => setShowModalUser(true)}
+      />
+
+      {showModalUser && (
+        <ModalUserCreate
+          onFinish={async () => {
+            setShowModalUser(false);
+            // Refrescar motos y buscar la placa para actualizar la moto seleccionada y sus usuarios
+            const nuevasMotos = await getMotos();
+            setMotosList(nuevasMotos);
+            const found = nuevasMotos.find((m: any) => m.placa === placaInput);
+            if (found) {
+              setMotoSelected(found);
+              setValue('motoId' as any, found.id);
+              // Si tiene users, seleccionar el primero
+              if (found.users && found.users.length > 0) {
+                setClienteSelected(found.users[0]);
+                setValue('clienteId' as any, found.users[0].id);
+              } else {
+                setClienteSelected(null);
+                setValue('clienteId' as any, null);
+              }
+            }
           }}
-          isOptionEqualToValue={(option: any, value: any) => Number(option?.id) === Number(value?.id)}
-          renderInput={(params) => <TextField {...params} label="Sucursal" variant="standard" fullWidth />}
         />
-      </Grid>
+      )}
 
-       <Grid size={{ xs: 12, sm: 6 }}>
-          <Autocomplete
-          options={mecanicos}
-          getOptionLabel={(opt: any) => `${opt?.primerNombre} ${opt?.primerApellido} - ${opt?.dpi || opt?.nit || ""}`}
-          value={mecanicoSelected}
-          onChange={(_, newVal) => {
-            setMecanicoSelected(newVal ?? null);
-            setValue('mecanicoId' as any, newVal?.id ?? 0);
-          }}
-          isOptionEqualToValue={(option: any, value: any) => Number(option?.id) === Number(value?.id)}
-          renderInput={(params) => <TextField {...params} label="Mecanico asignado" variant="standard" fullWidth />}
+      {/* El resto del formulario solo si hay moto seleccionada */}
+      {motoSedected && (
+        <ServicioDataForm
+          register={register}
+          productosCliente={productosCliente}
+          productoTmp={productoTmp}
+          setProductoTmp={setProductoTmp}
+          addProductoCliente={addProductoCliente}
+          removeProductoCliente={removeProductoCliente}
+          sucursalesList={sucursalesList}
+          sucursalSelected={sucursalSelected}
+          setSucursalSelected={setSucursalSelected}
+          setValue={setValue}
+          mecanicos={mecanicos}
+          mecanicoSelected={mecanicoSelected}
+          setMecanicoSelected={setMecanicoSelected}
+          clientes={motoSedected.users ?? []}
+          clienteSelected={clienteSelected}
+          setClienteSelected={setClienteSelected}
+          tiposServicio={tiposServicio}
+          tipoServicioSelected={tipoServicioSelected}
+          setTipoServicioSelected={setTipoServicioSelected}
+          servicioItems={servicioItems}
+          inventarioItems={inventarioItems}
+          toggleServicioItem={toggleServicioItem}
+          updateServicioItem={updateServicioItem}
+          imagenesFiles={imagenesFiles}
+          imagenesMeta={imagenesMeta}
+          handleImagenesChange={handleImagenesChange}
+          seHaranVentas={seHaranVentas}
+          changeSeHaranVentas={changeSeHaranVentas}
+          isSubmitting={isSubmitting}
+          submitLabel={submitLabel}
+          imagenGuardada={imagenGuardada}
+          setImagenGuardada={setImagenGuardada}
+          watch={watch}
         />
-        </Grid>
-
-       <Grid size={{ xs: 12, sm: 6 }}>
-          <Grid size={{ xs: 10, sm: 10 }}>
-
-              <Autocomplete
-              options={clientes}
-              getOptionLabel={(opt: any) => `${opt?.primerNombre} ${opt?.primerApellido} - ${opt?.dpi || opt?.nit || ""}`}
-              value={clienteSelected}
-              onChange={(_, newVal) => {
-                setClienteSelected(newVal ?? null);
-                setValue('clienteId' as any, newVal?.id ?? null);
-              }}
-              isOptionEqualToValue={(option: any, value: any) => Number(option?.id) === Number(value?.id)}
-              renderInput={(params) => <TextField {...params} label="Cliente" variant="standard" fullWidth />}
-            />
-          </Grid> 
-            <ModalUserCreate onFinish={getUpdateClientes} />
-      </Grid>
-
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <Autocomplete
-          options={tiposServicio}
-          getOptionLabel={(opt: TipoServicioGetType) => opt?.tipo ?? `Tipo Servicio ${opt?.id}`}
-          value={tipoServicioSelected}
-          onChange={(_, newVal) => {
-            console.log('Selected tipo servicio:', newVal);
-            setTipoServicioSelected(newVal ?? null);
-            setValue('tipoServicioId' as any, newVal?.id ?? 0);
-          }}
-          isOptionEqualToValue={(option: any, value: any) => Number(option?.id) === Number(value?.id)}
-          renderInput={(params) => <TextField {...params} label="Tipo Servicio" variant="standard" fullWidth />}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12 }}>
-        <Paper sx={{ p: 2 }}>
-          <Grid container spacing={1} alignItems="center">
-            <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField label="Producto cliente" variant="standard" fullWidth value={productoTmp.nombre} onChange={(e) => setProductoTmp(s => ({ ...s, nombre: e.target.value }))} />
-                 
-              </Grid>
-            <Grid size={{ xs: 12, sm: 3 }}>
-              <TextField label="Cantidad" type="number" value={productoTmp.cantidad} onChange={(e) => setProductoTmp(s => ({ ...s, cantidad: Number(e.target.value) }))} fullWidth variant="standard" />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 3 }}>
-              <Button startIcon={<AddIcon />} variant="contained" onClick={addProductoCliente} fullWidth>Agregar</Button>
-            </Grid>
-          </Grid>
-          
-          <TableContainer sx={{ width: '100%', overflowX: 'auto' }}>
-
-          <Table size="small" sx={{ mt: 2 }}>
-            <TableHead>
-              <TableRow>
-                <TableCell>Nombre</TableCell>
-                <TableCell>Cantidad</TableCell>
-                <TableCell>Acciones</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {productosCliente.map((p, idx) => (
-                <TableRow key={idx}>
-                  <TableCell>{p.nombre}</TableCell>
-                  <TableCell>{p.cantidad}</TableCell>
-                  <TableCell><IconButton onClick={() => removeProductoCliente(idx)}><DeleteIcon /></IconButton></TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          </TableContainer>
-        </Paper>
-      </Grid>
-      {
-        tipoServicioSelected?.servicioCompleto && (
-          <Grid size={{ xs: 12 }}>
-        <Paper sx={{ p: 2 }}>
-          <Box sx={{ mb: 1, fontWeight: 700 }}>Items de Inventario</Box>
-          <TableContainer sx={{ width: '100%', overflowX: 'auto' }}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>Item</TableCell>
-                <TableCell>Presente</TableCell>
-                <TableCell>Descripción (si no está presente)</TableCell>
-                <TableCell>Notas</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {servicioItems.map((it, idx) => {
-                const inv = inventarioItems.find(i => i.id === it.inventarioId);
-                return (
-                  <TableRow key={idx}>
-                    <TableCell>{inv?.item ?? `#${it.inventarioId}`}</TableCell>
-                    <TableCell>
-                      <Checkbox checked={!!it.checked} onChange={(e) => toggleServicioItem(idx, e.target.checked)} />
-                    </TableCell>
-                    <TableCell>
-                      <TextField fullWidth variant="standard" value={it.itemDescripcion ?? ''} onChange={(e) => updateServicioItem(idx, { itemDescripcion: e.target.value })} disabled={!!it.checked} />
-                    </TableCell>
-                    <TableCell>
-                      <TextField fullWidth variant="standard" value={it.notas ?? ''} onChange={(e) => updateServicioItem(idx, { notas: e.target.value })} />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-          </TableContainer>
-        </Paper>
-      </Grid>)
-      }
-      {
-        seHaranVentas != null && (
-              <Grid size={{ xs: 12 }}>
-                <FormControlLabel label="Se haran ventas?" control={
-                  <Checkbox checked={seHaranVentas} onChange={(e: any) => changeSeHaranVentas(e.target.checked)} />
-                }/>
-              </Grid>
-        )
-      }
-
-      <Grid size={{ xs: 12 }}>
-        <ImagenesEditorInput
-          value={{ files: imagenesFiles, metas: imagenesMeta }}
-          onChange={({ files, metas }) => handleImagenesChange(files, metas)}
-        />
-      </Grid>
-
-
-      <Grid size={{ xs: 12 }}>
-        <Typography variant='h6' textAlign={'center'} marginBottom={4}>
-          Firma del cliente
-        </Typography>
-
-        <SignatureField
-          onSaveSignature={(data: any) => setImagenGuardada(data)}
-          initialValue={typeof imagenGuardada === 'string' ? `${API_URL}/${imagenGuardada}` : undefined}
-          text="Firmar Hoja de recepción"
-        />
-      </Grid>
-      
-        
-      <Grid size={{ xs: 12 }}>
-        <Button type="submit" variant="contained" fullWidth disabled={isSubmitting}>{submitLabel}</Button>
-      </Grid>
+      )}
     </FormEstructure>
   );
 };
 
 export default ServicioForm;
 
-
-/*
-      <Grid size={{ xs: 12 }}>
-        <Box sx={{ mb: 1 }}>Subir imágenes (puede usar cámara en móviles)</Box>
-        <Button variant="outlined" component="label">Seleccionar imágenes<input hidden multiple type="file" accept="image/*" capture onChange={onFiles} /></Button>
-
-        {imagenesMeta.length > 0 && (
-          <Paper sx={{ mt: 2, p: 2 }}>
-            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-              {imagenesMeta.map((m, idx) => (
-                <Paper key={idx} sx={{ p: 1, width: 160 }}>
-                  {m.preview ? <img src={m.preview} alt={`img-${idx}`} style={{ width: '100%', height: 90, objectFit: 'cover', borderRadius: 4 }} /> : <Box sx={{ width: '100%', height: 90, bgcolor: '#f0f0f0' }} />}
-                  <TextField fullWidth size="small" placeholder="Descripción" value={m.descripcion} onChange={(e) => setImagenesMeta(s => s.map((it, i) => i === idx ? { ...it, descripcion: e.target.value } : it))} sx={{ mt: 1 }} />
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
-                    <IconButton size="small" onClick={() => removeImage(idx)}><DeleteIcon fontSize="small" /></IconButton>
-                  </Box>
-                </Paper>
-              ))}
-            </Box>
-          </Paper>
-        )}
-      </Grid>*/

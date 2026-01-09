@@ -84,7 +84,7 @@ const ModalUserCreate: React.FC<ModalUserCreateProps> = ({ onFinish }) => {
                             <Grid size={12}>
                             </Grid>
                             <Grid size={12}>
-                                <Button type="submit" variant="contained" color="primary" disabled={isSubmitting} fullWidth>
+                                <Button type="button" onClick={handleSubmit(handlerSubmit)} variant="contained" color="primary" disabled={isSubmitting} fullWidth>
                                     Guardar usuario
                                 </Button>
                             </Grid>
