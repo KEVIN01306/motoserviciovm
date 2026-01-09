@@ -20,10 +20,13 @@ const ItemsSider = () => {
   const userPermisos = user?.permisos || [];
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
 
-  const visibleGroups = MenuItems.map((group) => {
+  // Separar items con y sin 'module'
+  const visibleGroups = MenuItems.filter((group: any) => group.module).map((group) => {
     const children = (group.children || []).filter((c: any) => userPermisos.includes(c.permiso));
     return { ...group, children };
   }).filter((g) => (g.children || []).length > 0);
+
+  const visibleSingles = MenuItems.filter((item: any) => !item.module && userPermisos.includes(item.permiso));
 
   const toggleGroup = (moduleName: string) => {
     setOpenGroups((prev) => ({ ...prev, [moduleName]: !prev[moduleName] }));
@@ -35,6 +38,19 @@ const ItemsSider = () => {
         <Avatar variant="rounded" src="/public/icons/logo_mediano.png" sx={{ width: "100px", padding: "1px" }} />
       </Toolbar>
       <List>
+        {/* Items sin módulo, menú directo */}
+        {visibleSingles.map((item: any) => {
+          const Icon = item.icon as any;
+          return (
+            <ListItem key={item.name} disablePadding style={{overflowWrap: "anywhere"}}>
+              <ListItemButton onClick={() => (item.link ? goTo(item.link) : null)}>
+                <ListItemIcon sx={{ color: "#596d80", minWidth: 35 }}>{Icon ? <Icon /> : null}</ListItemIcon>
+                <ListItemText sx={{ color: "#596d80" }} primary={item.name} />
+              </ListItemButton>
+            </ListItem>
+          );
+        })}
+        {/* Items con módulo, menú colapsable */}
         {visibleGroups.map((group: any) => {
           const Icon = group.icon as any;
           const isOpen = !!openGroups[group.module];

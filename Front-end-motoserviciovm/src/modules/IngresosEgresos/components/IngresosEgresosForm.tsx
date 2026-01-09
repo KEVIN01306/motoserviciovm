@@ -72,6 +72,7 @@ const IngresosEgresosForm = forwardRef((props: Props, ref) => {
       <Grid size={{ xs: 12, sm: 6 }}>
         <TextField select {...register('tipoId' as any)} defaultValue={initial?.tipoId ?? tiposContabilidad().egreso} label="Tipo" fullWidth variant="standard">
           <MenuItem key={tiposContabilidad().egreso} selected value={tiposContabilidad().egreso}>Egreso</MenuItem>
+          <MenuItem key={tiposContabilidad().ingreso} value={tiposContabilidad().ingreso}>Ingreso</MenuItem>
         </TextField>
       </Grid>
 
@@ -85,7 +86,9 @@ const IngresosEgresosForm = forwardRef((props: Props, ref) => {
           renderInput={(params) => <TextField {...params} label="Sucursal" variant="standard" fullWidth />}
         />
       </Grid>
-
+      {
+        
+      }
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField select {...register('moduloTallerId' as any, { valueAsNumber: true })} defaultValue={initial?.moduloTallerId} fullWidth label="Módulo" variant="standard" >
              <MenuItem selected value={1}>Taller</MenuItem>

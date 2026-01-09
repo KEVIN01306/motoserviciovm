@@ -249,9 +249,7 @@ const ServicioDetailSalida = () => {
                                     <Box sx={{ mb: 4, mt: 3 }} >
                                         <Typography variant="h6" gutterBottom>En Reparación</Typography>
                                         <Typography variant='body2' gutterBottom>{data.enReparaciones[0].descripcion}</Typography>
-                                        <Typography variant="h6" sx={{ mt: 2 }}>
-                                            {`Total Reparacion ${data.enReparaciones[0].total ? `Q ${data.enReparaciones[0].total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'Q 0.00'}`}
-                                        </Typography>
+                                        
                                         <Chip label={data.enReparaciones[0]?.estado.estado ?? ''} color={chipColorByEstado(data.enReparaciones[0]?.estado.id)} sx={{ mb: 2 }} variant='outlined' />
                                     </Box>
 
@@ -283,9 +281,7 @@ const ServicioDetailSalida = () => {
                                         </Typography>
 
                                         <Chip label={data.enParqueos[0]?.estado.estado ?? ''} color={chipColorByEstado(data.enParqueos[0]?.estado.id)} sx={{ mb: 2 }} variant='outlined' />
-                                        <Typography variant="h6" sx={{ mt: 2 }}>
-                                            {`Total Parqueo ${data.enParqueos[0].total ? `Q ${data.enParqueos[0].total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'Q 0.00'}`}
-                                        </Typography>                  </Box>
+                                                        </Box>
                                     <Divider sx={{ my: 4 }} />
                                 </>
                             )
@@ -350,14 +346,7 @@ const ServicioDetailSalida = () => {
                         </Box>
 
 
-                        <Box sx={{ mb: 2 }}>
-                            {dataTableTotales.map((item, index) => (
-                                <Box key={index} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, borderTop: index === 0 ? '1px solid #e0e0e0' : 'none', pt: index === 0 ? 1 : 0 }}>
-                                    <Typography sx={{ color: '#6b7280', fontWeight: 600 }}>{item.label}</Typography>
-                                    <Typography>{item.value}</Typography>
-                                </Box>
-                            ))}
-                        </Box>
+
 
 
                         <Grid size={10}>

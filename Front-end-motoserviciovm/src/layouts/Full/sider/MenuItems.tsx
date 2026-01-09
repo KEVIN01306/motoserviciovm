@@ -1,70 +1,62 @@
 import { PiUserCheckDuotone, PiUsersDuotone, PiListNumbersBold, PiTrademarkRegisteredBold, PiCylinderBold, PiCashRegisterDuotone } from "react-icons/pi";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
-import { AdminPanelSettings, AutoFixHighOutlined, StoreMallDirectoryOutlined } from "@mui/icons-material";
+import { AutoFixHighOutlined, StoreMallDirectoryOutlined } from "@mui/icons-material";
 import { RiBikeFill, RiEBikeLine, RiProductHuntLine } from "react-icons/ri";
 import { IoCubeSharp } from "react-icons/io5";
-import { AiTwotoneHome } from "react-icons/ai";screenTop
+import { AiTwotoneHome } from "react-icons/ai"; screenTop
 /**
  * Grouped menu structure: each entry is a module group with a title and children items.
  */
 const MenuItems = [
+
+    // Orden original respetado, agrupando primero los items individuales en el orden dado
+    { name: "INGRESO", link: "/admin/servicios", icon: AutoFixHighOutlined, permiso: "servicios:view" },
+    { name: "VENTAS", link: "/admin/ventas", icon: RiProductHuntLine, permiso: "ventas:view" },
+    { name: "INGRESOS/EGRESOS", link: "/admin/ingresos-egresos", icon: PiListNumbersBold, permiso: "ingresos-egresos:view" },
+    { name: "CONTABILIDAD", link: "/admin/contabilidad", icon: PiCashRegisterDuotone, permiso: "contabilidad:view" },
     {
-        module: "Panel",
-        icon: AdminPanelSettings,
-        children: [
-            { name: "Home", link: "/admin", icon: AiTwotoneHome  , permiso: "home:view" },
-            { name: "Contabilidad", link: "/admin/contabilidad", icon: PiCashRegisterDuotone, permiso: "contabilidad:view" },
-        ],
-    },
-    {
-        module: "Motos",
+        module: "MOTOS",
         icon: RiBikeFill,
         children: [
-            { name: "Líneas", link: "/admin/lineas", icon: PiListNumbersBold, permiso: "lineas:view" },
-            { name: "Cilindradas", link: "/admin/cilindrada", icon: PiCylinderBold, permiso: "cilindradas:view" },
-            { name: "Marcas", link: "/admin/marcas", icon: PiTrademarkRegisteredBold, permiso: "marcas:view" },
-            { name: "Modelos", link: "/admin/modelos", icon: RiEBikeLine, permiso: "modelos:view" },
-            { name: "Motos", link: "/admin/motos", icon: RiBikeFill, permiso: "motos:view" },
-            { name: "En Parqueo", link: "/admin/enparqueo", icon: RiBikeFill, permiso: "enparqueo:view" },
-            { name: "En Reparación", link: "/admin/enreparacion", icon: IoCubeSharp, permiso: "enreparacion:view" },
-        ],
-    },
-    {
-        module: "Servicios",
-        icon: AutoFixHighOutlined,
-        children: [
-            { name: "Opciones de Servicio", link: "/admin/opcionservicio", icon: PiListNumbersBold, permiso: "opcioneservicios:view" },
-            { name: "Tipos de Servicio", link: "/admin/tiposervicio", icon: PiListNumbersBold, permiso: "tiposervicios:view" },
-            { name: "Inventarios", link: "/admin/inventarios", icon: IoCubeSharp, permiso: "inventarios:view" },
-            { name: "Servicios", link: "/admin/servicios", icon: AutoFixHighOutlined, permiso: "servicios:view" },
+            { name: "LÍNEAS", link: "/admin/lineas", icon: PiListNumbersBold, permiso: "lineas:view" },
+            { name: "CILINDRADAS", link: "/admin/cilindrada", icon: PiCylinderBold, permiso: "cilindradas:view" },
+            { name: "MARCAS", link: "/admin/marcas", icon: PiTrademarkRegisteredBold, permiso: "marcas:view" },
+            { name: "MODELOS", link: "/admin/modelos", icon: RiEBikeLine, permiso: "modelos:view" },
+            { name: "EN PARQUEO", link: "/admin/enparqueo", icon: RiBikeFill, permiso: "enparqueo:view" },
+            { name: "EN REPARACIÓN", link: "/admin/enreparacion", icon: IoCubeSharp, permiso: "enreparacion:view" },
+            { name: "MOTOS", link: "/admin/motos", icon: RiBikeFill, permiso: "motos:view" },
         ]
     },
+    // Luego los módulos en el orden dado
     {
-        module: "Productos",
+        module: "SERVICIOS",
+        icon: AutoFixHighOutlined,
+        children: [
+            { name: "OPCIONES DE SERVICIO", link: "/admin/opcionservicio", icon: PiListNumbersBold, permiso: "opcioneservicios:view" },
+            { name: "TIPOS DE SERVICIO", link: "/admin/tiposervicio", icon: PiListNumbersBold, permiso: "tiposervicios:view" },
+            { name: "INVENTARIOS", link: "/admin/inventarios", icon: IoCubeSharp, permiso: "inventarios:view" },
+        ]
+    },
+
+    {
+        module: "PRODUCTOS",
         icon: IoCubeSharp,
         children: [
-            { name: "Categorías de Producto", link: "/admin/categoriaproducto", icon: PiListNumbersBold, permiso: "categoriaproducto:view" },
-            { name: "Productos", link: "/admin/productos", icon: IoCubeSharp, permiso: "productos:view" },
-            { name: "Ventas", link: "/admin/ventas", icon: RiProductHuntLine, permiso: "ventas:view" },
+            { name: "CATEGORÍAS DE PRODUCTO", link: "/admin/categoriaproducto", icon: PiListNumbersBold, permiso: "categoriaproducto:view" },
+            { name: "PRODUCTOS", link: "/admin/productos", icon: IoCubeSharp, permiso: "productos:view" },
         ],
     },
     {
-        module: "Ingresos/Egresos",
-        icon: PiListNumbersBold,
-        children: [
-            { name: "Ingresos/Egresos", link: "/admin/ingresos-egresos", icon: PiListNumbersBold, permiso: "ingresos-egresos:view" },
-        ],
-    },
-    {
-        module: "Administración",
+        module: "ADMINISTRACIÓN",
         icon: MdOutlineAdminPanelSettings,
         children: [
-            { name: "Sucursales", link: "/admin/sucursales", icon: StoreMallDirectoryOutlined, permiso: "sucursales:view" },
-            { name: "Usuarios", link: "/admin/users", icon: PiUserCheckDuotone, permiso: "usuarios:view" },
-            { name: "Roles", link: "/admin/roles", icon: PiUsersDuotone, permiso: "roles:view" },
-            { name: "Permisos", link: "/admin/permisos", icon: AutoFixHighOutlined, permiso: "permisos:view" },
+            { name: "SUCURSALES", link: "/admin/sucursales", icon: StoreMallDirectoryOutlined, permiso: "sucursales:view" },
+            { name: "USUARIOS", link: "/admin/users", icon: PiUserCheckDuotone, permiso: "usuarios:view" },
+            { name: "ROLES", link: "/admin/roles", icon: PiUsersDuotone, permiso: "roles:view" },
+            { name: "PERMISOS", link: "/admin/permisos", icon: AutoFixHighOutlined, permiso: "permisos:view" },
         ],
     },
+    { name: "HOME", link: "/admin", icon: AiTwotoneHome, permiso: "home:view" },
 ];
 
 export default MenuItems;
