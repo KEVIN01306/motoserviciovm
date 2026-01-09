@@ -34,7 +34,7 @@ const HistorialServicio = () => {
     const [serviciosError, setServiciosError] = useState<string | null>(null);
     // Fechas por defecto: 1 de enero del año actual y hoy
     const defaultStart = dayjs().startOf('year').format('YYYY-MM-DD');
-    const defaultEnd = dayjs().format('YYYY-MM-DD');
+    const defaultEnd = dayjs().endOf('year').format('YYYY-MM-DD');
     const [startDate, setStartDate] = useState(defaultStart);
     const [endDate, setEndDate] = useState(defaultEnd);
 
