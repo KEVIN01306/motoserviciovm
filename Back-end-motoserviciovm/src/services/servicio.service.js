@@ -22,11 +22,12 @@ const getServicios = async (filters = {}) => {
         include: { moto: true, sucursal: true, cliente: true, mecanico: true, estado: true },
     });
 
-    if (!items || items.length === 0) {
+    /*if (!items || items.length === 0) {
         const error = new Error('DATA_NOT_FOUND');
         error.code = 'DATA_NOT_FOUND';
         throw error;
     }
+        */
 
     return items;
 }
