@@ -113,6 +113,7 @@ export const ServicioInitialState: ServicioType = {
   imagenesMeta: [],
   estadoId: estados().enServicio,
   kilometrajeProximoServicio: 0,
+  opcionesServicioManual: [],
 };
 
 export const ServicioItemInitialState: ServicioItemType = {
@@ -149,6 +150,7 @@ export const mergeServicioDataWithDefaults = (apiData: Partial<ServicioType>): P
     productosCliente: apiData.productosCliente ?? ServicioInitialState.productosCliente,
     imagenesMeta: apiData.imagenesMeta ?? ServicioInitialState.imagenesMeta,
     kilometraje: apiData.kilometraje ?? ServicioInitialState.kilometraje,
+    opcionesServicioManual: apiData.opcionesServicioManual ?? ServicioInitialState.opcionesServicioManual,
   };
 };
 

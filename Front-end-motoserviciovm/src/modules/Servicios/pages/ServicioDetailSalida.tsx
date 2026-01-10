@@ -37,7 +37,7 @@ const ServicioDetailSalida = () => {
             setLoading(true);
             const res = await getServicio(id);
             setData(res);
-
+            console.log(res);
         } catch (err: any) {
             setError(err?.message ?? 'Error cargando servicio');
         } finally { setLoading(false); }
@@ -249,7 +249,7 @@ const ServicioDetailSalida = () => {
                                     <Box sx={{ mb: 4, mt: 3 }} >
                                         <Typography variant="h6" gutterBottom>En Reparación</Typography>
                                         <Typography variant='body2' gutterBottom>{data.enReparaciones[0].descripcion}</Typography>
-                                        
+
                                         <Chip label={data.enReparaciones[0]?.estado.estado ?? ''} color={chipColorByEstado(data.enReparaciones[0]?.estado.id)} sx={{ mb: 2 }} variant='outlined' />
                                     </Box>
 
@@ -272,30 +272,43 @@ const ServicioDetailSalida = () => {
                                 <>
                                     <Divider sx={{ my: 4 }} />
                                     <Box sx={{ mb: 2, mt: 3 }} >
-                                        <Typography  variant="h6" gutterBottom>En Parqueo</Typography>
+                                        <Typography variant="h6" gutterBottom>En Parqueo</Typography>
                                         <Typography variant='body2' gutterBottom>{data.enParqueos[0].descripcion}</Typography>
-                                        <Typography  variant='body2' gutterBottom>{`Desde: ${data.enParqueos[0].fechaEntrada ? formatDate(data.enParqueos[0].fechaEntrada as any) : '-'}`}</Typography>
-                                        <Typography  variant='body2' gutterBottom>{`Fecha Salida: ${data.enParqueos[0].fechaSalida ? formatDate(data.enParqueos[0].fechaSalida as any) : '-'}`}</Typography>
+                                        <Typography variant='body2' gutterBottom>{`Desde: ${data.enParqueos[0].fechaEntrada ? formatDate(data.enParqueos[0].fechaEntrada as any) : '-'}`}</Typography>
+                                        <Typography variant='body2' gutterBottom>{`Fecha Salida: ${data.enParqueos[0].fechaSalida ? formatDate(data.enParqueos[0].fechaSalida as any) : '-'}`}</Typography>
                                         <Typography variant="body2" >
                                             Dias en parqueo: {new Date().getDate() - new Date(data.enParqueos[0].createdAt ? data.enParqueos[0].createdAt : '').getDate()}
                                         </Typography>
 
                                         <Chip label={data.enParqueos[0]?.estado.estado ?? ''} color={chipColorByEstado(data.enParqueos[0]?.estado.id)} sx={{ mb: 2 }} variant='outlined' />
-                                                        </Box>
+                                    </Box>
                                     <Divider sx={{ my: 4 }} />
                                 </>
                             )
                         }
 
                         <Typography variant="h5" m={2} gutterBottom>{data.tipoServicio?.tipo ?? ''}</Typography>
-
+                        {
+                            data.tipoServicio?.cantidadOpcionesServicio === 0 ? (
+                                <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
+                                    {data.tipoServicio?.opcionServicios?.map((item: OpcionServicioType) => (
+                                        <li key={item.id}>
+                                            <Typography variant="body1">{item.opcion}</Typography>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ):(
                         <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
-                            {data.tipoServicio?.opcionServicios?.map((item: OpcionServicioType) => (
+                            {data.servicioOpcionesTipoServicio?.map((item: any) => (
                                 <li key={item.id}>
-                                    <Typography variant="body1">{item.opcion}</Typography>
+                                    <Typography variant="body1">{item.opcionServicio?.opcion}</Typography>
                                 </li>
                             ))}
                         </ul>
+
+                        )
+
+                        }
 
 
                         <Divider sx={{ my: 2 }} />

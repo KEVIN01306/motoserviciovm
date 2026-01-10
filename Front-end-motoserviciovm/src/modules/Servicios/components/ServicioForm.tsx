@@ -94,6 +94,7 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
         const { getTipos } = await import('../../../services/tipoServicio.services');
         const ts = await getTipos();
         setTiposServicio(ts);
+        console.log('Mecanicos loading in ServicioForm', ts);
         const mn = await getUsersMecanicos();
         setMecanicos(mn)
         getUpdateClientes();

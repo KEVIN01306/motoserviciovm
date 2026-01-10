@@ -5,6 +5,11 @@ const getTiposServicio = async () => {
     const tipos = await prisma.tipoServicio.findMany({
         where: { estadoId: estados().activo },
         orderBy: { tipo: 'asc' },
+        include: {
+            _count: {
+                select: { opcionServicios: true },
+            },
+        },
     });
 
     if (!tipos) {
@@ -12,7 +17,10 @@ const getTiposServicio = async () => {
         error.code = 'DATA_NOT_FOUND';
         throw error;
     }
-    return tipos;
+    return tipos.map(tipo => ({
+        ...tipo,
+        cantidadOpcionesServicio: tipo._count.opcionServicios,
+    }));
 };
 
 const getTipoServicio = async (id) => {

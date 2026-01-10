@@ -6,6 +6,7 @@ export type TipoServicioType = z.infer<typeof tipoServicioSchema>;
 
 export type TipoServicioGetType = Omit<TipoServicioType,  'opcionServicios'> & {
     opcionServicios: OpcionServicioType[];
+    cantidadOpcionesServicio: number;
 }
 
 export const TipoServicioInitialState = {

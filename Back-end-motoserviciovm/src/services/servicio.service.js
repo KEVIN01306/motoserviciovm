@@ -39,22 +39,24 @@ const getServicio = async (id) => {
 }
 
 const postServicio = async (data) => {
-    const { servicioItems, productosCliente, imagenesMeta, imagenFiles, ...base } = data;
+    const { servicioItems, productosCliente, imagenesMeta, imagenFiles, opcionesServicioManual, ...base } = data;
     const uploaded = Array.isArray(imagenFiles) ? imagenFiles : [];
-    const fechaEntrada = new Date() 
+    const fechaEntrada = new Date();
 
-    base.fechaEntrada = fechaEntrada
+    base.fechaEntrada = fechaEntrada;
 
     try {
         const result = await prisma.$transaction(async (tx) => {
             // validate inventario ids if provided
             if (Array.isArray(servicioItems) && servicioItems.length > 0) {
-                const ids = [...new Set(servicioItems.map(s => s.inventarioId))];
+                const ids = [...new Set(servicioItems.map((s) => s.inventarioId))];
                 const existentes = await tx.inventario.findMany({ where: { id: { in: ids } }, select: { id: true } });
-                const existentesIds = existentes.map(e => e.id);
-                const missing = ids.filter(i => !existentesIds.includes(i));
+                const existentesIds = existentes.map((e) => e.id);
+                const missing = ids.filter((i) => !existentesIds.includes(i));
                 if (missing.length > 0) {
-                    const error = new Error('DATA_NOT_FOUND_INVENTARIO'); error.code = 'DATA_NOT_FOUND_INVENTARIO'; throw error;
+                    const error = new Error("DATA_NOT_FOUND_INVENTARIO");
+                    error.code = "DATA_NOT_FOUND_INVENTARIO";
+                    throw error;
                 }
             }
 
@@ -63,7 +65,16 @@ const postServicio = async (data) => {
             // create servicioItems
             if (Array.isArray(servicioItems) && servicioItems.length > 0) {
                 for (const si of servicioItems) {
-                    await tx.servicioInventario.create({ data: { servicioId: created.id, inventarioId: si.inventarioId, checked: !!si.checked, itemName: si.itemName ?? null, itemDescripcion: si.itemDescripcion ?? null, notas: si.notas ?? null } });
+                    await tx.servicioInventario.create({
+                        data: {
+                            servicioId: created.id,
+                            inventarioId: si.inventarioId,
+                            checked: !!si.checked,
+                            itemName: si.itemName ?? null,
+                            itemDescripcion: si.itemDescripcion ?? null,
+                            notas: si.notas ?? null,
+                        },
+                    });
                     await pause(30);
                 }
             }
@@ -71,20 +82,28 @@ const postServicio = async (data) => {
             // create productosCliente
             if (Array.isArray(productosCliente) && productosCliente.length > 0) {
                 for (const pc of productosCliente) {
-                    await tx.servicioProductoCliente.create({ data: { nombre: pc.nombre, cantidad: pc.cantidad, servicioId: created.id } });
+                    await tx.servicioProductoCliente.create({
+                        data: { nombre: pc.nombre, cantidad: pc.cantidad, servicioId: created.id },
+                    });
                     await pause(30);
                 }
             }
 
             // create ServicioOpcionesTipoServicio
-            const opciones = await tx.opcionServicio.findMany({
+            let opciones = await tx.opcionServicio.findMany({
                 where: { tipoServicios: { some: { id: base.tipoServicioId } } },
             });
 
-            await tx.moto.update({
-                where: { id: base.motoId },
-                data: { estadoId: estados().enServicio },
-            });
+            if (opciones.length === 0 && Array.isArray(opcionesServicioManual) && opcionesServicioManual.length > 0) {
+                // Ensure opcionesServicioManual is parsed as an array of integers
+                const parsedOpcionesServicioManual = opcionesServicioManual.map((item) =>
+                    typeof item === "string" ? JSON.parse(item) : item
+                ).flat();
+
+                opciones = await tx.opcionServicio.findMany({
+                    where: { id: { in: parsedOpcionesServicioManual } },
+                });
+            }
 
             for (const opcion of opciones) {
                 await tx.servicioOpcionesTipoServicio.create({
@@ -105,12 +124,17 @@ const postServicio = async (data) => {
                     const meta = metas[i] ?? {};
                     const descripcion = typeof meta === "string" ? meta : meta.descripcion ?? "";
                     const ruta = "/uploads/servicios/" + f.filename;
-                    await tx.imagen.create({ data: { imagen: ruta, descripcion: descripcion, servicioId: created.id } });
+                    await tx.imagen.create({
+                        data: { imagen: ruta, descripcion: descripcion, servicioId: created.id },
+                    });
                     await pause(30);
                 }
             }
 
-            const withNested = await tx.servicio.findFirst({ where: { id: created.id }, include: { imagen: true, servicioItems: true, productosCliente: true, moto: true, sucursal: true } });
+            const withNested = await tx.servicio.findFirst({
+                where: { id: created.id },
+                include: { imagen: true, servicioItems: true, productosCliente: true, moto: true, sucursal: true },
+            });
             return withNested;
         }, { maxWait: 20000, timeout: 120000 });
 
@@ -119,7 +143,11 @@ const postServicio = async (data) => {
         // cleanup uploaded files if any
         if (uploaded.length > 0) {
             for (const f of uploaded) {
-                try { await deleteImage('/uploads/servicios/' + f.filename); } catch (e) { /* ignore */ }
+                try {
+                    await deleteImage("/uploads/servicios/" + f.filename);
+                } catch (e) {
+                    /* ignore */
+                }
             }
         }
         throw err;

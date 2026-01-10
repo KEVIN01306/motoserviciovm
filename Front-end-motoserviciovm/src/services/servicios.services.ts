@@ -139,6 +139,9 @@ const postServicio = async (payload: Partial<ServicioType> & { imagenesFiles?: F
       const compressedFirma = await compressImage(payload.firmaEntradaFile);
       form.append('firmaEntrada', compressedFirma);
     }
+    if (payload.opcionesServicioManual && Array.isArray(payload.opcionesServicioManual)) {
+      form.append('opcionesServicioManual', JSON.stringify(payload.opcionesServicioManual));
+    }
     const response = await api.post<apiResponse<ServicioGetType>>(API_SERVICIOS, form, {
       headers: { 'Content-Type': 'multipart/form-data' },
 
@@ -189,7 +192,7 @@ export const putFirmaSalida = async (
     }
 
     if (data.descripcionAccion) form.append('descripcionAccion', data.descripcionAccion);
-      
+
     const response = await api.put(`/servicios/salida/${id}`, form, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });

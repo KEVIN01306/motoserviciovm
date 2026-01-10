@@ -54,4 +54,5 @@ export const servicioSchema = z.object({
     imagenesMeta: z.array(imagenMetaSchema).optional(),
     createdAt: z.date().optional(),
     updatedAt: z.date().optional(),
+    opcionesServicioManual: z.array(z.number()).optional(),
 });

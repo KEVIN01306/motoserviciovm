@@ -81,7 +81,7 @@ const postServicioHandler = async (req, res) => {
         if (body.total) body.total = parseFloat(body.total);
 
         // 3. Parseo de JSON Strings (Arrays anidados)
-        const camposJSON = ['servicioItems', 'productosCliente', 'imagenesMeta'];
+        const camposJSON = ['servicioItems', 'productosCliente', 'imagenesMeta', 'opcionesServicioManual'];
         camposJSON.forEach(campo => {
             try {
                 if (typeof body[campo] === 'string') {
