@@ -149,6 +149,7 @@ const InputsForm = ({ register, errors, control, watch, setValue, roles, tipoUse
                         <TextField
                             label="Dpi"
                             fullWidth
+                            required={tipo === "Usuario Regular" || TipoUser}
                             variant="standard"
                             size="small"
                             {...register("dpi")}
@@ -160,6 +161,7 @@ const InputsForm = ({ register, errors, control, watch, setValue, roles, tipoUse
                     <TextField
                         label="Nit"
                         fullWidth
+                        required={tipo === "Empresa"}
                         variant="standard"
                         size="small"
                         {...register("nit")}
@@ -172,7 +174,7 @@ const InputsForm = ({ register, errors, control, watch, setValue, roles, tipoUse
                 <TextField
                     label="Email"
                     fullWidth
-                    required
+                    required={tipo === "" || TipoUser}
                     variant="filled"
                     size="small"
                     {...register("email")}
@@ -186,7 +188,7 @@ const InputsForm = ({ register, errors, control, watch, setValue, roles, tipoUse
                         <TextField
                             label="Password"
                             fullWidth
-                            required
+                            required={tipo === "" || TipoUser}
                             type="password"
                             variant="filled"
                             size="small"
@@ -200,7 +202,7 @@ const InputsForm = ({ register, errors, control, watch, setValue, roles, tipoUse
             <Grid size={{ xs: 12, md: 12 }}>
                 <TextField
                     label="Fecha de Nacimiento"
-                    required
+                    
                     fullWidth
                     type="date"
                     variant="standard"

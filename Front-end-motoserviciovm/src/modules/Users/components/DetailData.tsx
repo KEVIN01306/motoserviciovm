@@ -72,7 +72,7 @@ const DataDetail = ({ user }: DataDetail) => {
                     }
                     <DetailItem
                         label="Fecha de Nacimiento"
-                        value={new Date(fechaNac).toLocaleDateString() || 'N/A'}
+                        value={fechaNac ? new Date(fechaNac).toLocaleDateString() : 'N/A'}
                         icon={<Celebration fontSize="small" />}
                     />
                     <DetailItem

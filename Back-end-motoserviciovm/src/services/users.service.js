@@ -105,105 +105,126 @@ const getUSer = async (id) => {
 }
 
 const postUser = async (data) => {
-	
-		const user = await prisma.user.findUnique({
-			where: { email: data.email }
-		});
+    const existingUser = await prisma.user.findFirst({
+        where: {
+            OR: [
+                { email: data.email ?? undefined },
+                { nit: data.nit ?? undefined },
+                { dpi: data.dpi ?? undefined },
+            ],
+        },
+    });
 
-		if (user) {
-			const error = new Error('CONFLICT');
-			error.code = 'CONFLICT';
-			throw error;
-		}
-		const { roles: rolIds, sucursales: sucursalIds, motos: motoIds, ...userData } = data;
+    if (existingUser) {
+        const error = new Error('CONFLICT');
+        error.code = 'CONFLICT';
+        throw error;
+    }
 
-		const rolesConnect = (rolIds || []).map(rolId => ({
-			id: rolId
-		}))
+    const { roles: rolIds, sucursales: sucursalIds, motos: motoIds, ...userData } = data;
 
-		const sucursalesConnect = (sucursalIds || []).map(sucursalId => ({
-			id: sucursalId
-		}))
+    const rolesConnect = (rolIds || []).map(rolId => ({
+        id: rolId,
+    }));
 
-		const motosConnect = (motoIds || []).map(motoId => ({
-			id: motoId
-		}))
-		const newUser = await prisma.user.create({
-			data: {
-				...userData,
-				roles:{
-					connect: rolesConnect
-				},
-				sucursales:{
-					connect: sucursalesConnect
-				},
-				motos: {
-					connect: motosConnect
-				}
-			},
-			include:{
-				roles: true,
-				sucursales: true,	
-				motos: true,
-			}
-		});
-		//console.log(newUSer.email)
+    const sucursalesConnect = (sucursalIds || []).map(sucursalId => ({
+        id: sucursalId,
+    }));
 
-		return newUser.email
+    const motosConnect = (motoIds || []).map(motoId => ({
+        id: motoId,
+    }));
+
+    const newUser = await prisma.user.create({
+        data: {
+            ...userData,
+            roles: {
+                connect: rolesConnect,
+            },
+            sucursales: {
+                connect: sucursalesConnect,
+            },
+            motos: {
+                connect: motosConnect,
+            },
+        },
+        include: {
+            roles: true,
+            sucursales: true,
+            motos: true,
+        },
+    });
+
+    return newUser.primerNombre;
 }
 
 
 
 const putUser = async (id, data) => {
+    const existingUser = await prisma.user.findFirst({
+        where: {
+            id: { not: id },
+            OR: [
+                { email: data.email ?? undefined },
+                { nit: data.nit ?? undefined },
+                { dpi: data.dpi ?? undefined },
+            ],
+        },
+    });
 
-		const user = await prisma.user.findUnique({
-			where: { id: id}
-		});
+    if (existingUser) {
+        const error = new Error('CONFLICT');
+        error.code = 'CONFLICT';
+        throw error;
+    }
 
-		console.log(data)
+    const user = await prisma.user.findUnique({
+        where: { id: id },
+    });
 
-		if (!user) {
-			const error = new Error('DATA_NOT_FOUND');
-			error.code = 'DATA_NOT_FOUND';
-			throw error;
-		}
+    if (!user) {
+        const error = new Error('DATA_NOT_FOUND');
+        error.code = 'DATA_NOT_FOUND';
+        throw error;
+    }
 
-		const { roles: rolIds, sucursales: sucursalIds, motos: motoIds, ...userData } = data;
+    const { roles: rolIds, sucursales: sucursalIds, motos: motoIds, ...userData } = data;
 
-		const rolesConnect = (rolIds || []).map(rolId => ({
-			id: rolId
-		}))
+    const rolesConnect = (rolIds || []).map((rolId) => ({
+        id: rolId,
+    }));
 
-		const sucursalesConnect = (sucursalIds || []).map(sucursalId => ({
-			id: sucursalId
-		}))
+    const sucursalesConnect = (sucursalIds || []).map((sucursalId) => ({
+        id: sucursalId,
+    }));
 
-		const motosConnect = (motoIds || []).map(motoId => ({
-			id: motoId
-		}))
-		const newUser = await prisma.user.update({
-			where: { id: id },
-			data: {
-				...userData,
-				roles:{
-					set: rolesConnect
-				},
-				sucursales:{
-					set: sucursalesConnect
-				},
-				motos: {
-					set: motosConnect
-				}
-			},
-			include:{
-				roles: true,
-				sucursales: true,
-				motos: true,
-			}
-		});
+    const motosConnect = (motoIds || []).map((motoId) => ({
+        id: motoId,
+    }));
 
-		return newUser.email
-}
+    const updatedUser = await prisma.user.update({
+        where: { id: id },
+        data: {
+            ...userData,
+            roles: {
+                set: rolesConnect,
+            },
+            sucursales: {
+                set: sucursalesConnect,
+            },
+            motos: {
+                set: motosConnect,
+            },
+        },
+        include: {
+            roles: true,
+            sucursales: true,
+            motos: true,
+        },
+    });
+
+    return updatedUser.primerNombre;
+};
 
 
 const patchUserActive = async (id) => {

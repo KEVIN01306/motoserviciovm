@@ -101,6 +101,8 @@ const postUserHandler = async (req,res) => {
     try{
         const data = req.body
 
+        data.email = data.email === "" ? null : data.email;
+
         const validationResult = userSchema.safeParse(data);
 
         if (!validationResult.success) {
@@ -116,6 +118,7 @@ const postUserHandler = async (req,res) => {
 
         res.status(201).json(responseSucces("Usuario creado exitosamente",userEmail))
     }catch (error){
+        console.error(error);
         let errorCode = 500;
         let errorMessage = 'INTERNAL_SERVER_ERROR'
         switch(error.code){
@@ -134,6 +137,8 @@ const putUserHandler = async (req,res) => {
         const { id } = req.params
         const data = req.body
 
+        data.email = data.email === "" ? null : data.email;
+
         const validationResult = userSchema.safeParse(data);
 
         if (!validationResult.success) {
@@ -150,6 +155,7 @@ const putUserHandler = async (req,res) => {
 
         res.status(200).json(responseSucces("usuario actualizado exitosamente",UserEmail))
     }catch (error){
+        console.error(error);
         let errorCode = 500;
         let errorMessage = 'INTERNAL_SERVER_ERROR'
         switch(error.code){
@@ -157,9 +163,12 @@ const putUserHandler = async (req,res) => {
                 errorCode = 400;
                 errorMessage = error.code;
                 break;
+            case 'CONFLICT':
+                errorCode = 409;
+                errorMessage = error.code;
+                break;
         }
         
-        console.log(error)
 
         return res.status(errorCode).json(responseError(errorMessage));
     }

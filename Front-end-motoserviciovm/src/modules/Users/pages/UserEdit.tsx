@@ -123,7 +123,7 @@ const UserEdit = () => {
             const dataFormat = mergeUserDataWithDefaults(response);
 
             reset(dataFormat);
-
+            
         } catch (err: any) {
             setError(err.message)
         } finally {

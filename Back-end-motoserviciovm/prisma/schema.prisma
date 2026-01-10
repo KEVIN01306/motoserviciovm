@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -14,646 +8,547 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model Sucursal {
-  id              Int @id @default(autoincrement())
-  nombre          String @unique
-  direccion       String
-  telefono        String
-  email           String
-
-  usuarios        User[] @relation("UserSucursales")
-  servicios       Servicio[]
-  citas           Cita[]
-  ventas          Venta[]
-  repuestosReparaciones RepuestosReparacion[]
+  id                    Int                   @id @default(autoincrement())
+  nombre                String                @unique
+  direccion             String
+  telefono              String
+  email                 String
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  estadoId              Int
+  citas                 Cita[]
+  enParqueos            EnParqueo[]
+  enReparaciones        EnReparacion[]
   ingresosEgresos       IngresosEgresos[]
-  enParqueos      EnParqueo[]
-  enReparaciones  EnReparacion[]
+  repuestosReparaciones RepuestosReparacion[]
+  servicios             Servicio[]
+  estado                Estado                @relation(fields: [estadoId], references: [id])
+  ventas                Venta[]
+  usuarios              User[]                @relation("UserSucursales")
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
+  @@index([estadoId], map: "Sucursal_estadoId_fkey")
 }
 
 model User {
-  id              Int @id @default(autoincrement())
-  primerNombre    String
-  segundoNombre   String?
-  primerApellido  String
-  segundoApellido String?
-  fechaNac        DateTime
-  dpi             String?
-  nit             String?        
-  tipo            String?
-  activo          Boolean @default(true)
-  numeroTel       String  
-  numeroAuxTel    String?
-  email           String  @unique
-  password        String?
-
-  roles           Rol[] @relation("UserRoles")
-
-  sucursales      Sucursal[] @relation("UserSucursales")
-
-  motos           Moto[] @relation("UserMotos")
-
-  serviciosComoCliente Servicio[] @relation("ServicioCliente")
+  id                    Int        @id @default(autoincrement())
+  primerNombre          String
+  segundoNombre         String?
+  primerApellido        String
+  segundoApellido       String?
+  fechaNac              DateTime?
+  dpi                   String?    @unique
+  nit                   String?    @unique
+  tipo                  String?
+  numeroTel             String
+  numeroAuxTel          String?
+  email                 String?    @unique
+  password              String?
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+  activo                Boolean    @default(true)
+  estadoId              Int
+  citas                 Cita[]     @relation("CitaCliente")
+  serviciosComoCliente  Servicio[] @relation("ServicioCliente")
   serviciosComoMecanico Servicio[] @relation("ServicioMecanico")
-  ventas           Venta[]
-  citas            Cita[] @relation("CitaCliente")
+  estado                Estado     @relation(fields: [estadoId], references: [id])
+  ventas                Venta[]
+  motos                 Moto[]     @relation("UserMotos")
+  roles                 Rol[]      @relation("UserRoles")
+  sucursales            Sucursal[] @relation("UserSucursales")
 
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([estadoId], map: "User_estadoId_fkey")
 }
 
 model Rol {
-  id              Int @id @default(autoincrement())
-  rol             String @unique
-  descripcion     String?
+  id          Int       @id @default(autoincrement())
+  rol         String    @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  descripcion String?
+  estadoId    Int
+  estado      Estado    @relation(fields: [estadoId], references: [id])
+  permisos    Permiso[] @relation("RolPermisos")
+  usuarios    User[]    @relation("UserRoles")
 
-  usuarios        User[] @relation("UserRoles")
-  permisos        Permiso[] @relation("RolPermisos")
-
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([estadoId], map: "Rol_estadoId_fkey")
 }
-
 
 model Permiso {
-  id              Int @id @default(autoincrement())
-  permiso         String @unique
-  modulo          String?
-  roles           Rol[] @relation("RolPermisos")
+  id        Int      @id @default(autoincrement())
+  permiso   String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  modulo    String?
+  estadoId  Int
+  estado    Estado   @relation(fields: [estadoId], references: [id])
+  roles     Rol[]    @relation("RolPermisos")
 
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([estadoId], map: "Permiso_estadoId_fkey")
 }
 
-
-
 model Marca {
-  id              Int @id @default(autoincrement())
-  marca           String @unique
+  id        Int      @id @default(autoincrement())
+  marca     String   @unique
+  estadoId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  estado    Estado   @relation(fields: [estadoId], references: [id])
+  modelos   Modelo[]
 
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
-
-  modelos         Modelo[]
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([estadoId], map: "Marca_estadoId_fkey")
 }
 
 model Linea {
-  id              Int @id @default(autoincrement())
-  linea           String @unique
+  id        Int      @id @default(autoincrement())
+  linea     String   @unique
+  estadoId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  estado    Estado   @relation(fields: [estadoId], references: [id])
+  modelos   Modelo[]
 
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
-
-  modelos         Modelo[]
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([estadoId], map: "Linea_estadoId_fkey")
 }
 
 model Cilindrada {
-  id              Int @id @default(autoincrement())
-  cilindrada      Int @unique
+  id         Int      @id @default(autoincrement())
+  cilindrada Int      @unique
+  estadoId   Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  estado     Estado   @relation(fields: [estadoId], references: [id])
+  modelos    Modelo[]
 
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
-
-  modelos         Modelo[]
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([estadoId], map: "Cilindrada_estadoId_fkey")
 }
 
 model Modelo {
-  id              Int @id @default(autoincrement())
-  año             Int
+  id           Int        @id @default(autoincrement())
+  año         Int
+  marcaId      Int
+  lineaId      Int
+  cilindradaId Int
+  estadoId     Int
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  modelo       String     @unique
+  description  String?
+  cilindrada   Cilindrada @relation(fields: [cilindradaId], references: [id])
+  estado       Estado     @relation(fields: [estadoId], references: [id])
+  linea        Linea      @relation(fields: [lineaId], references: [id])
+  marca        Marca      @relation(fields: [marcaId], references: [id])
+  motos        Moto[]
 
-  modelo          String @unique
-
-  marcaId         Int
-  marca           Marca @relation(fields: [marcaId], references: [id])
-
-  lineaId         Int
-  linea           Linea @relation(fields: [lineaId], references: [id])
-
-  cilindradaId    Int
-  cilindrada      Cilindrada @relation(fields: [cilindradaId], references: [id])    
-
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
-
-  motos           Moto[]
-
-  description     String?
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([cilindradaId], map: "Modelo_cilindradaId_fkey")
+  @@index([estadoId], map: "Modelo_estadoId_fkey")
+  @@index([lineaId], map: "Modelo_lineaId_fkey")
+  @@index([marcaId], map: "Modelo_marcaId_fkey")
 }
 
 model Estado {
-  id              Int @id @default(autoincrement())
-  estado          String @unique
-
-  motos           Moto[]
-  users           User[]
-  sucursales      Sucursal[]
-  roles           Rol[]
-  permisos        Permiso[]
-  marcas          Marca[]
-  lineas          Linea[]
-  cilindradas     Cilindrada[]
-  modelos         Modelo[]
-  tipoServicios   TipoServicio[]
-  opcionServicios OpcionServicio[]
-  servicios       Servicio[]
-  inventarios     Inventario[]
-  categoriaProductos CategoriaProducto[]
-  productos       Producto[]
-  ventas          Venta[]
-  enParqueos      EnParqueo[]
-  enReparaciones  EnReparacion[]
+  id                    Int                   @id @default(autoincrement())
+  estado                String                @unique
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  categoriaProductos    CategoriaProducto[]
+  cilindradas           Cilindrada[]
+  citas                 Cita[]
+  enParqueos            EnParqueo[]
+  enReparaciones        EnReparacion[]
+  ingresosEgresos       IngresosEgresos[]
+  inventarios           Inventario[]
+  lineas                Linea[]
+  marcas                Marca[]
+  modelos               Modelo[]
+  motos                 Moto[]
+  opcionServicios       OpcionServicio[]
+  permisos              Permiso[]
+  productos             Producto[]
   repuestosReparaciones RepuestosReparacion[]
-  citas           Cita[]
-  ingresosEgresos IngresosEgresos[]
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  roles                 Rol[]
+  servicios             Servicio[]
+  sucursales            Sucursal[]
+  tipoServicios         TipoServicio[]
+  users                 User[]
+  ventas                Venta[]
 }
 
 model Moto {
-  id              Int @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())
+  placa      String     @unique
+  avatar     String?
+  modeloId   Int
+  estadoId   Int
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  calcomania String?
+  citas      Cita[]
+  estado     Estado     @relation(fields: [estadoId], references: [id])
+  modelo     Modelo     @relation(fields: [modeloId], references: [id])
+  servicios  Servicio[]
+  users      User[]     @relation("UserMotos")
 
-  placa           String @unique
-  avatar          String?
-
-  calcomania      String?
-
-  modeloId        Int
-  modelo          Modelo @relation(fields: [modeloId], references: [id])
-
-  users           User[] @relation("UserMotos")
-
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
-
-  servicios       Servicio[]
-  citas           Cita[]
-
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([estadoId], map: "Moto_estadoId_fkey")
+  @@index([modeloId], map: "Moto_modeloId_fkey")
 }
 
 model TipoServicio {
-  id              Int @id @default(autoincrement())
-  tipo            String @unique
-  descripcion     String?
+  id               Int              @id @default(autoincrement())
+  tipo             String           @unique
+  descripcion      String?
+  estadoId         Int
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  servicioCompleto Boolean?         @default(false)
+  servicios        Servicio[]
+  estado           Estado           @relation(fields: [estadoId], references: [id])
+  opcionServicios  OpcionServicio[] @relation("TipoOpcionServicios")
 
-  opcionServicios OpcionServicio[] @relation("TipoOpcionServicios")
-
-  servicios       Servicio[]
-
-  servicioCompleto  Boolean? @default(false)
-
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([estadoId], map: "TipoServicio_estadoId_fkey")
 }
 
 model OpcionServicio {
-  id              Int @id @default(autoincrement())
-  opcion          String @unique
-  descripcion     String?
-
-  tipoServicios TipoServicio[] @relation("TipoOpcionServicios")
-
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
-
+  id                           Int                            @id @default(autoincrement())
+  opcion                       String                         @unique
+  descripcion                  String?
+  estadoId                     Int
+  createdAt                    DateTime                       @default(now())
+  updatedAt                    DateTime                       @updatedAt
+  estado                       Estado                         @relation(fields: [estadoId], references: [id])
   servicioOpcionesTipoServicio ServicioOpcionesTipoServicio[]
+  tipoServicios                TipoServicio[]                 @relation("TipoOpcionServicios")
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([estadoId], map: "OpcionServicio_estadoId_fkey")
 }
 
 model Servicio {
-  id              Int @id @default(autoincrement())
-  descripcion     String
-
-  kilometraje     Int?
-  kilometrajeProximoServicio    Int?
-
-  fechaEntrada    DateTime
-
-  fechaSalida     DateTime?
-
-  firmaEntrada    String?
-
-  firmaSalida     String?
-
-  total           Float
-
-  observaciones    String?
-
-  proximaFechaServicio DateTime?
-
-  descripcionProximoServicio String?
-
-  descuentosServicio Float?
-
-  sucursalId     Int
-  sucursal       Sucursal @relation(fields: [sucursalId], references: [id])
-
-  motoId          Int
-  moto            Moto @relation(fields: [motoId], references: [id])
-
-  clienteId      Int?
-  cliente        User? @relation("ServicioCliente", fields: [clienteId], references: [id])
-
-  mecanicoId     Int
-  mecanico       User @relation("ServicioMecanico", fields: [mecanicoId], references: [id])
-
-  tipoServicioId  Int
-  tipoServicio    TipoServicio @relation(fields: [tipoServicioId], references: [id])
-
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
-
-  imagen          Imagen[]  
-
-  servicioItems   ServicioInventario[]
-  ventas           Venta[]
-  productosCliente ServicioProductoCliente[]
-
-  proximoServicioItems ServicioProductoProximo[]
-
+  id                           Int                            @id @default(autoincrement())
+  descripcion                  String
+  fechaEntrada                 DateTime
+  fechaSalida                  DateTime?
+  total                        Float
+  observaciones                String?
+  proximaFechaServicio         DateTime?
+  descripcionProximoServicio   String?
+  sucursalId                   Int
+  motoId                       Int
+  clienteId                    Int?
+  mecanicoId                   Int
+  tipoServicioId               Int
+  estadoId                     Int
+  createdAt                    DateTime                       @default(now())
+  updatedAt                    DateTime                       @updatedAt
+  kilometraje                  Int?
+  firmaEntrada                 String?
+  firmaSalida                  String?
+  kilometrajeProximoServicio   Int?
+  descuentosServicio           Float?
+  checkedReparacion            Boolean?                       @default(false)
+  chekedParqueo                Boolean?                       @default(false)
+  enParqueos                   EnParqueo[]
+  enReparaciones               EnReparacion[]
+  imagen                       Imagen[]
+  cliente                      User?                          @relation("ServicioCliente", fields: [clienteId], references: [id])
+  estado                       Estado                         @relation(fields: [estadoId], references: [id])
+  mecanico                     User                           @relation("ServicioMecanico", fields: [mecanicoId], references: [id])
+  moto                         Moto                           @relation(fields: [motoId], references: [id])
+  sucursal                     Sucursal                       @relation(fields: [sucursalId], references: [id])
+  tipoServicio                 TipoServicio                   @relation(fields: [tipoServicioId], references: [id])
+  servicioItems                ServicioInventario[]
   servicioOpcionesTipoServicio ServicioOpcionesTipoServicio[]
+  productosCliente             ServicioProductoCliente[]
+  proximoServicioItems         ServicioProductoProximo[]
+  ventas                       Venta[]
 
-  enParqueos      EnParqueo[]
-  enReparaciones  EnReparacion[]
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([clienteId], map: "Servicio_clienteId_fkey")
+  @@index([estadoId], map: "Servicio_estadoId_fkey")
+  @@index([mecanicoId], map: "Servicio_mecanicoId_fkey")
+  @@index([motoId], map: "Servicio_motoId_fkey")
+  @@index([sucursalId], map: "Servicio_sucursalId_fkey")
+  @@index([tipoServicioId], map: "Servicio_tipoServicioId_fkey")
 }
 
 model ServicioOpcionesTipoServicio {
-  id              Int @id @default(autoincrement())
-
-  servicioId      Int
-  servicio        Servicio @relation(fields: [servicioId], references: [id])
-
+  id               Int            @id @default(autoincrement())
+  servicioId       Int
   opcionServicioId Int
-  opcionServicio  OpcionServicio @relation(fields: [opcionServicioId], references: [id])
-
-  checked         Boolean @default(false)
-
-  observaciones   String?
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  checked          Boolean        @default(false)
+  observaciones    String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  opcionServicio   OpcionServicio @relation(fields: [opcionServicioId], references: [id])
+  servicio         Servicio       @relation(fields: [servicioId], references: [id])
 
   @@unique([servicioId, opcionServicioId])
+  @@index([opcionServicioId], map: "ServicioOpcionesTipoServicio_opcionServicioId_fkey")
 }
 
 model Imagen {
-  id              Int @id @default(autoincrement())
-  imagen          String
+  id          Int      @id @default(autoincrement())
+  imagen      String
+  descripcion String
+  servicioId  Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  servicio    Servicio @relation(fields: [servicioId], references: [id])
 
-  descripcion     String
-
-  servicioId      Int
-  servicio        Servicio @relation(fields: [servicioId], references: [id])
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([servicioId], map: "Imagen_servicioId_fkey")
 }
 
-
 model ServicioProductoProximo {
-  id              Int @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
+  nombre     String
+  servicioId Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  servicio   Servicio @relation(fields: [servicioId], references: [id])
 
-  nombre          String
-
-  servicioId      Int
-  servicio        Servicio @relation(fields: [servicioId], references: [id])
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
+  @@index([servicioId], map: "ServicioProductoProximo_servicioId_fkey")
 }
 
 model ServicioProductoCliente {
-  id              Int @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
+  nombre     String
+  cantidad   Int
+  servicioId Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  servicio   Servicio @relation(fields: [servicioId], references: [id])
 
-  nombre          String
-  cantidad       Int
-
-  servicioId      Int
-  servicio        Servicio @relation(fields: [servicioId], references: [id])
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
+  @@index([servicioId], map: "ServicioProductoCliente_servicioId_fkey")
 }
 
 model ServicioInventario {
-  id              Int @id @default(autoincrement())
+  id              Int        @id @default(autoincrement())
   servicioId      Int
-  servicio        Servicio @relation(fields: [servicioId], references: [id])
-
   inventarioId    Int
-  inventario      Inventario @relation(fields: [inventarioId], references: [id])
-
-  checked         Boolean @default(false)
-
+  checked         Boolean    @default(false)
   itemName        String?
   itemDescripcion String?
   notas           String?
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  inventario      Inventario @relation(fields: [inventarioId], references: [id])
+  servicio        Servicio   @relation(fields: [servicioId], references: [id])
 
   @@unique([servicioId, inventarioId])
+  @@index([inventarioId], map: "ServicioInventario_inventarioId_fkey")
 }
 
 model Inventario {
-  id              Int @id @default(autoincrement())
-  item            String
-  descripcion     String?
-  activo          Boolean @default(true)
+  id            Int                  @id @default(autoincrement())
+  item          String
+  descripcion   String?
+  activo        Boolean              @default(true)
+  estadoId      Int
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  estado        Estado               @relation(fields: [estadoId], references: [id])
+  servicioItems ServicioInventario[]
 
-  servicioItems   ServicioInventario[]
-
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([estadoId], map: "Inventario_estadoId_fkey")
 }
 
 model CategoriaProducto {
-  id              Int @id @default(autoincrement())
-  categoria       String @unique
+  id        Int        @id @default(autoincrement())
+  categoria String     @unique
+  estadoId  Int
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  estado    Estado     @relation(fields: [estadoId], references: [id])
+  productos Producto[]
 
-  productos       Producto[]
-
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([estadoId], map: "CategoriaProducto_estadoId_fkey")
 }
 
-
 model Producto {
-  id              Int @id @default(autoincrement())
+  id              Int               @id @default(autoincrement())
   nombre          String
   descripcion     String?
-  costo           Float
   precio          Float
   imagen          String?
-
   cantidad        Int
-
-  ventasProductos VentaProducto[] @relation("Producto_VentaProducto")
-
   categoriaId     Int
-  categoria       CategoriaProducto @relation(fields: [categoriaId], references: [id])
-
   estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  costo           Float
+  categoria       CategoriaProducto @relation(fields: [categoriaId], references: [id])
+  estado          Estado            @relation(fields: [estadoId], references: [id])
+  ventasProductos VentaProducto[]   @relation("Producto_VentaProducto")
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([categoriaId], map: "Producto_categoriaId_fkey")
+  @@index([estadoId], map: "Producto_estadoId_fkey")
 }
 
 model Venta {
-  id              Int @id @default(autoincrement())
-
-  costo          Float?
-
-  precioTotal     Float?
-
-  gananciaTotal   Float?
-
-  descuentoTotal      Float?
-
-  usuarioId       Int
-  usuario         User @relation(fields: [usuarioId], references: [id])
-
-  servicioId      Int?
-  servicio        Servicio? @relation(fields: [servicioId], references: [id])
-  
-  total           Float
-
-  productos       VentaProducto[] @relation("Venta_VentaProducto")
-
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
-
+  id             Int             @id @default(autoincrement())
+  usuarioId      Int
+  servicioId     Int?
+  total          Float
+  estadoId       Int
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
   sucursalId     Int?
-  sucursal       Sucursal? @relation(fields: [sucursalId], references: [id])
+  gananciaTotal  Float?
+  costo          Float?
+  precioTotal    Float?
+  descuentoTotal Float?
+  estado         Estado          @relation(fields: [estadoId], references: [id])
+  servicio       Servicio?       @relation(fields: [servicioId], references: [id])
+  sucursal       Sucursal?       @relation(fields: [sucursalId], references: [id])
+  usuario        User            @relation(fields: [usuarioId], references: [id])
+  productos      VentaProducto[] @relation("Venta_VentaProducto")
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([estadoId], map: "Venta_estadoId_fkey")
+  @@index([servicioId], map: "Venta_servicioId_fkey")
+  @@index([sucursalId], map: "Venta_sucursalId_fkey")
+  @@index([usuarioId], map: "Venta_usuarioId_fkey")
 }
 
 model VentaProducto {
-  id              Int @id @default(autoincrement())
-
-  costo           Float?  
-
-  precio          Float?
-
-  ganacia         Float?
-
-  descuento      Boolean?
-
-  ventaId         Int
-  venta           Venta @relation("Venta_VentaProducto", fields: [ventaId], references: [id])
-
-  productoId      Int
-  producto       Producto @relation("Producto_VentaProducto", fields: [productoId], references: [id])
-
-  cantidad       Int
-
-  totalProducto  Float
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  ventaId       Int
+  productoId    Int
+  cantidad      Int
+  totalProducto Float
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  precio        Float?
+  costo         Float?
+  ganacia       Float?
+  descuento     Boolean?
+  producto      Producto @relation("Producto_VentaProducto", fields: [productoId], references: [id])
+  venta         Venta    @relation("Venta_VentaProducto", fields: [ventaId], references: [id])
 
   @@unique([ventaId, productoId])
+  @@index([productoId], map: "VentaProducto_productoId_fkey")
 }
 
-
 model EnParqueo {
-  id              Int @id @default(autoincrement())
-  descripcion     String
+  id            Int       @id @default(autoincrement())
+  descripcion   String
+  fechaEntrada  DateTime
+  fechaSalida   DateTime?
+  total         Float?
+  observaciones String?
+  estadoId      Int
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sucursalId    Int?
+  servicioId    Int?
+  estado        Estado    @relation(fields: [estadoId], references: [id])
+  servicio      Servicio? @relation(fields: [servicioId], references: [id])
+  sucursal      Sucursal? @relation(fields: [sucursalId], references: [id])
 
-  fechaEntrada    DateTime
-
-  fechaSalida     DateTime?
-  firmaSalida     String?
-
-  total           Float?
-
-  observaciones    String?
-
-  servicioId      Int?
-  servicio        Servicio? @relation(fields: [servicioId], references: [id])
-
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
-
-  sucursalId     Int?
-  sucursal       Sucursal? @relation(fields: [sucursalId], references: [id])
-
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([estadoId], map: "EnParqueo_estadoId_fkey")
+  @@index([servicioId], map: "EnParqueo_servicioId_fkey")
+  @@index([sucursalId], map: "EnParqueo_sucursalId_fkey")
 }
 
 model EnReparacion {
-  id              Int @id @default(autoincrement())
-  descripcion     String
+  id            Int                   @id @default(autoincrement())
+  descripcion   String
+  fechaEntrada  DateTime
+  fechaSalida   DateTime?
+  total         Float?
+  observaciones String?
+  estadoId      Int
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  sucursalId    Int?
+  servicioId    Int?
+  estado        Estado                @relation(fields: [estadoId], references: [id])
+  servicio      Servicio?             @relation(fields: [servicioId], references: [id])
+  sucursal      Sucursal?             @relation(fields: [sucursalId], references: [id])
+  repuestos     RepuestosReparacion[]
 
-  fechaEntrada    DateTime
-
-  fechaSalida     DateTime?
-
-  firmaSalida     String?
-
-  total           Float?
-
-  observaciones    String?
-
-  servicioId      Int?
-  servicio        Servicio? @relation(fields: [servicioId], references: [id])
-
-  repuestos       RepuestosReparacion[]
-
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
-
-  sucursalId     Int?
-  sucursal       Sucursal? @relation(fields: [sucursalId], references: [id])
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([estadoId], map: "EnReparacion_estadoId_fkey")
+  @@index([servicioId], map: "EnReparacion_servicioId_fkey")
+  @@index([sucursalId], map: "EnReparacion_sucursalId_fkey")
 }
 
 model RepuestosReparacion {
-  id              Int @id @default(autoincrement())
-  nombre          String
-  descripcion     String
+  id           Int          @id @default(autoincrement())
+  nombre       String
+  descripcion  String
+  imagen       String?
+  refencia     String
+  cantidad     Int
+  checked      Boolean      @default(false)
+  sucursalId   Int?
+  reparacionId Int
+  estadoId     Int
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  estado       Estado       @relation(fields: [estadoId], references: [id])
+  reparacion   EnReparacion @relation(fields: [reparacionId], references: [id])
+  sucursal     Sucursal?    @relation(fields: [sucursalId], references: [id])
 
-  imagen          String?
-
-  refencia       String
-  cantidad       Int
-
-  checked         Boolean @default(false)
-
-  sucursalId     Int?
-  sucursal       Sucursal? @relation(fields: [sucursalId], references: [id])
-
-  reparacionId    Int
-  reparacion      EnReparacion @relation(fields: [reparacionId], references: [id])
-
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([estadoId], map: "RepuestosReparacion_estadoId_fkey")
+  @@index([reparacionId], map: "RepuestosReparacion_reparacionId_fkey")
+  @@index([sucursalId], map: "RepuestosReparacion_sucursalId_fkey")
 }
 
 model Cita {
-  id              Int @id @default(autoincrement())
-  descripcion     String
-
-  fechaCita       DateTime
-
-  nombreContacto String
+  id               Int      @id @default(autoincrement())
+  descripcion      String
+  fechaCita        DateTime
+  nombreContacto   String
   telefonoContacto String
+  sucursalId       Int
+  clienteId        Int?
+  dpiNit           String?
+  motoId           Int
+  placa            String?
+  estadoId         Int
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  cliente          User?    @relation("CitaCliente", fields: [clienteId], references: [id])
+  estado           Estado   @relation(fields: [estadoId], references: [id])
+  moto             Moto     @relation(fields: [motoId], references: [id])
+  sucursal         Sucursal @relation(fields: [sucursalId], references: [id])
 
-  sucursalId     Int
-  sucursal       Sucursal @relation(fields: [sucursalId], references: [id])
-
-  clienteId      Int?
-  cliente        User? @relation("CitaCliente", fields: [clienteId], references: [id])
-
-  dpiNit          String?
-
-  motoId          Int
-  moto            Moto @relation(fields: [motoId], references: [id])  
-
-  placa          String?
-
-
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([clienteId], map: "Cita_clienteId_fkey")
+  @@index([estadoId], map: "Cita_estadoId_fkey")
+  @@index([motoId], map: "Cita_motoId_fkey")
+  @@index([sucursalId], map: "Cita_sucursalId_fkey")
 }
 
 model TipoContabilidad {
-  id            Int @id @default(autoincrement())
-  tipo          String
-
+  id              Int               @id @default(autoincrement())
+  tipo            String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
   IngresosEgresos IngresosEgresos[]
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
 }
 
 model ModuloTaller {
-  id              Int @id @default(autoincrement())
-  modulo          String @unique
-
+  id              Int               @id @default(autoincrement())
+  modulo          String            @unique
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
   IngresosEgresos IngresosEgresos[]
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
 }
 
 model IngresosEgresos {
-  id              Int @id @default(autoincrement())
-  descripcion     String?
+  id             Int              @id @default(autoincrement())
+  descripcion    String?
   monto          Float
-
-  tipoId           Int
-  tipo             TipoContabilidad @relation(fields: [tipoId],references: [id])
-
-  moduloTallerId   Int?
-  moduloTaller     ModuloTaller? @relation(fields: [moduloTallerId], references: [id])
-
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  estadoId       Int
   sucursalId     Int
-  sucursal       Sucursal @relation(fields: [sucursalId], references: [id])
+  tipoId         Int
+  moduloTallerId Int?
+  estado         Estado           @relation(fields: [estadoId], references: [id])
+  moduloTaller   ModuloTaller?    @relation(fields: [moduloTallerId], references: [id])
+  sucursal       Sucursal         @relation(fields: [sucursalId], references: [id])
+  tipo           TipoContabilidad @relation(fields: [tipoId], references: [id])
 
-  estadoId        Int
-  estado          Estado @relation(fields: [estadoId], references: [id])
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  @@index([estadoId], map: "IngresosEgresos_estadoId_fkey")
+  @@index([moduloTallerId], map: "IngresosEgresos_moduloTallerId_fkey")
+  @@index([sucursalId], map: "IngresosEgresos_sucursalId_fkey")
+  @@index([tipoId], map: "IngresosEgresos_tipoId_fkey")
 }

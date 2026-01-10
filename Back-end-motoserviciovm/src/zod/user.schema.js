@@ -6,14 +6,19 @@ export const userSchema = z.object({
     segundoNombre:      z.string().optional(),
     primerApellido:     z.string(),
     segundoApellido:    z.string().optional(),
-    fechaNac:           z.coerce.date(),
-    dpi:                z.string().optional(),
-    nit:                z.string().optional(),      
+    fechaNac:           z.coerce.date().optional().nullable(),
+    dpi:                z.string().optional().nullable(),
+    nit:                z.string().optional().nullable(),      
     tipo:               z.string().optional(),
     activo:             z.boolean().default(false),
     numeroTel:          z.string().min(8).max(8),
     numeroAuxTel :      z.string().optional(),
-    email:              z.email().optional(),
+    email:              z
+                        .string()
+                        .email("Correo inválido") // Valida el formato
+                        .optional() 
+                        .nullable()
+                        .or(z.literal("")),
     password:           z.string().optional(),
     roles:              z.array(z.number().int()).optional(),
     sucursales:         z.array(z.number().int()).optional(),

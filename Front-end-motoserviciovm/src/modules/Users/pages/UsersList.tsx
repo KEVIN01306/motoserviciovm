@@ -121,7 +121,7 @@ const UsersList = () => {
         const baseColumns: Column<UserGetType>[] = [
             { id: "primerNombre", label: "First Name", minWidth: 150 },
             { id: "numeroTel", label: "Numero de Teléfono", minWidth: 100 },
-            { id: "email", label: "Email", minWidth: 100 },
+            { id: "email", label: "Email", minWidth: 100, format: (value: any) => value ?? 'N/A' },
             { id: "activo", label: "Estado", minWidth: 100, format: (value: any) => changeChip(value) },
         ];
 

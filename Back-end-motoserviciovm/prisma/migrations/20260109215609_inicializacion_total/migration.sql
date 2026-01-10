@@ -10,6 +10,7 @@ CREATE TABLE `Sucursal` (
     `estadoId` INTEGER NOT NULL,
 
     UNIQUE INDEX `Sucursal_nombre_key`(`nombre`),
+    INDEX `Sucursal_estadoId_fkey`(`estadoId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -24,16 +25,17 @@ CREATE TABLE `User` (
     `dpi` VARCHAR(191) NULL,
     `nit` VARCHAR(191) NULL,
     `tipo` VARCHAR(191) NULL,
-    `activo` BOOLEAN NOT NULL DEFAULT true,
     `numeroTel` VARCHAR(191) NOT NULL,
     `numeroAuxTel` VARCHAR(191) NULL,
     `email` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NULL,
-    `estadoId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
+    `activo` BOOLEAN NOT NULL DEFAULT true,
+    `estadoId` INTEGER NOT NULL,
 
     UNIQUE INDEX `User_email_key`(`email`),
+    INDEX `User_estadoId_fkey`(`estadoId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -41,12 +43,13 @@ CREATE TABLE `User` (
 CREATE TABLE `Rol` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `rol` VARCHAR(191) NOT NULL,
-    `descripcion` VARCHAR(191) NULL,
-    `estadoId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
+    `descripcion` VARCHAR(191) NULL,
+    `estadoId` INTEGER NOT NULL,
 
     UNIQUE INDEX `Rol_rol_key`(`rol`),
+    INDEX `Rol_estadoId_fkey`(`estadoId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -54,12 +57,13 @@ CREATE TABLE `Rol` (
 CREATE TABLE `Permiso` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `permiso` VARCHAR(191) NOT NULL,
-    `modulo` VARCHAR(191) NULL,
-    `estadoId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
+    `modulo` VARCHAR(191) NULL,
+    `estadoId` INTEGER NOT NULL,
 
     UNIQUE INDEX `Permiso_permiso_key`(`permiso`),
+    INDEX `Permiso_estadoId_fkey`(`estadoId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -72,6 +76,7 @@ CREATE TABLE `Marca` (
     `updatedAt` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `Marca_marca_key`(`marca`),
+    INDEX `Marca_estadoId_fkey`(`estadoId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -84,6 +89,7 @@ CREATE TABLE `Linea` (
     `updatedAt` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `Linea_linea_key`(`linea`),
+    INDEX `Linea_estadoId_fkey`(`estadoId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -96,6 +102,7 @@ CREATE TABLE `Cilindrada` (
     `updatedAt` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `Cilindrada_cilindrada_key`(`cilindrada`),
+    INDEX `Cilindrada_estadoId_fkey`(`estadoId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -103,16 +110,20 @@ CREATE TABLE `Cilindrada` (
 CREATE TABLE `Modelo` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `año` INTEGER NOT NULL,
-    `modelo` VARCHAR(191) NOT NULL,
     `marcaId` INTEGER NOT NULL,
     `lineaId` INTEGER NOT NULL,
     `cilindradaId` INTEGER NOT NULL,
     `estadoId` INTEGER NOT NULL,
-    `description` VARCHAR(191) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
+    `modelo` VARCHAR(191) NOT NULL,
+    `description` VARCHAR(191) NULL,
 
     UNIQUE INDEX `Modelo_modelo_key`(`modelo`),
+    INDEX `Modelo_cilindradaId_fkey`(`cilindradaId`),
+    INDEX `Modelo_estadoId_fkey`(`estadoId`),
+    INDEX `Modelo_lineaId_fkey`(`lineaId`),
+    INDEX `Modelo_marcaId_fkey`(`marcaId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -132,13 +143,15 @@ CREATE TABLE `Moto` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `placa` VARCHAR(191) NOT NULL,
     `avatar` VARCHAR(191) NULL,
-    `calcomania` VARCHAR(191) NULL,
     `modeloId` INTEGER NOT NULL,
     `estadoId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
+    `calcomania` VARCHAR(191) NULL,
 
     UNIQUE INDEX `Moto_placa_key`(`placa`),
+    INDEX `Moto_estadoId_fkey`(`estadoId`),
+    INDEX `Moto_modeloId_fkey`(`modeloId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -147,12 +160,13 @@ CREATE TABLE `TipoServicio` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `tipo` VARCHAR(191) NOT NULL,
     `descripcion` VARCHAR(191) NULL,
-    `servicioCompleto` BOOLEAN NULL DEFAULT false,
     `estadoId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
+    `servicioCompleto` BOOLEAN NULL DEFAULT false,
 
     UNIQUE INDEX `TipoServicio_tipo_key`(`tipo`),
+    INDEX `TipoServicio_estadoId_fkey`(`estadoId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -166,6 +180,7 @@ CREATE TABLE `OpcionServicio` (
     `updatedAt` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `OpcionServicio_opcion_key`(`opcion`),
+    INDEX `OpcionServicio_estadoId_fkey`(`estadoId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -173,17 +188,12 @@ CREATE TABLE `OpcionServicio` (
 CREATE TABLE `Servicio` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `descripcion` VARCHAR(191) NOT NULL,
-    `kilometraje` INTEGER NULL,
-    `kilometrajeProximoServicio` INTEGER NULL,
     `fechaEntrada` DATETIME(3) NOT NULL,
     `fechaSalida` DATETIME(3) NULL,
-    `firmaEntrada` VARCHAR(191) NULL,
-    `firmaSalida` VARCHAR(191) NULL,
     `total` DOUBLE NOT NULL,
     `observaciones` VARCHAR(191) NULL,
     `proximaFechaServicio` DATETIME(3) NULL,
     `descripcionProximoServicio` VARCHAR(191) NULL,
-    `descuentosServicio` DOUBLE NULL,
     `sucursalId` INTEGER NOT NULL,
     `motoId` INTEGER NOT NULL,
     `clienteId` INTEGER NULL,
@@ -192,7 +202,20 @@ CREATE TABLE `Servicio` (
     `estadoId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
+    `kilometraje` INTEGER NULL,
+    `firmaEntrada` VARCHAR(191) NULL,
+    `firmaSalida` VARCHAR(191) NULL,
+    `kilometrajeProximoServicio` INTEGER NULL,
+    `descuentosServicio` DOUBLE NULL,
+    `checkedReparacion` BOOLEAN NULL DEFAULT false,
+    `chekedParqueo` BOOLEAN NULL DEFAULT false,
 
+    INDEX `Servicio_clienteId_fkey`(`clienteId`),
+    INDEX `Servicio_estadoId_fkey`(`estadoId`),
+    INDEX `Servicio_mecanicoId_fkey`(`mecanicoId`),
+    INDEX `Servicio_motoId_fkey`(`motoId`),
+    INDEX `Servicio_sucursalId_fkey`(`sucursalId`),
+    INDEX `Servicio_tipoServicioId_fkey`(`tipoServicioId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -206,6 +229,7 @@ CREATE TABLE `ServicioOpcionesTipoServicio` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
+    INDEX `ServicioOpcionesTipoServicio_opcionServicioId_fkey`(`opcionServicioId`),
     UNIQUE INDEX `ServicioOpcionesTipoServicio_servicioId_opcionServicioId_key`(`servicioId`, `opcionServicioId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -219,6 +243,7 @@ CREATE TABLE `Imagen` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
+    INDEX `Imagen_servicioId_fkey`(`servicioId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -230,6 +255,7 @@ CREATE TABLE `ServicioProductoProximo` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
+    INDEX `ServicioProductoProximo_servicioId_fkey`(`servicioId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -242,6 +268,7 @@ CREATE TABLE `ServicioProductoCliente` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
+    INDEX `ServicioProductoCliente_servicioId_fkey`(`servicioId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -257,6 +284,7 @@ CREATE TABLE `ServicioInventario` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
+    INDEX `ServicioInventario_inventarioId_fkey`(`inventarioId`),
     UNIQUE INDEX `ServicioInventario_servicioId_inventarioId_key`(`servicioId`, `inventarioId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -271,6 +299,7 @@ CREATE TABLE `Inventario` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
+    INDEX `Inventario_estadoId_fkey`(`estadoId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -283,6 +312,7 @@ CREATE TABLE `CategoriaProducto` (
     `updatedAt` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `CategoriaProducto_categoria_key`(`categoria`),
+    INDEX `CategoriaProducto_estadoId_fkey`(`estadoId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -291,7 +321,6 @@ CREATE TABLE `Producto` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `nombre` VARCHAR(191) NOT NULL,
     `descripcion` VARCHAR(191) NULL,
-    `costo` DOUBLE NOT NULL,
     `precio` DOUBLE NOT NULL,
     `imagen` VARCHAR(191) NULL,
     `cantidad` INTEGER NOT NULL,
@@ -299,42 +328,50 @@ CREATE TABLE `Producto` (
     `estadoId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
+    `costo` DOUBLE NOT NULL,
 
+    INDEX `Producto_categoriaId_fkey`(`categoriaId`),
+    INDEX `Producto_estadoId_fkey`(`estadoId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `Venta` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `costo` DOUBLE NULL,
-    `precioTotal` DOUBLE NULL,
-    `gananciaTotal` DOUBLE NULL,
-    `descuentoTotal` DOUBLE NULL,
     `usuarioId` INTEGER NOT NULL,
     `servicioId` INTEGER NULL,
     `total` DOUBLE NOT NULL,
     `estadoId` INTEGER NOT NULL,
-    `sucursalId` INTEGER NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
+    `sucursalId` INTEGER NULL,
+    `gananciaTotal` DOUBLE NULL,
+    `costo` DOUBLE NULL,
+    `precioTotal` DOUBLE NULL,
+    `descuentoTotal` DOUBLE NULL,
 
+    INDEX `Venta_estadoId_fkey`(`estadoId`),
+    INDEX `Venta_servicioId_fkey`(`servicioId`),
+    INDEX `Venta_sucursalId_fkey`(`sucursalId`),
+    INDEX `Venta_usuarioId_fkey`(`usuarioId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `VentaProducto` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `costo` DOUBLE NULL,
-    `precio` DOUBLE NULL,
-    `ganacia` DOUBLE NULL,
-    `descuento` BOOLEAN NULL,
     `ventaId` INTEGER NOT NULL,
     `productoId` INTEGER NOT NULL,
     `cantidad` INTEGER NOT NULL,
     `totalProducto` DOUBLE NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
+    `precio` DOUBLE NULL,
+    `costo` DOUBLE NULL,
+    `ganacia` DOUBLE NULL,
+    `descuento` BOOLEAN NULL,
 
+    INDEX `VentaProducto_productoId_fkey`(`productoId`),
     UNIQUE INDEX `VentaProducto_ventaId_productoId_key`(`ventaId`, `productoId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -347,12 +384,15 @@ CREATE TABLE `EnParqueo` (
     `fechaSalida` DATETIME(3) NULL,
     `total` DOUBLE NULL,
     `observaciones` VARCHAR(191) NULL,
-    `servicioId` INTEGER NULL,
     `estadoId` INTEGER NOT NULL,
-    `sucursalId` INTEGER NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
+    `sucursalId` INTEGER NULL,
+    `servicioId` INTEGER NULL,
 
+    INDEX `EnParqueo_estadoId_fkey`(`estadoId`),
+    INDEX `EnParqueo_servicioId_fkey`(`servicioId`),
+    INDEX `EnParqueo_sucursalId_fkey`(`sucursalId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -364,12 +404,15 @@ CREATE TABLE `EnReparacion` (
     `fechaSalida` DATETIME(3) NULL,
     `total` DOUBLE NULL,
     `observaciones` VARCHAR(191) NULL,
-    `servicioId` INTEGER NULL,
     `estadoId` INTEGER NOT NULL,
-    `sucursalId` INTEGER NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
+    `sucursalId` INTEGER NULL,
+    `servicioId` INTEGER NULL,
 
+    INDEX `EnReparacion_estadoId_fkey`(`estadoId`),
+    INDEX `EnReparacion_servicioId_fkey`(`servicioId`),
+    INDEX `EnReparacion_sucursalId_fkey`(`sucursalId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -388,6 +431,9 @@ CREATE TABLE `RepuestosReparacion` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
+    INDEX `RepuestosReparacion_estadoId_fkey`(`estadoId`),
+    INDEX `RepuestosReparacion_reparacionId_fkey`(`reparacionId`),
+    INDEX `RepuestosReparacion_sucursalId_fkey`(`sucursalId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -407,6 +453,10 @@ CREATE TABLE `Cita` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
+    INDEX `Cita_clienteId_fkey`(`clienteId`),
+    INDEX `Cita_estadoId_fkey`(`estadoId`),
+    INDEX `Cita_motoId_fkey`(`motoId`),
+    INDEX `Cita_sucursalId_fkey`(`sucursalId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -436,13 +486,17 @@ CREATE TABLE `IngresosEgresos` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `descripcion` VARCHAR(191) NULL,
     `monto` DOUBLE NOT NULL,
-    `tipoId` INTEGER NOT NULL,
-    `moduloTallerId` INTEGER NULL,
-    `sucursalId` INTEGER NOT NULL,
-    `estadoId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
+    `estadoId` INTEGER NOT NULL,
+    `sucursalId` INTEGER NOT NULL,
+    `tipoId` INTEGER NOT NULL,
+    `moduloTallerId` INTEGER NULL,
 
+    INDEX `IngresosEgresos_estadoId_fkey`(`estadoId`),
+    INDEX `IngresosEgresos_moduloTallerId_fkey`(`moduloTallerId`),
+    INDEX `IngresosEgresos_sucursalId_fkey`(`sucursalId`),
+    INDEX `IngresosEgresos_tipoId_fkey`(`tipoId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -513,22 +567,22 @@ ALTER TABLE `Linea` ADD CONSTRAINT `Linea_estadoId_fkey` FOREIGN KEY (`estadoId`
 ALTER TABLE `Cilindrada` ADD CONSTRAINT `Cilindrada_estadoId_fkey` FOREIGN KEY (`estadoId`) REFERENCES `Estado`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Modelo` ADD CONSTRAINT `Modelo_marcaId_fkey` FOREIGN KEY (`marcaId`) REFERENCES `Marca`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Modelo` ADD CONSTRAINT `Modelo_lineaId_fkey` FOREIGN KEY (`lineaId`) REFERENCES `Linea`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE `Modelo` ADD CONSTRAINT `Modelo_cilindradaId_fkey` FOREIGN KEY (`cilindradaId`) REFERENCES `Cilindrada`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Modelo` ADD CONSTRAINT `Modelo_estadoId_fkey` FOREIGN KEY (`estadoId`) REFERENCES `Estado`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Moto` ADD CONSTRAINT `Moto_modeloId_fkey` FOREIGN KEY (`modeloId`) REFERENCES `Modelo`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Modelo` ADD CONSTRAINT `Modelo_lineaId_fkey` FOREIGN KEY (`lineaId`) REFERENCES `Linea`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Modelo` ADD CONSTRAINT `Modelo_marcaId_fkey` FOREIGN KEY (`marcaId`) REFERENCES `Marca`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Moto` ADD CONSTRAINT `Moto_estadoId_fkey` FOREIGN KEY (`estadoId`) REFERENCES `Estado`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Moto` ADD CONSTRAINT `Moto_modeloId_fkey` FOREIGN KEY (`modeloId`) REFERENCES `Modelo`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `TipoServicio` ADD CONSTRAINT `TipoServicio_estadoId_fkey` FOREIGN KEY (`estadoId`) REFERENCES `Estado`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -537,28 +591,28 @@ ALTER TABLE `TipoServicio` ADD CONSTRAINT `TipoServicio_estadoId_fkey` FOREIGN K
 ALTER TABLE `OpcionServicio` ADD CONSTRAINT `OpcionServicio_estadoId_fkey` FOREIGN KEY (`estadoId`) REFERENCES `Estado`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Servicio` ADD CONSTRAINT `Servicio_sucursalId_fkey` FOREIGN KEY (`sucursalId`) REFERENCES `Sucursal`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Servicio` ADD CONSTRAINT `Servicio_motoId_fkey` FOREIGN KEY (`motoId`) REFERENCES `Moto`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE `Servicio` ADD CONSTRAINT `Servicio_clienteId_fkey` FOREIGN KEY (`clienteId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Servicio` ADD CONSTRAINT `Servicio_mecanicoId_fkey` FOREIGN KEY (`mecanicoId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Servicio` ADD CONSTRAINT `Servicio_tipoServicioId_fkey` FOREIGN KEY (`tipoServicioId`) REFERENCES `TipoServicio`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Servicio` ADD CONSTRAINT `Servicio_estadoId_fkey` FOREIGN KEY (`estadoId`) REFERENCES `Estado`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ServicioOpcionesTipoServicio` ADD CONSTRAINT `ServicioOpcionesTipoServicio_servicioId_fkey` FOREIGN KEY (`servicioId`) REFERENCES `Servicio`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Servicio` ADD CONSTRAINT `Servicio_mecanicoId_fkey` FOREIGN KEY (`mecanicoId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Servicio` ADD CONSTRAINT `Servicio_motoId_fkey` FOREIGN KEY (`motoId`) REFERENCES `Moto`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Servicio` ADD CONSTRAINT `Servicio_sucursalId_fkey` FOREIGN KEY (`sucursalId`) REFERENCES `Sucursal`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Servicio` ADD CONSTRAINT `Servicio_tipoServicioId_fkey` FOREIGN KEY (`tipoServicioId`) REFERENCES `TipoServicio`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `ServicioOpcionesTipoServicio` ADD CONSTRAINT `ServicioOpcionesTipoServicio_opcionServicioId_fkey` FOREIGN KEY (`opcionServicioId`) REFERENCES `OpcionServicio`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ServicioOpcionesTipoServicio` ADD CONSTRAINT `ServicioOpcionesTipoServicio_servicioId_fkey` FOREIGN KEY (`servicioId`) REFERENCES `Servicio`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Imagen` ADD CONSTRAINT `Imagen_servicioId_fkey` FOREIGN KEY (`servicioId`) REFERENCES `Servicio`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -570,10 +624,10 @@ ALTER TABLE `ServicioProductoProximo` ADD CONSTRAINT `ServicioProductoProximo_se
 ALTER TABLE `ServicioProductoCliente` ADD CONSTRAINT `ServicioProductoCliente_servicioId_fkey` FOREIGN KEY (`servicioId`) REFERENCES `Servicio`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ServicioInventario` ADD CONSTRAINT `ServicioInventario_servicioId_fkey` FOREIGN KEY (`servicioId`) REFERENCES `Servicio`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `ServicioInventario` ADD CONSTRAINT `ServicioInventario_inventarioId_fkey` FOREIGN KEY (`inventarioId`) REFERENCES `Inventario`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ServicioInventario` ADD CONSTRAINT `ServicioInventario_inventarioId_fkey` FOREIGN KEY (`inventarioId`) REFERENCES `Inventario`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `ServicioInventario` ADD CONSTRAINT `ServicioInventario_servicioId_fkey` FOREIGN KEY (`servicioId`) REFERENCES `Servicio`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Inventario` ADD CONSTRAINT `Inventario_estadoId_fkey` FOREIGN KEY (`estadoId`) REFERENCES `Estado`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -588,64 +642,64 @@ ALTER TABLE `Producto` ADD CONSTRAINT `Producto_categoriaId_fkey` FOREIGN KEY (`
 ALTER TABLE `Producto` ADD CONSTRAINT `Producto_estadoId_fkey` FOREIGN KEY (`estadoId`) REFERENCES `Estado`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Venta` ADD CONSTRAINT `Venta_usuarioId_fkey` FOREIGN KEY (`usuarioId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Venta` ADD CONSTRAINT `Venta_estadoId_fkey` FOREIGN KEY (`estadoId`) REFERENCES `Estado`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Venta` ADD CONSTRAINT `Venta_servicioId_fkey` FOREIGN KEY (`servicioId`) REFERENCES `Servicio`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Venta` ADD CONSTRAINT `Venta_estadoId_fkey` FOREIGN KEY (`estadoId`) REFERENCES `Estado`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE `Venta` ADD CONSTRAINT `Venta_sucursalId_fkey` FOREIGN KEY (`sucursalId`) REFERENCES `Sucursal`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `VentaProducto` ADD CONSTRAINT `VentaProducto_ventaId_fkey` FOREIGN KEY (`ventaId`) REFERENCES `Venta`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Venta` ADD CONSTRAINT `Venta_usuarioId_fkey` FOREIGN KEY (`usuarioId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `VentaProducto` ADD CONSTRAINT `VentaProducto_productoId_fkey` FOREIGN KEY (`productoId`) REFERENCES `Producto`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `EnParqueo` ADD CONSTRAINT `EnParqueo_servicioId_fkey` FOREIGN KEY (`servicioId`) REFERENCES `Servicio`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `VentaProducto` ADD CONSTRAINT `VentaProducto_ventaId_fkey` FOREIGN KEY (`ventaId`) REFERENCES `Venta`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `EnParqueo` ADD CONSTRAINT `EnParqueo_estadoId_fkey` FOREIGN KEY (`estadoId`) REFERENCES `Estado`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `EnParqueo` ADD CONSTRAINT `EnParqueo_sucursalId_fkey` FOREIGN KEY (`sucursalId`) REFERENCES `Sucursal`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `EnParqueo` ADD CONSTRAINT `EnParqueo_servicioId_fkey` FOREIGN KEY (`servicioId`) REFERENCES `Servicio`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `EnReparacion` ADD CONSTRAINT `EnReparacion_servicioId_fkey` FOREIGN KEY (`servicioId`) REFERENCES `Servicio`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `EnParqueo` ADD CONSTRAINT `EnParqueo_sucursalId_fkey` FOREIGN KEY (`sucursalId`) REFERENCES `Sucursal`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `EnReparacion` ADD CONSTRAINT `EnReparacion_estadoId_fkey` FOREIGN KEY (`estadoId`) REFERENCES `Estado`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `EnReparacion` ADD CONSTRAINT `EnReparacion_servicioId_fkey` FOREIGN KEY (`servicioId`) REFERENCES `Servicio`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `EnReparacion` ADD CONSTRAINT `EnReparacion_sucursalId_fkey` FOREIGN KEY (`sucursalId`) REFERENCES `Sucursal`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `RepuestosReparacion` ADD CONSTRAINT `RepuestosReparacion_sucursalId_fkey` FOREIGN KEY (`sucursalId`) REFERENCES `Sucursal`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `RepuestosReparacion` ADD CONSTRAINT `RepuestosReparacion_reparacionId_fkey` FOREIGN KEY (`reparacionId`) REFERENCES `EnReparacion`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `RepuestosReparacion` ADD CONSTRAINT `RepuestosReparacion_estadoId_fkey` FOREIGN KEY (`estadoId`) REFERENCES `Estado`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Cita` ADD CONSTRAINT `Cita_sucursalId_fkey` FOREIGN KEY (`sucursalId`) REFERENCES `Sucursal`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `RepuestosReparacion` ADD CONSTRAINT `RepuestosReparacion_reparacionId_fkey` FOREIGN KEY (`reparacionId`) REFERENCES `EnReparacion`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `RepuestosReparacion` ADD CONSTRAINT `RepuestosReparacion_sucursalId_fkey` FOREIGN KEY (`sucursalId`) REFERENCES `Sucursal`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Cita` ADD CONSTRAINT `Cita_clienteId_fkey` FOREIGN KEY (`clienteId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Cita` ADD CONSTRAINT `Cita_motoId_fkey` FOREIGN KEY (`motoId`) REFERENCES `Moto`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE `Cita` ADD CONSTRAINT `Cita_estadoId_fkey` FOREIGN KEY (`estadoId`) REFERENCES `Estado`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `IngresosEgresos` ADD CONSTRAINT `IngresosEgresos_tipoId_fkey` FOREIGN KEY (`tipoId`) REFERENCES `TipoContabilidad`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Cita` ADD CONSTRAINT `Cita_motoId_fkey` FOREIGN KEY (`motoId`) REFERENCES `Moto`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Cita` ADD CONSTRAINT `Cita_sucursalId_fkey` FOREIGN KEY (`sucursalId`) REFERENCES `Sucursal`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `IngresosEgresos` ADD CONSTRAINT `IngresosEgresos_estadoId_fkey` FOREIGN KEY (`estadoId`) REFERENCES `Estado`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `IngresosEgresos` ADD CONSTRAINT `IngresosEgresos_moduloTallerId_fkey` FOREIGN KEY (`moduloTallerId`) REFERENCES `ModuloTaller`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -654,7 +708,7 @@ ALTER TABLE `IngresosEgresos` ADD CONSTRAINT `IngresosEgresos_moduloTallerId_fke
 ALTER TABLE `IngresosEgresos` ADD CONSTRAINT `IngresosEgresos_sucursalId_fkey` FOREIGN KEY (`sucursalId`) REFERENCES `Sucursal`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `IngresosEgresos` ADD CONSTRAINT `IngresosEgresos_estadoId_fkey` FOREIGN KEY (`estadoId`) REFERENCES `Estado`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `IngresosEgresos` ADD CONSTRAINT `IngresosEgresos_tipoId_fkey` FOREIGN KEY (`tipoId`) REFERENCES `TipoContabilidad`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `_UserSucursales` ADD CONSTRAINT `_UserSucursales_A_fkey` FOREIGN KEY (`A`) REFERENCES `Sucursal`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
