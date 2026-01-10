@@ -13,12 +13,7 @@ const getMotosHandler =  async (req, res) => {
         console.error(error);
         let errorCode = 500;
         let errorMessage = 'INTERNAL_SERVER_ERROR'
-        switch(error.code){
-            case 'DATA_NOT_FOUND':
-                errorCode = 404;
-                errorMessage = error.code;
-                break;
-        }
+        
         res.status(errorCode).json(responseError(errorMessage));
     }
 }
