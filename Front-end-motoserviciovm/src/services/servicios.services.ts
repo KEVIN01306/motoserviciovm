@@ -186,6 +186,7 @@ export const putFirmaSalida = async (
     if (data.kilometrajeProximoServicio !== undefined) form.append('kilometrajeProximoServicio', String(data.kilometrajeProximoServicio));
     form.append('firmaSalida', data.firmaSalida);
     if (data.accionSalida) form.append('accionSalida', data.accionSalida);
+    if (data.totalSalidaAnticipado !== undefined) form.append('totalSalidaAnticipado', String(data.totalSalidaAnticipado));
     // Enviar la lista como proximoServicioItems
     if (data.proximoServicioItems && Array.isArray(data.proximoServicioItems) && data.proximoServicioItems.length > 0) {
       form.append('proximoServicioItems', JSON.stringify(data.proximoServicioItems));

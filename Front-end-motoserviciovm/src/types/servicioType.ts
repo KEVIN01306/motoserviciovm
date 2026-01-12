@@ -32,6 +32,7 @@ export type ImagenGetType = ImagenMetaType & {
 export type ServicioType = Omit<z.infer<typeof servicioSchema>, 'firmaSalida'> & {
   firmaSalida: string | File | null;
   accionSalida?: string;
+  totalSalidaAnticipado?: number;
   descripcionAccion?: string;
 }
 
@@ -91,6 +92,7 @@ export type ServicioSalidaPayloadType = Pick<
   firmaSalida: File;
   proximoServicioItems?: servicioProductoProximoType[];
   accionSalida?: string;
+  totalSalidaAnticipado?: number;
   descripcionAccion?: string;
 };
 

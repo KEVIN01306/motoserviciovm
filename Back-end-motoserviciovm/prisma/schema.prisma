@@ -431,6 +431,7 @@ model EnParqueo {
   descripcion   String
   fechaEntrada  DateTime
   fechaSalida   DateTime?
+  firmaSalida   String?
   total         Float?
   observaciones String?
   estadoId      Int
@@ -452,6 +453,7 @@ model EnReparacion {
   descripcion   String
   fechaEntrada  DateTime
   fechaSalida   DateTime?
+  firmaSalida   String?
   total         Float?
   observaciones String?
   estadoId      Int

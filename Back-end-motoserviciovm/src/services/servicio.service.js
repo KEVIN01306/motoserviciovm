@@ -296,6 +296,7 @@ const salidaServicio = async (id, data) => {
                         fechaEntrada: new Date(),
                         estadoId: estados().activo,
                         descripcion: base.descripcionAccion,
+                        total: base.totalSalidaAnticipado || 0,
                     },
                 });
             }

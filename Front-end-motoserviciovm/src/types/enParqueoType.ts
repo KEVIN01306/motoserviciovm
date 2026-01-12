@@ -9,12 +9,12 @@ export type EnParqueoType = z.infer<typeof enParqueoSchema>;
 export type EnParqueoGetType = EnParqueoType & {
     servicio: ServicioGetType;
     estado: EstadoType;
+    fechaSalida: Date | null;
 }
 
 export const EnParqueoInitialState = {
     descripcion: "",
     fechaEntrada: new Date(),
-    fechaSalida: null as Date | null,
     total: 0,
     observaciones: "",
     servicioId: undefined as number | undefined,
@@ -27,10 +27,18 @@ export const mergeEnParqueoDataWithDefaults = (apiData: Partial<EnParqueoType>):
     return {
         descripcion: apiData.descripcion ?? EnParqueoInitialState.descripcion,
         fechaEntrada: apiData.fechaEntrada ?? EnParqueoInitialState.fechaEntrada,
-        fechaSalida: apiData.fechaSalida ?? EnParqueoInitialState.fechaSalida,
         total: apiData.total ?? EnParqueoInitialState.total,
         observaciones: apiData.observaciones ?? EnParqueoInitialState.observaciones,
         servicioId: apiData.servicioId ?? EnParqueoInitialState.servicioId,
         estadoId: apiData.estadoId ?? EnParqueoInitialState.estadoId,
     };
 }
+
+/** Prepara los datos para el envío al backend, incluyendo solo los campos necesarios */
+export const mergeEnParqueoDataForSubmission = (formData: Partial<EnParqueoType>): Partial<EnParqueoType> => {
+    return {
+        total: formData.total ?? 0, // Valor inicial por defecto
+        observaciones: formData.observaciones,
+        firmaSalida: formData.firmaSalida, // Incluir firmaSalida para el envío
+    };
+};

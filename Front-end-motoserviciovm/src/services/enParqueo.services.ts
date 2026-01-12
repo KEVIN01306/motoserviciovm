@@ -3,6 +3,7 @@ import { api } from "../axios/axios";
 import type { apiResponse } from "../types/apiResponse";
 import type { EnParqueoType, EnParqueoGetType } from "../types/enParqueoType";
 
+
 const API_URL = import.meta.env.VITE_DOMAIN;
 const API_ENPARQUEO = API_URL + "enParqueo";
 
@@ -62,7 +63,38 @@ const postEnParqueo = async (payload: EnParqueoType) => {
 
 const putEnParqueoSalida = async (id: EnParqueoType["id"], payload: Partial<EnParqueoType>) => {
   try {
-    const response = await api.put<apiResponse<EnParqueoGetType>>(`${API_ENPARQUEO}/salida/${id}`, payload);
+    let dataToSend: any = payload;
+    console.log("Payload before submission:", payload);
+    let config = {};
+    if (payload.firmaSalida) {
+      const formData = new FormData();
+      if (typeof payload.firmaSalida === "string" && payload.firmaSalida.startsWith("data:image")) {
+        const arr = payload.firmaSalida.split(",");
+        const mimeMatch = arr[0].match(/:(.*?);/);
+        const mime = mimeMatch ? mimeMatch[1] : "image/jpeg";
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) u8arr[n] = bstr.charCodeAt(n);
+        const file = new File([u8arr], "firmaSalida.jpg", { type: mime });
+        formData.append("firmaSalida", file);
+      } else if (payload.firmaSalida instanceof File) {
+        formData.append("firmaSalida", payload.firmaSalida);
+      }
+      Object.entries(payload).forEach(([key, value]) => {
+        if (key !== "firmaSalida" && value !== undefined && value !== null) {
+          formData.append(key, value as any);
+        }
+      });
+
+      dataToSend = formData;
+      config = { headers: { "Content-Type": "multipart/form-data" } };
+    }
+    const response = await api.put<apiResponse<EnParqueoGetType>>(
+      `${API_ENPARQUEO}/salida/${id}`,
+      dataToSend,
+      config
+    );
     return response.data.data ?? "";
   } catch (error) {
     if (axios.isAxiosError(error)) {

@@ -1,6 +1,7 @@
-import { Card, CardContent, Grid, Typography, Button } from "@mui/material";
+import { Card, CardContent, Grid, Typography, Button, Avatar } from "@mui/material";
 import type { EnReparacionGetType } from "../../../types/enReparacionType";
 import { useGoTo } from "../../../hooks/useGoTo";
+const API_URL = import.meta.env.VITE_DOMAIN;
 
 const DetailData = ({ item }: { item: EnReparacionGetType }) => {
   const goTo = useGoTo();
@@ -46,6 +47,18 @@ const DetailData = ({ item }: { item: EnReparacionGetType }) => {
           <Grid size={12}>
             <Typography variant="subtitle2">Observaciones</Typography>
             <Typography>{item.observaciones ?? "-"}</Typography>
+          </Grid>
+          <Grid container spacing={2} mt={4} justifyContent="center" alignItems="center">
+
+              {
+                  item.firmaSalida &&
+                  <Grid size={{ xs: 12, md: 6 }} textAlign="center">
+                      <Avatar sx={{ width: 200, height: 120, mx: 'auto', borderRadius: 2, justifyContent: 'center', display: 'flex', alignItems: 'center' }} src={`${API_URL}/${item.firmaSalida ?? ''}`} alt="Firma Cliente Salida" />
+                      <Typography variant="body2" color="textSecondary" align="center" sx={{ mt: 2 }}>
+                          {'firma cliente (Salida)'}
+                      </Typography>
+                  </Grid>
+              }
           </Grid>
         </Grid>
       </CardContent>

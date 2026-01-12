@@ -174,6 +174,7 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
       kilometrajeProximoServicio: data.kilometrajeProximoServicio,
       proximoServicioItems: servicioProductoProximo.length > 0 ? servicioProductoProximo : undefined,
       accionSalida: data.accionSalida,
+      totalSalidaAnticipado: data.totalSalidaAnticipado,
       descripcionAccion: data.descripcionAccion
     };
     await onSubmit(payload);
@@ -220,7 +221,8 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
   const accionSalida = watch('accionSalida');
   return (
     <FormEstructure handleSubmit={handleSubmit(internalSubmit)} pGrid={2}>
-
+      <Typography variant="h6" sx={{ gridColumn: 'span 12' }}>{`Placa: ${initial?.moto?.placa}`}</Typography>
+      <Typography variant="h6" sx={{ gridColumn: 'span 12' }}>{`Kilometraje de recepcion: ${initial?.kilometraje}`}</Typography>
       <Grid size={{ xs: 12, sm: 12 }}>
         <TextField {...register('observaciones' as any)} label="Observaciones" fullWidth variant="standard" />
       </Grid>
@@ -464,6 +466,7 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
             </Alert>
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField {...register('descripcionAccion' as any)} label="Descripcion de la reparacion" type="text" fullWidth variant="standard" />
+              <TextField {...register('totalSalidaAnticipado' as any)} label="Total Salida Anticipado" type="text" fullWidth variant="standard" />
             </Grid>
           </>
         )

@@ -14,7 +14,7 @@ import { getEnReparacion, putEnReparacionSalida } from "../../../services/enRepa
 import { successToast, errorToast } from "../../../utils/toast";
 import { enReparacionSchema } from "../../../zod/enReparacion.schema";
 import type { EnReparacionType, EnReparacionGetType } from "../../../types/enReparacionType";
-import { mergeEnReparacionDataWithDefaults } from "../../../types/enReparacionType";
+import { mergeEnReparacionDataWithDefaults, mergeEnReparacionDataForSubmission } from "../../../types/enReparacionType";
 
 const EnReparacionSalida = () => {
   const { id } = useParams();
@@ -23,10 +23,12 @@ const EnReparacionSalida = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { control, handleSubmit, reset, formState, register } = useForm<Partial<EnReparacionType>>({
+  const { control, handleSubmit, reset, formState, register, watch } = useForm<Partial<EnReparacionType>>({
     resolver: zodResolver(enReparacionSchema) as any,
-    defaultValues: {},
+    defaultValues: {} as Partial<EnReparacionType>,
   });
+
+
 
   useEffect(() => {
     const load = async () => {
@@ -50,16 +52,15 @@ const EnReparacionSalida = () => {
   const onSubmit = async (data: Partial<EnReparacionType>) => {
     if (!id) return;
     try {
-      const payload: Partial<EnReparacionType> = { ...data };
-      if (payload.total !== undefined && payload.total !== null) {
-        const n = Number((payload.total as unknown) as string);
-        payload.total = Number.isNaN(n) ? undefined : n;
-      }
-
+      // Usar la nueva función para preparar el payload
+      const payload = mergeEnReparacionDataForSubmission(data);
+      console.log("Submitting payload:", payload);
+      console.log("En Reparacion data:", data);
       await putEnReparacionSalida(Number(id), payload);
       successToast("Salida registrada");
-      goTo("/admin/enreparacion");
+      goTo(`/admin/enreparacion/${id}`);
     } catch (err: any) {
+      console.error("Error during form submission:", err);
       errorToast(err.message);
     }
   };
@@ -76,7 +77,15 @@ const EnReparacionSalida = () => {
         ]}
       />
 
-      <FormEstructure handleSubmit={handleSubmit(onSubmit)}>
+      <FormEstructure
+        handleSubmit={handleSubmit(
+          onSubmit,
+          (errors) => {
+            console.error("Validation errors:", errors); // Log validation errors
+            errorToast("Por favor, revisa los campos del formulario.");
+          }
+        )}
+      >
         <SalidaForm control={control} errors={formState.errors} readOnlyValues={item ?? undefined} register={register} />
 
         <Grid size={12}>

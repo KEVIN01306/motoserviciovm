@@ -93,61 +93,52 @@ const postEnParqueo = async (data) => {
     return newEnParqueo;
 }
 
-const putEnParqueoSalida = async (id, data) => {
-
+const putEnParqueoSalida = async (id, data, firmaSalidaFile) => {
     try {
         await prisma.$transaction(async (tx) => {
-            const existingEnParqueo = await tx.enParqueo.findUnique({
-                where: { id: id },
-            });
-
-            if (!existingEnParqueo) {
+            // Validate if enParqueo exists
+            const existing = await tx.enParqueo.findUnique({ where: { id } });
+            if (!existing) {
                 const error = new Error('DATA_NOT_FOUND');
                 error.code = 'DATA_NOT_FOUND';
                 throw error;
             }
 
-            const servicio = await tx.servicio.findUnique({ where: { id: existingEnParqueo.servicioId }, include: { enReparaciones: true } });
+            // Validate if servicio exists
+            const servicio = await tx.servicio.findUnique({ where: { id: existing.servicioId } });
             if (!servicio) {
                 const error = new Error('SERVICIO_NOT_FOUND');
                 error.code = 'SERVICIO_NOT_FOUND';
                 throw error;
             }
 
-            const motoId = servicio.motoId;
-
-            const isTermino = servicio.enReparaciones.every(reparacion => reparacion.estadoId === estados().activo);
-
-            // Update servicio state
-            await tx.servicio.update({
-                where: { id: existingEnParqueo.servicioId },
-                data: { estadoId: isTermino ? estados().enReparacion : estados().enServicio },
-            });
-
-
-            await tx.moto.update({
-                where: { id: motoId },
-                data: { estadoId: isTermino ? estados().enReparacion : estados().enServicio },
-            });
-
+            // Add fechaSalida to data
             const fechaSalida = new Date();
             data.fechaSalida = fechaSalida;
 
-            const updatedEnParqueo = await tx.enParqueo.update({
-                where: { id: id },
-                data: {
-                    ...data,
-                    estadoId: estados().entregado,
-                },
+            // Handle firmaSalida file
+            if (firmaSalidaFile) {
+                const firmaPath = `/uploads/enParqueos/${firmaSalidaFile.filename}`;
+                data.firmaSalida = firmaPath;
+            }
+
+            // Update enParqueo
+            const updated = await tx.enParqueo.update({
+                where: { id },
+                data: { ...data, estadoId: estados().entregado },
             });
-            return updatedEnParqueo;
-        }, { timeout: 30000, maxWait: 10000 }
-        );
-    } catch (error) {
-        throw error;
+
+            console.log("Updated enParqueo record:", updated);
+
+            return updated;
+        });
+
+        return { success: true };
+    } catch (err) {
+        console.error("Error in putEnParqueoSalida:", err);
+        throw new Error('INTERNAL_SERVER_ERROR');
     }
-    
-}
+};
 
 export {
         getEnParqueos,

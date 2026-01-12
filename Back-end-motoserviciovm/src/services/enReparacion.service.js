@@ -81,7 +81,7 @@ const putEnReparacion = async (id, data) => {
     return updated;
 };
 
-const putEnReparacionSalida = async (id, data) => {
+const putEnReparacionSalida = async (id, data, firmaSalidaFile) => {
     try {
         await prisma.$transaction(async (tx) => {
             // Validate if enReparacion exists
@@ -116,6 +116,12 @@ const putEnReparacionSalida = async (id, data) => {
             // Add fechaSalida to data
             const fechaSalida = new Date();
             data.fechaSalida = fechaSalida;
+
+            // Handle firmaSalida file
+            if (firmaSalidaFile) {
+                const firmaPath = `/uploads/enReparaciones/${firmaSalidaFile.filename}`;
+                data.firmaSalida = firmaPath;
+            }
 
             // Update enReparacion
             const updated = await tx.enReparacion.update({

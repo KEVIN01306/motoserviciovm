@@ -78,36 +78,46 @@ const postEnParqueoHandler = async (req, res) => {
 }
 
 const putEnParqueoSalidaHandler = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const data = req.body;
-        const validationResult = enParqueoSchema.safeParse(data);
-        if (!validationResult.success) {
-            const errorMessages = validationResult.error.issues.map(issue =>
-                `${issue.path.join('.')}: ${issue.message}`);
-            return res.status(400).json(responseError(errorMessages));
-        }
-        const { data: value } = validationResult;
-        const updatedEnParqueo = await putEnParqueoSalida(parseInt(id), value);
-        res.status(200).json(responseSucces('En Parqueo actualizado exitosamente', updatedEnParqueo));
-    } catch (error) {
-        console.error('Error updating En Parqueo:', error);
-        let errorCode = 500;
-        let errorMessage = 'INTERNAL_SERVER_ERROR';
-        switch (error.code) {
-            case 'DATA_NOT_FOUND':
-                errorCode = 404;
-                errorMessage = error.code;
-                break;
-        }
-        res.status(errorCode).json(responseError(errorMessage));
+  try {
+    const { id } = req.params;
+    const data = req.body;
+
+    if (data.total !== undefined) {
+      data.total = parseFloat(data.total);
     }
-}
+
+    const validation = enParqueoSchema.partial().safeParse(data);
+    if (!validation.success) {
+      const errorMessages = validation.error.issues.map(i => `${i.path.join('.')}: ${i.message}`);
+      return res.status(400).json(responseError(errorMessages));
+    }
+
+    let firmaSalidaFile = null;
+    if (req.files && req.files['firmaSalida'] && req.files['firmaSalida'][0]) {
+      firmaSalidaFile = req.files['firmaSalida'][0];
+      console.log('Firma salida file uploaded:', firmaSalidaFile.filename);
+    }
+
+    const updated = await putEnParqueoSalida(parseInt(id), validation.data, firmaSalidaFile);
+    res.status(200).json(responseSucces('En Parqueo salida registrado', updated));
+  } catch (error) {
+    console.error('Error updating En Parqueo salida:', error);
+    let errorCode = 500;
+    let errorMessage = 'INTERNAL_SERVER_ERROR';
+    switch (error.code) {
+      case 'DATA_NOT_FOUND':
+        errorCode = 404;
+        errorMessage = error.code;
+        break;
+    }
+    res.status(errorCode).json(responseError(errorMessage));
+  }
+};
 
 
 export {
     getEnParqueosHandler,
     getEnParqueoHandler,
     postEnParqueoHandler,
-    putEnParqueoSalidaHandler
+    putEnParqueoSalidaHandler,
 }

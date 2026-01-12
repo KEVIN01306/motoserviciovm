@@ -18,4 +18,5 @@ export const enParqueoSchema = z.object({
     estadoId: z.number().int().positive().optional(),
     createdAt: z.date().optional(),
     updatedAt: z.date().optional(),
+    firmaSalida: z.union([z.string(), z.instanceof(File)]).optional().nullable(),
 });

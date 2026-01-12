@@ -11,6 +11,7 @@ import { successToast, errorToast } from '../../../utils/toast';
 import { mergeServicioDataWithDefaults, type ServicioGetType } from '../../../types/servicioType';
 import ServicioFormSalida from '../components/ServicioFormSalida';
 import { estados } from '../../../utils/estados';
+import { da } from 'zod/v4/locales';
 
 const ServicioSalida = () => {
   const { id } = useParams();
@@ -43,22 +44,26 @@ const ServicioSalida = () => {
         kilometrajeProximoServicio,
         proximoServicioItems,
         accionSalida,
+        totalSalidaAnticipado,
         descripcionAccion,
         // ...otros
       } = payload;
-      if (!firmaSalidaFile) throw new Error('Debe adjuntar la firma de salida');
+      if (!firmaSalidaFile && (data?.firmaSalida == null || data?.firmaSalida === '' || data.firmaEntrada == 'undefined')) throw new Error('Debe adjuntar la firma de salida');
       if (accionSalida === "SOLOSALIDA" && data?.enReparaciones?.length ? data?.enReparaciones[0].estadoId == estados().activo : false) throw new Error('El servicio aun cuenta son reparaciones pendientes, no se puede registrar solo salida.');
       if (accionSalida === "SOLOSALIDA" && data?.enParqueos?.length ? data?.enParqueos[0].estadoId == estados().activo : false) throw new Error('El servicio aun cuenta son parqueos pendientes, no se puede registrar solo salida.');
+      const firmaSalida = firmaSalidaFile || (data?.firmaSalida ? null : undefined); // Si ya hay firma en data, enviar null
+
       await putFirmaSalida(id, {
         total,
         observaciones,
         proximaFechaServicio: proximaFechaServicio || '',
         descripcionProximoServicio: descripcionProximoServicio || '',
-        firmaSalida: firmaSalidaFile,
+        firmaSalida, // Enviar null si ya existe firma en data
         kilometrajeProximoServicio: kilometrajeProximoServicio || 0,
         proximoServicioItems: proximoServicioItems || [],
         accionSalida: accionSalida || '',
-        descripcionAccion: descripcionAccion || ''
+        descripcionAccion: descripcionAccion || '',
+        totalSalidaAnticipado: totalSalidaAnticipado || 0
       });
       console.log()
       successToast('Firma de salida registrada');payload

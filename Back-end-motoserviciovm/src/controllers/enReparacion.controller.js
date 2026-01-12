@@ -99,12 +99,27 @@ const putEnReparacionSalidaHandler = async (req, res) => {
   try {
     const { id } = req.params;
     const data = req.body;
+
+    if (data.total !== undefined) {
+      data.total = parseInt(data.total);
+    }
+
     const validation = enReparacionSchema.partial().safeParse(data);
+
+
     if (!validation.success) {
       const errorMessages = validation.error.issues.map(i => `${i.path.join('.')}: ${i.message}`);
       return res.status(400).json(responseError(errorMessages));
     }
-    const updated = await putEnReparacionSalida(parseInt(id), validation.data);
+
+    let firmaSalidaFile = null;
+    if (req.files && req.files['firmaSalida'] && req.files['firmaSalida'][0]) {
+      firmaSalidaFile = req.files['firmaSalida'][0];
+      console.log('Firma salida file uploaded:', firmaSalidaFile.filename);
+    }
+    
+
+    const updated = await putEnReparacionSalida(parseInt(id), validation.data, firmaSalidaFile);
     res.status(200).json(responseSucces('En Reparacion salida registrado', updated));
   } catch (error) {
     console.error('Error updating En Reparacion salida:', error);

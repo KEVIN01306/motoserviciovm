@@ -137,7 +137,7 @@ const postServicioHandler = async (req, res) => {
             }
 
             // Firma de Salida
-            if (req.files['firmaSalida'] && req.files['firmaSalida'][0]) {
+            if (req.files && req.files['firmaSalida'] && req.files['firmaSalida'][0]) {
                 body.firmaSalida = directorio + req.files['firmaSalida'][0].filename;
             }
 
@@ -234,10 +234,14 @@ const salidaServicioHandler = async (req, res) => {
         // Handle file uploads
         if (req.files && req.files['firmaSalida'] && req.files['firmaSalida'][0]) {
             body.firmaSalida = directorio + req.files['firmaSalida'][0].filename;
+        } else if (body.firmaSalida === 'null') {
+            // Remove firmaSalida if explicitly set to 'null'
+            delete body.firmaSalida;
         }
 
         // Parse numeric fields
         if (body.total !== undefined) body.total = parseFloat(body.total);
+        if (body.totalSalidaAnticipado !== undefined) body.totalSalidaAnticipado = parseFloat(body.totalSalidaAnticipado);
         if (body.kilometrajeProximoServicio !== undefined) {
             body.kilometrajeProximoServicio = parseInt(body.kilometrajeProximoServicio);
         }
@@ -285,6 +289,7 @@ const salidaServicioHandler = async (req, res) => {
             estadoId: estados().entregado,
             accionSalida: body.accionSalida,
             descripcionAccion: body.descripcionAccion,
+            totalSalidaAnticipado: body.totalSalidaAnticipado,
         };
 
         const updated = await salidaServicio(parseInt(id), dataToSend);

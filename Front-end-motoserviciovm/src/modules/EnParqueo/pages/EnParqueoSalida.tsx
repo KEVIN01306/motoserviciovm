@@ -14,7 +14,7 @@ import { getEnParqueo, putEnParqueoSalida } from "../../../services/enParqueo.se
 import { successToast, errorToast } from "../../../utils/toast";
 import { enParqueoSchema } from "../../../zod/enParqueo.schema";
 import type { EnParqueoType, EnParqueoGetType } from "../../../types/enParqueoType";
-import { mergeEnParqueoDataWithDefaults } from "../../../types/enParqueoType";
+import { mergeEnParqueoDataForSubmission, mergeEnParqueoDataWithDefaults } from "../../../types/enParqueoType";
 
 const EnParqueoSalida = () => {
   const { id } = useParams();
@@ -25,7 +25,7 @@ const EnParqueoSalida = () => {
 
   const { control, handleSubmit, reset, formState, register } = useForm<Partial<EnParqueoType>>({
     resolver: zodResolver(enParqueoSchema) as any,
-    defaultValues: {},
+    defaultValues: {} as Partial<EnParqueoType>,
   });
 
   useEffect(() => {
@@ -35,13 +35,6 @@ const EnParqueoSalida = () => {
         if (id) {
           const data: EnParqueoGetType = await getEnParqueo(Number(id));
           setItem(data);
-          // if already entregado, redirect to detail
-          const estadoLabel = (data.estado?.estado ?? "").toLowerCase();
-          if (estadoLabel.includes("entreg") || estadoLabel.includes("salid") || estadoLabel.includes("salida")) {
-            goTo(`/admin/enparqueo/${id}`);
-            return;
-          }
-          // normalize api data to form defaults using merge helper
           const merged = mergeEnParqueoDataWithDefaults(data as Partial<EnParqueoType>);
           reset(merged as any);
         }
@@ -57,17 +50,13 @@ const EnParqueoSalida = () => {
   const onSubmit = async (data: Partial<EnParqueoType>) => {
     if (!id) return;
     try {
-      // Ensure `total` is sent as a number (TextField with type=number provides strings)
-      const payload: Partial<EnParqueoType> = { ...data };
-      if (payload.total !== undefined && payload.total !== null) {
-        const n = Number((payload.total as unknown) as string);
-        payload.total = Number.isNaN(n) ? undefined : n;
-      }
-
+      const payload = mergeEnParqueoDataForSubmission(data);
+      console.log("Submitting payload:", payload);
       await putEnParqueoSalida(Number(id), payload);
       successToast("Salida registrada");
-      goTo("/admin/enparqueo");
+      goTo(`/admin/enparqueo/${id}`);
     } catch (err: any) {
+      console.error("Error during form submission:", err);
       errorToast(err.message);
     }
   };
@@ -84,8 +73,16 @@ const EnParqueoSalida = () => {
         ]}
       />
 
-      <FormEstructure handleSubmit={handleSubmit(onSubmit)}>
-        <SalidaForm control={control} errors={formState.errors} readOnlyValues={item ?? undefined} register={register}/>
+      <FormEstructure
+        handleSubmit={handleSubmit(
+          onSubmit,
+          (errors) => {
+            console.error("Validation errors:", errors);
+            errorToast("Por favor, revisa los campos del formulario.");
+          }
+        )}
+      >
+        <SalidaForm control={control} errors={formState.errors} readOnlyValues={item ?? undefined} register={register} />
 
         <Grid size={12}>
           <Divider sx={{ my: 2 }} />
