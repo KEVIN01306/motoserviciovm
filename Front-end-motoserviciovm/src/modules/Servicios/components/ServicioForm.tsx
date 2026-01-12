@@ -20,7 +20,7 @@ import ServicioDataForm from './ServicioDataForm';
 
 type Props = {
   initial?: Partial<ServicioGetType>;
-  onSubmit: (payload: Partial<ServicioType> & { imagenesFiles?: File[] }) => Promise<void>;
+  onSubmit: (payload: Partial<ServicioType> & { imagenesFiles?: File[], firmaEntradaFile?: File }) => Promise<void>;
   submitLabel?: string;
   seHaranVentas?: boolean;
   changeSeHaranVentas? : (value: boolean) => void;

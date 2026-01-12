@@ -55,4 +55,6 @@ export const servicioSchema = z.object({
     createdAt: z.date().optional(),
     updatedAt: z.date().optional(),
     opcionesServicioManual: z.array(z.number()).optional(),
+    nombreClienteMoto: z.string().optional().nullable(),
+    dpiClienteMoto: z.string().optional().nullable(),
 });

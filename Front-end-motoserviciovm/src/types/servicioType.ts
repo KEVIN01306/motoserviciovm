@@ -116,6 +116,8 @@ export const ServicioInitialState: ServicioType = {
   estadoId: estados().enServicio,
   kilometrajeProximoServicio: 0,
   opcionesServicioManual: [],
+  dpiClienteMoto: null,
+  nombreClienteMoto: null,
 };
 
 export const ServicioItemInitialState: ServicioItemType = {
@@ -153,6 +155,8 @@ export const mergeServicioDataWithDefaults = (apiData: Partial<ServicioType>): P
     imagenesMeta: apiData.imagenesMeta ?? ServicioInitialState.imagenesMeta,
     kilometraje: apiData.kilometraje ?? ServicioInitialState.kilometraje,
     opcionesServicioManual: apiData.opcionesServicioManual ?? ServicioInitialState.opcionesServicioManual,
+    nombreClienteMoto: apiData.nombreClienteMoto ?? ServicioInitialState.nombreClienteMoto,
+    dpiClienteMoto: apiData.dpiClienteMoto ?? ServicioInitialState.dpiClienteMoto,
   };
 };
 

@@ -297,16 +297,16 @@ const ServicioDetailSalida = () => {
                                         </li>
                                     ))}
                                 </ul>
-                            ):(
-                        <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
-                            {data.servicioOpcionesTipoServicio?.map((item: any) => (
-                                <li key={item.id}>
-                                    <Typography variant="body1">{item.opcionServicio?.opcion}</Typography>
-                                </li>
-                            ))}
-                        </ul>
+                            ) : (
+                                <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
+                                    {data.servicioOpcionesTipoServicio?.map((item: any) => (
+                                        <li key={item.id}>
+                                            <Typography variant="body1">{item.opcionServicio?.opcion}</Typography>
+                                        </li>
+                                    ))}
+                                </ul>
 
-                        )
+                            )
 
                         }
 
@@ -378,6 +378,12 @@ const ServicioDetailSalida = () => {
                                     </Typography>
                                 </Grid>
                             }
+                            {data.nombreClienteMoto && (
+                                <Typography variant="caption" color="textSecondary" align="center">{data.nombreClienteMoto}</Typography>
+                            )}
+                            {data.dpiClienteMoto && (
+                                <Typography variant="caption" color="textSecondary" align="center">{data.dpiClienteMoto}</Typography>
+                            )}
                         </Grid>
 
                         <Typography mt={6} display={'flex'} justifyContent={'center'} color='red' fontWeight={400} variant='body2'>Este no es un documento contable</Typography>

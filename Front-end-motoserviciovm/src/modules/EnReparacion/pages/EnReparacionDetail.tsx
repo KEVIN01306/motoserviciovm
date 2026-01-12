@@ -36,6 +36,7 @@ const EnReparacionDetail = () => {
     };
     load();
   }, [id]);
+  
 
   if (loading) return <Loading />;
   if (error) return <ErrorCard errorText={error} restart={() => window.location.reload()} />;

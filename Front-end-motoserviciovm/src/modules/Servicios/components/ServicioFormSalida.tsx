@@ -335,6 +335,7 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
           text={'Firma de Salida'}
         />
       </Grid>
+      {/* Nota: campos nombreClienteMoto y dpiClienteMoto sólo se capturan en la entrada (ServicioDataForm) */}
 
       {
         initial?.enReparaciones && initial.enReparaciones.length > 0 && (

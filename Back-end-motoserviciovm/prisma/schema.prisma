@@ -246,6 +246,8 @@ model Servicio {
   descuentosServicio           Float?
   checkedReparacion            Boolean?                       @default(false)
   chekedParqueo                Boolean?                       @default(false)
+  nombreClienteMoto            String?
+  dpiClienteMoto               String?
   enParqueos                   EnParqueo[]
   enReparaciones               EnReparacion[]
   imagen                       Imagen[]

@@ -68,6 +68,9 @@ const ServicioDataForm = ({
       <Grid size={{ xs: 12 }}>
         <TextField {...register('descripcion' as any)} label="Descripción" fullWidth variant="standard" />
       </Grid>
+      <Grid size={{ xs: 12 }}>
+        <TextField {...register('total' as any, { valueAsNumber: true })} label="Total" fullWidth variant="standard" />
+      </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
         <TextField {...register('kilometraje' as any, { valueAsNumber: true })} label="Kilometraje" type="number" fullWidth variant="standard" />
       </Grid>
@@ -230,7 +233,6 @@ const ServicioDataForm = ({
         </Grid>
       )}
       <Grid size={{ xs: 12 }}>
-        <p>cantidad de opciones del servicio{tipoServicioSelected?.cantidadOpcionesServicio}</p>
       </Grid>
       {seHaranVentas != null && (
         <Grid size={{ xs: 12 }}>
@@ -254,6 +256,12 @@ const ServicioDataForm = ({
           initialValue={typeof imagenGuardada === 'string' ? `${API_URL}/${imagenGuardada}` : undefined}
           text="Firmar Hoja de recepción"
         />
+      </Grid>
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <TextField {...register('nombreClienteMoto' as any)} label="Nombre quien deja la moto (opcional)" fullWidth variant="standard" />
+      </Grid>
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <TextField {...register('dpiClienteMoto' as any)} label="DPI / NIT quien deja la moto (opcional)" fullWidth variant="standard" />
       </Grid>
       <Grid size={{ xs: 12 }}>
         <Button type="submit" variant="contained" fullWidth disabled={isSubmitting}>{submitLabel}</Button>

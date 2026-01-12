@@ -38,6 +38,7 @@ const ServicioCreate = () => {
   const handleSubmit = async (payload: any) => {
     try {
       const body = { ...payload };
+      console.log('Creating servicio with data:', body);
       const response = await postServicio(body);
       successToast('Servicio creado');
       if (seHaranVentas) {

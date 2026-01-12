@@ -44,4 +44,6 @@ export const servicioSchema = z.object({
     productosCliente: z.array(servicioProductoClienteSchema).optional(),
     imagenesMeta: z.array(imagenMetaSchema).optional(),
     proximoServicioItems: z.array(servicioProductoProximoSchema).optional(),
+    nombreClienteMoto: z.string().optional().nullable(),
+    dpiClienteMoto: z.string().optional().nullable(),
 });

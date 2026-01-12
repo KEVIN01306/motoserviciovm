@@ -275,7 +275,13 @@ const ServicioDetail = () => {
                 <Avatar sx={{ width: 200, height: 120, mx: 'auto', borderRadius: 2, justifyContent: 'center', display: 'flex', alignItems: 'center' }}  src={`${API_URL}/${data.firmaEntrada ?? ''}`} alt="Firma Cliente Entrada" />
               <Typography variant="body2" color="textSecondary" align="center" sx={{ mt: 2 }}>
                 {'firma cliente (Entrada)'}
-              </Typography>
+              </Typography >
+              {data.nombreClienteMoto && (
+                <Typography variant="caption" m={1} color="textSecondary" align="center">{data.nombreClienteMoto}</Typography>
+              )}
+              {data.dpiClienteMoto && (
+                <Typography variant="caption"  color="textSecondary" align="center">{data.dpiClienteMoto}</Typography>
+              )}
               </Grid>
 
               {
