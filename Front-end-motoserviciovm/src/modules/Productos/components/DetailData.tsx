@@ -41,7 +41,7 @@ const DetailData = ({ producto, id }: Props) => {
             </Box>
           </Grid>
 
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid size={{ xs: 12, md: (producto?.imagen ? 6 : 12) }}>
             <Box>
               <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 1 }}>
                 <Typography sx={{ minWidth: 120, color: "#6b7280", fontWeight: 600 }}>Descripción</Typography>

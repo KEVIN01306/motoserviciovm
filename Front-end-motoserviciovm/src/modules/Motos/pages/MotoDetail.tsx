@@ -25,7 +25,7 @@ const MotoDetail = () => {
         { label: "Motos", icon: <RiBikeFill fontSize="inherit" />, href: "/admin/motos" },
         { label: "Detalle Moto", icon: <RiBikeFill fontSize="inherit" />, href: "/admin/motos/" + id },
     ];
-    
+
 
     const getOne = async () => {
         try {
@@ -56,7 +56,7 @@ const MotoDetail = () => {
                 {/* Top area: avatar left, info right (stack on mobile) */}
                 <Grid container spacing={2}>
                     <Grid size={{ xs: 12, md: 6 }}>
-                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", flexDirection: 'column', gap: 2 }}>
+                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
                             {moto?.avatar ? (
                                 <Box
                                     component="img"
@@ -65,7 +65,7 @@ const MotoDetail = () => {
                                     sx={{ width: "100%", maxHeight: 400, objectFit: "contain", borderRadius: 1 }}
                                 />
                             ) : (
-                                <Box   sx={{ width: "100%", height: 200, bgcolor: "#f3f4f6", borderRadius: 1 }} />
+                                <Box sx={{ width: "100%", height: 200, bgcolor: "#f3f4f6", borderRadius: 1 }} />
                             )}
 
                             {/* Calcomania: botón para ver imagen/pdf */}

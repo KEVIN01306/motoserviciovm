@@ -148,6 +148,14 @@ async function main() {
     skipDuplicates: true,
   });
 
+  await prisma.tipoHorario.createMany({
+    data: [
+      { id: 1, tipo: 'Simple' },
+      { id: 2, tipo: 'Completo' },
+    ],
+    skipDuplicates: true,
+  });
+
   await prisma.permiso.createMany({
     data: PERMISOS_SEED,
     skipDuplicates: true,

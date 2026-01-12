@@ -26,6 +26,7 @@ model Sucursal {
   estado                Estado                @relation(fields: [estadoId], references: [id])
   ventas                Venta[]
   usuarios              User[]                @relation("UserSucursales")
+  tipoServicioHorarios TipoServicioHorario[]
 
   @@index([estadoId], map: "Sucursal_estadoId_fkey")
 }
@@ -201,7 +202,10 @@ model TipoServicio {
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   servicioCompleto Boolean?         @default(false)
+  tipoHorarioId     Int?
+  tipoHorario      TipoServicioHorario? @relation(fields: [tipoHorarioId], references: [id])
   servicios        Servicio[]
+  citas            Cita[]                
   estado           Estado           @relation(fields: [estadoId], references: [id])
   opcionServicios  OpcionServicio[] @relation("TipoOpcionServicios")
 
@@ -499,19 +503,22 @@ model Cita {
   id               Int      @id @default(autoincrement())
   descripcion      String
   fechaCita        DateTime
+  horaCita         String
   nombreContacto   String
   telefonoContacto String
   sucursalId       Int
   clienteId        Int?
   dpiNit           String?
-  motoId           Int
+  tipoServicioId     Int
+  motoId           Int?
   placa            String?
   estadoId         Int
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+  tipoServicio     TipoServicio @relation(fields: [tipoServicioId], references: [id])
   cliente          User?    @relation("CitaCliente", fields: [clienteId], references: [id])
   estado           Estado   @relation(fields: [estadoId], references: [id])
-  moto             Moto     @relation(fields: [motoId], references: [id])
+  moto             Moto?     @relation(fields: [motoId], references: [id])
   sucursal         Sucursal @relation(fields: [sucursalId], references: [id])
 
   @@index([clienteId], map: "Cita_clienteId_fkey")
@@ -519,6 +526,56 @@ model Cita {
   @@index([motoId], map: "Cita_motoId_fkey")
   @@index([sucursalId], map: "Cita_sucursalId_fkey")
 }
+
+model HorasDisponible {
+  id        Int      @id @default(autoincrement())
+  horaInicio      String   
+  horaFin         String
+  tipoServicioHorarioId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tipoServicioHorario TipoServicioHorario @relation(fields: [tipoServicioHorarioId], references: [id])
+}
+
+model DiasDisponible {
+  id        Int      @id @default(autoincrement())
+  dia       String   
+  tipoServicioHorarioId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tipoServicioHorario TipoServicioHorario @relation(fields: [tipoServicioHorarioId], references: [id])
+}
+
+model TipoServicioHorario {
+  id             Int      @id @default(autoincrement())
+
+  cantidadPersonal Int
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  sucursalId     Int
+
+  fechaVijencia DateTime?
+
+  tipoHorarioId Int
+
+  tipoHorario   TipoHorario @relation(fields: [tipoHorarioId], references: [id])
+  sucursal       Sucursal @relation(fields: [sucursalId], references: [id])
+  tipoServicios TipoServicio[]
+  horarios         HorasDisponible[]
+  dias             DiasDisponible[]
+}
+
+model TipoHorario {
+  id        Int      @id @default(autoincrement())
+  tipo      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tipoServicioHorarios TipoServicioHorario[]
+}
+
 
 model TipoContabilidad {
   id              Int               @id @default(autoincrement())
