@@ -4,6 +4,8 @@ import type { TipoServicioType } from "../../../types/tipoServicioType";
 import type { OpcionServicioType } from "../../../types/opcionServicioType";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import type { TipoHorarioType } from "../../../types/tipoHorario";
+import { useState } from "react";
 
 interface InputsFormProps {
     register: UseFormRegister<TipoServicioType>;
@@ -12,12 +14,13 @@ interface InputsFormProps {
     watch: UseFormWatch<TipoServicioType>;
     setValue: UseFormSetValue<TipoServicioType>;
     opciones: OpcionServicioType[];
+    tiposHorario: TipoHorarioType[];
 }
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-const InputsForm = ({ register, errors, control, watch, setValue, opciones }: InputsFormProps) => {
+const InputsForm = ({ register, errors, control, watch, setValue, opciones, tiposHorario }: InputsFormProps) => {
 
     return (
         <>
@@ -42,6 +45,24 @@ const InputsForm = ({ register, errors, control, watch, setValue, opciones }: In
                     {...register("descripcion")}
                     error={!!errors.descripcion}
                     helperText={errors.descripcion?.message}
+                />
+            </Grid>
+           <Grid size={12}>
+            <Controller
+                name="tipoHorarioId"
+                control={control}
+                render={({ field }) => (
+                    <Autocomplete
+                    options={tiposHorario}
+                    getOptionLabel={(opt) => opt.tipo ?? ""}
+                    value={tiposHorario.find((m) => String(m.id) === String(field.value)) ?? null}
+                    onChange={(_, value) => field.onChange(value ? value.id : undefined)}
+                    isOptionEqualToValue={(opt, val) => String(opt.id) === String((val as any)?.id)}
+                    renderInput={(params) => (
+                        <TextField {...params} label="Tipo de Horario" variant="standard" />
+                    )}
+                    />
+                )}
                 />
             </Grid>
 

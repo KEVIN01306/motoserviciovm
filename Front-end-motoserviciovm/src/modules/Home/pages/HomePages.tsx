@@ -70,7 +70,7 @@ const HomePages = () => {
 						<List>
 							{sucursales.map((s: any) => (
 								<ListItem key={s.id} disablePadding>
-									<ListItemText primary={s.nombre} secondary={s.direccion} />
+									<ListItemText primary={s.nombre} />
 								</ListItem>
 							))}
 						</List>

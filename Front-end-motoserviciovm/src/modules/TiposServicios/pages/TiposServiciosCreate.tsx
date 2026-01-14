@@ -13,10 +13,13 @@ import { useGoTo } from "../../../hooks/useGoTo";
 import { getOpciones } from "../../../services/opcionServicio.services";
 import type { OpcionServicioType } from "../../../types/opcionServicioType";
 import { PiDeviceTabletFill, PiPlus } from "react-icons/pi";
+import { getTiposHorario } from "../../../services/tipoHorario.services";
+import type { TipoHorarioType } from "../../../types/tipoHorario";
 
 const TiposServiciosCreate = () => {
   const goTo = useGoTo();
   const [opciones, setOpciones] = useState<OpcionServicioType[]>([]);
+  const [tiposHorario, setTiposHorario] = useState<TipoHorarioType[]>([]);
 
   const { register, handleSubmit, reset, control, formState, watch, setValue } = useForm<TipoServicioType>({
     resolver: zodResolver(tipoServicioSchema) as any,
@@ -25,6 +28,19 @@ const TiposServiciosCreate = () => {
 
   const { isSubmitting } = formState;
 
+  const fecthTiposHorarios = async () => {
+    try {
+      const res = await getTiposHorario();
+      setTiposHorario(res);
+      console.log(res);
+    } catch (err) {
+      // ignore or could show toast
+    }
+  };
+
+  useEffect(() => {
+    fecthTiposHorarios();
+  }, []);
   useEffect(() => {
     const fetchOpciones = async () => {
       try {
@@ -57,7 +73,7 @@ const TiposServiciosCreate = () => {
       />
 
       <FormEstructure handleSubmit={handleSubmit(handlerSubmit)}>
-        <InputsForm register={register} errors={formState.errors as any} control={control} watch={watch} setValue={setValue} opciones={opciones} />
+        <InputsForm register={register} errors={formState.errors as any} control={control} watch={watch} setValue={setValue} opciones={opciones} tiposHorario={tiposHorario} />
 
         <Grid size={12}>
           <Divider sx={{ my: 2 }} />

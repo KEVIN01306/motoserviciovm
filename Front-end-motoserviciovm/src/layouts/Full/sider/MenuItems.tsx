@@ -14,6 +14,7 @@ const MenuItems = [
     { name: "VENTAS", link: "/admin/ventas", icon: RiProductHuntLine, permiso: "ventas:view" },
     { name: "INGRESOS/EGRESOS", link: "/admin/ingresos-egresos", icon: PiListNumbersBold, permiso: "ingresos-egresos:view" },
     { name: "CONTABILIDAD", link: "/admin/contabilidad", icon: PiCashRegisterDuotone, permiso: "contabilidad:view" },
+    { name: "MOTOS", link: "/admin/motos", icon: RiBikeFill, permiso: "motos:view" },
     {
         module: "MOTOS",
         icon: RiBikeFill,
@@ -24,7 +25,6 @@ const MenuItems = [
             { name: "MODELOS", link: "/admin/modelos", icon: RiEBikeLine, permiso: "modelos:view" },
             { name: "EN PARQUEO", link: "/admin/enparqueo", icon: RiBikeFill, permiso: "enparqueo:view" },
             { name: "EN REPARACIÓN", link: "/admin/enreparacion", icon: IoCubeSharp, permiso: "enreparacion:view" },
-            { name: "MOTOS", link: "/admin/motos", icon: RiBikeFill, permiso: "motos:view" },
         ]
     },
     // Luego los módulos en el orden dado

@@ -7,4 +7,5 @@ export const tipoServicioSchema = z.object({
     opcionServicios: z.array(z.number()).optional(),
     servicioCompleto: z.boolean().optional(),
     estadoId: z.number().optional(),
+    tipoHorarioId: z.number().optional(),
 });

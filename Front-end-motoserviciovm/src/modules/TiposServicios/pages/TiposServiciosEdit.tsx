@@ -17,6 +17,8 @@ import { getOpciones } from "../../../services/opcionServicio.services";
 import type { OpcionServicioType } from "../../../types/opcionServicioType";
 import { PiDeviceTabletFill } from "react-icons/pi";
 import { EditNoteOutlined } from "@mui/icons-material";
+import { getTiposHorario } from "../../../services/tipoHorario.services";
+import type { TipoHorarioType } from "../../../types/tipoHorario";
 
 const TiposServiciosEdit = () => {
   const { id } = useParams();
@@ -29,8 +31,23 @@ const TiposServiciosEdit = () => {
 
   const [item, setItem] = useState<TipoServicioGetType | null>(null);
   const [opciones, setOpciones] = useState<OpcionServicioType[]>([]);
+  const [tiposHorario, setTiposHorario] = useState<TipoHorarioType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const fecthTiposHorarios = async () => {
+    try {
+      const res = await getTiposHorario();
+      setTiposHorario(res);
+      console.log(res);
+    } catch (err) {
+      // ignore or could show toast
+    }
+  };
+
+  useEffect(() => {
+    fecthTiposHorarios();
+  }, []);
 
   useEffect(() => {
     const fetch = async () => {
@@ -76,7 +93,7 @@ const TiposServiciosEdit = () => {
       />
 
       <FormEstructure handleSubmit={handleSubmit(onSubmit)}>
-        <InputsForm register={register} errors={formState.errors as any} control={control} watch={watch} setValue={setValue} opciones={opciones} />
+        <InputsForm register={register} errors={formState.errors as any} control={control} watch={watch} setValue={setValue} opciones={opciones} tiposHorario={tiposHorario}/>
 
         <Grid size={12}>
           <Divider sx={{ my: 2 }} />

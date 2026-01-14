@@ -203,7 +203,7 @@ model TipoServicio {
   updatedAt        DateTime         @updatedAt
   servicioCompleto Boolean?         @default(false)
   tipoHorarioId     Int?
-  tipoHorario      TipoServicioHorario? @relation(fields: [tipoHorarioId], references: [id])
+  tipoHorario      TipoHorario? @relation(fields: [tipoHorarioId], references: [id])
   servicios        Servicio[]
   citas            Cita[]                
   estado           Estado           @relation(fields: [estadoId], references: [id])
@@ -531,27 +531,25 @@ model HorasDisponible {
   id        Int      @id @default(autoincrement())
   horaInicio      String   
   horaFin         String
-  tipoServicioHorarioId Int
+  tipoServicioHorarioDiaId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  tipoServicioHorario TipoServicioHorario @relation(fields: [tipoServicioHorarioId], references: [id])
+  tipoServicioHorarioDia TipoServicioHorarioDia @relation(fields: [tipoServicioHorarioDiaId], references: [id])
 }
 
 model DiasDisponible {
   id        Int      @id @default(autoincrement())
-  dia       String   
-  tipoServicioHorarioId Int
+  dia       String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  tipoServicioHorario TipoServicioHorario @relation(fields: [tipoServicioHorarioId], references: [id])
+  tipoServicioHorarioDias TipoServicioHorarioDia[]
 }
 
 model TipoServicioHorario {
   id             Int      @id @default(autoincrement())
 
-  cantidadPersonal Int
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   sucursalId     Int
@@ -562,9 +560,7 @@ model TipoServicioHorario {
 
   tipoHorario   TipoHorario @relation(fields: [tipoHorarioId], references: [id])
   sucursal       Sucursal @relation(fields: [sucursalId], references: [id])
-  tipoServicios TipoServicio[]
-  horarios         HorasDisponible[]
-  dias             DiasDisponible[]
+  diasConfig       TipoServicioHorarioDia[]
 }
 
 model TipoHorario {
@@ -574,6 +570,22 @@ model TipoHorario {
   updatedAt DateTime @updatedAt
 
   tipoServicioHorarios TipoServicioHorario[]
+  tipoServicios TipoServicio[]
+}
+
+model TipoServicioHorarioDia {
+  id                    Int                   @id @default(autoincrement())
+  tipoServicioHorarioId Int
+  diaId                 Int
+  cantidadPersonal      Int
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+
+  tipoServicioHorario   TipoServicioHorario   @relation(fields: [tipoServicioHorarioId], references: [id])
+  dia                   DiasDisponible        @relation(fields: [diaId], references: [id])
+  horas                 HorasDisponible[]
+
+  @@unique([tipoServicioHorarioId, diaId])
 }
 
 

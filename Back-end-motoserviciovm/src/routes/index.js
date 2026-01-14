@@ -29,5 +29,7 @@ router.use('/ventaProductos', (await import('./ventaProducto.routes.js')).defaul
 router.use('/servicios', (await import('./servicio.routes.js')).default);
 router.use('/contabilidad', (await import('./contabilidad.routes.js')).default);
 router.use('/ingresos-egresos', (await import('./ingresosEgresos.routes.js')).default);
+router.use('/tipoHorario', (await import('./tipoHorario.routes.js')).default);
+router.use('/tipoServicioHorario', (await import('./tipoServicioHorario.routes.js')).default);
 
 export default router;

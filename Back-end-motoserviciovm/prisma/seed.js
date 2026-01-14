@@ -156,6 +156,19 @@ async function main() {
     skipDuplicates: true,
   });
 
+  await prisma.diasDisponible.createMany({
+    data: [
+      { id: 1, dia: 'Lunes' },
+      { id: 2, dia: 'Martes' },
+      { id: 3, dia: 'Miércoles' },
+      { id: 4, dia: 'Jueves' },
+      { id: 5, dia: 'Viernes' },
+      { id: 6, dia: 'Sábado' },
+      { id: 7, dia: 'Domingo' },
+    ],
+    skipDuplicates: true,
+  });
+
   await prisma.permiso.createMany({
     data: PERMISOS_SEED,
     skipDuplicates: true,
