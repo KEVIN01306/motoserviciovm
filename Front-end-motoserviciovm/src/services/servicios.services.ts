@@ -287,6 +287,31 @@ const putServicioOpcionesTipoServicio = async (
   return response.data.data;
 };
 
+// PUT /servicios/:id/descripcion -> actualizar solo la descripción del servicio
+const putObservacionesServicio = async (id: string | number, observaciones: string) => {
+  try {
+    const response = await api.put<apiResponse<any>>(`${API_SERVICIOS}/${id}/observaciones`, { observaciones }, { headers: { 'Content-Type': 'application/json' } });
+    return response.data.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (!error.response) {
+        throw new Error('No se pudo conectar con el servidor (timeout o red).');
+      }
+      if (error.response) {
+        const status = error.response.status;
+        if (status === 404) throw new Error('NOT FOUND API OR NOT EXISTED IN THE SERVER');
+        if (status === 500) throw new Error('INTERNAL ERROR SERVER');
+        const serverMessage = error.response.data?.message;
+        if (serverMessage) throw new Error(serverMessage);
+        throw new Error('CONNECTION ERROR');
+      } else {
+        throw new Error('No se pudo conectar con el servidor (timeout o red).');
+      }
+    }
+    throw new Error((error as Error).message);
+  }
+};
+
 import type { servicioProductoProximoType } from '../types/servicioType';
 // PUT /proximosServiciosItems/:id para actualizar proximoServicioItems
 export const putProximoServicioItems = async (
@@ -303,4 +328,4 @@ export const putProximoServicioItems = async (
 };
 
 
-export { getServicios, getServicio, postServicio, putServicio, putServicioOpcionesTipoServicio };
+export { getServicios, getServicio, postServicio, putServicio, putServicioOpcionesTipoServicio, putObservacionesServicio };

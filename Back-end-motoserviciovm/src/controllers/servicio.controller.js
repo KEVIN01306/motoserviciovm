@@ -1,6 +1,6 @@
 import z from "zod";
 import { responseError, responseSucces, responseSuccesAll } from "../helpers/response.helper.js";
-import { getServicios, getServicio, postServicio, putServicio, deleteServicio, salidaServicio, putProgreso, putProximoServicioItems, addServicioImages } from "../services/servicio.service.js";
+import { getServicios, getServicio, postServicio, putServicio, deleteServicio, salidaServicio, putProgreso, putProximoServicioItems, addServicioImages, putObservacionesServicio } from "../services/servicio.service.js";
 import { estados } from "../utils/estados.js";
 import { servicioSchema, servicioProductoProximoSchema } from "../zod/servicio.schema.js";
 
@@ -375,6 +375,24 @@ const addServicioImagesHandler = async (req, res) => {
     }
 };
 
+const putObservacionesServicioHandler = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { observaciones } = req.body;
+        const updated = await putObservacionesServicio(parseInt(id), observaciones);
+        return res.status(200).json(responseSucces("Observaciones del servicio actualizadas", updated));
+    } catch (err) {
+        console.error("Error in putObservacionesServicioHandler:", err);
+        let code = 500;
+        let msg = "INTERNAL_SERVER_ERROR";
+        if (err.code === "DATA_NOT_FOUND") {
+            code = 404;
+            msg = err.code;
+        }
+        return res.status(code).json(responseError(msg));
+    }
+};
+
 export {
     getServiciosHandler,
     getServicioHandler,
@@ -385,4 +403,5 @@ export {
     putProgresoHandler,
     updateProximoServicioItemsHandler,
     addServicioImagesHandler,
+    putObservacionesServicioHandler,
 }

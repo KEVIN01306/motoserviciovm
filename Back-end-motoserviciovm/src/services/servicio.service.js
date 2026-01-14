@@ -430,6 +430,13 @@ const addServicioImages = async (id, imagenFiles, imagenesMeta) => {
     }
 };
 
+const putObservacionesServicio = async (id, observaciones) => {
+    const existing = await prisma.servicio.findFirst({ where: { id: id } });
+    if (!existing) { const error = new Error('DATA_NOT_FOUND'); error.code = 'DATA_NOT_FOUND'; throw error; }
+    const updated = await prisma.servicio.update({ where: { id: id }, data: { observaciones: observaciones } });
+    return updated;
+}
+
 export {
     getServicios,
     getServicio,
@@ -440,4 +447,5 @@ export {
     putProgreso,
     putProximoServicioItems,
     addServicioImages,
+    putObservacionesServicio,
 }

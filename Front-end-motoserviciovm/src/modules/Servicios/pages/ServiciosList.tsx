@@ -53,7 +53,7 @@ const ServiciosList = () => {
         switch (id) {
         case estados().enEspera:
             return "warning";
-        case estados().confirmado:
+        case estados().entregado:
             return "success";
         case estados().cancelado:
             return "error";

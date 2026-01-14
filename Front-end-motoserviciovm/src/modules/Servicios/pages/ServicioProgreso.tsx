@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab, Avatar, Paper, colors } from '@mui/material';
+import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab, Avatar, Paper, colors, TextField, Button } from '@mui/material';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiToolsLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';
 import ErrorCard from '../../../components/utils/ErrorCard';
-import { getServicio, putServicioOpcionesTipoServicio, putProximoServicioItems, putServicioImagenes } from '../../../services/servicios.services';
+import { getServicio, putServicioOpcionesTipoServicio, putProximoServicioItems, putServicioImagenes, putObservacionesServicio } from '../../../services/servicios.services';
+import { successToast, errorToast } from '../../../utils/toast';
 import ImagenesProgresoForm from '../components/ImagenesProgresoForm';
 
 import ProximoServicioItemsForm from '../components/ProximoServicioItemsForm';
@@ -69,6 +70,8 @@ const ServicioProgreso = () => {
         }
     };
     const [data, setData] = useState<ServicioGetType | null>(null);
+    const [obsText, setObsText] = useState<string>('');
+    const [savingDesc, setSavingDesc] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const goTo = useGoTo();
@@ -86,6 +89,10 @@ const ServicioProgreso = () => {
     };
 
     useEffect(() => { fetch(); }, [id]);
+
+    useEffect(() => {
+        setObsText(data?.observaciones ?? '');
+    }, [data]);
 
 
     useEffect(() => {
@@ -363,7 +370,31 @@ const ServicioProgreso = () => {
 
 
                         <Grid size={10}>
-                            <Box sx={{ mb: 1, justifyContent: 'start', display: 'flex' }}><Typography sx={{ color: '#0517b', fontWeight: 600 }}>{`Observaciones detalladas: `}</Typography><Typography>{data.observaciones ?? '-'}</Typography></Box>
+                            <Box sx={{ mb: 1, justifyContent: 'start', display: 'flex', gap: 2, flexDirection: { xs: 'column', md: 'row' } }}>
+                                <TextField
+                                    label="Observaciones detalladas"
+                                    fullWidth
+                                    multiline
+                                    minRows={2}
+                                    value={obsText}
+                                    onChange={(e) => setObsText(e.target.value)}
+                                />
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <Button variant="contained" color="primary" disabled={savingDesc} onClick={async () => {
+                                        if (!data?.id) return;
+                                        setSavingDesc(true);
+                                        try {
+                                            await putObservacionesServicio(data.id, obsText);
+                                            successToast('Observaciones actualizadas');
+                                            await fetch();
+                                        } catch (e: any) {
+                                            errorToast(e?.message ?? 'Error actualizando observaciones');
+                                        } finally {
+                                            setSavingDesc(false);
+                                        }
+                                    }}>{savingDesc ? 'Guardando...' : 'Actualizar Observaciones'}</Button>
+                                </Box>
+                            </Box>
                         </Grid>
 
                     </CardContent>
