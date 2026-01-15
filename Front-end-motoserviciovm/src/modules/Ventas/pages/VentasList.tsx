@@ -61,7 +61,7 @@ const VentasList = () => {
     setFilteredItems(items.filter(i =>
       String(i.id).toLowerCase().includes(term) ||
       (i.usuario?.primerNombre ?? '').toLowerCase().includes(term) ||
-        (i.estado?.estado ?? '').toLowerCase().includes(term)
+      (i.estado?.estado ?? '').toLowerCase().includes(term)
     ));
   }, [searchTerm, searchCodigo, items]);
 
@@ -69,18 +69,18 @@ const VentasList = () => {
     { label: 'Ventas', icon: <RiProductHuntLine fontSize="inherit" />, href: '/admin/ventas' },
   ];
 
-     const chipColorByEstado = (id: number) => {
-        switch (id) {
-        case estados().enEspera:
-            return "warning";
-        case estados().confirmado:
-            return "success";
-        case estados().cancelado:
-            return "error";
-        default:
-            return "primary";
-        }
-    };
+  const chipColorByEstado = (id: number) => {
+    switch (id) {
+      case estados().enEspera:
+        return "warning";
+      case estados().confirmado:
+        return "success";
+      case estados().cancelado:
+        return "error";
+      default:
+        return "primary";
+    }
+  };
 
   const getTableActions = () => {
     // return a function so Table can compute actions per row
@@ -102,29 +102,33 @@ const VentasList = () => {
       }
 
       if (user?.permisos.includes('ventas:finalize')) {
-        actions.push({ label: (<><PiUserCheckBold /><span className="ml-1.5">Finalizar</span></>), onClick: async (r) => {
-          if (!window.confirm(`¿Finalizar la venta #${r.id}?`)) return;
-          try {
-            await finalizarVenta(r.id);
-            successToast('Venta finalizada');
-            fetch();
-          } catch (err: any) {
-            errorToast(err?.message ?? 'Error al finalizar');
-          }
-        }, permiso: 'ventas:finalize' });
+        actions.push({
+          label: (<><PiUserCheckBold /><span className="ml-1.5">Finalizar</span></>), onClick: async (r) => {
+            if (!window.confirm(`¿Finalizar la venta #${r.id}?`)) return;
+            try {
+              await finalizarVenta(r.id);
+              successToast('Venta finalizada');
+              fetch();
+            } catch (err: any) {
+              errorToast(err?.message ?? 'Error al finalizar');
+            }
+          }, permiso: 'ventas:finalize'
+        });
       }
 
       if (user?.permisos.includes('ventas:cancel')) {
-        actions.push({ label: (<><RiProductHuntLine /><span className="ml-1.5">Cancelar</span></>), onClick: async (r) => {
-          if (!window.confirm(`¿Cancelar la venta #${r.id}?`)) return;
-          try {
-            await cancelarVenta(r.id);
-            successToast('Venta cancelada');
-            fetch();
-          } catch (err: any) {
-            errorToast(err?.message ?? 'Error al cancelar');
-          }
-        }, permiso: 'ventas:cancel' });
+        actions.push({
+          label: (<><RiProductHuntLine /><span className="ml-1.5">Cancelar</span></>), onClick: async (r) => {
+            if (!window.confirm(`¿Cancelar la venta #${r.id}?`)) return;
+            try {
+              await cancelarVenta(r.id);
+              successToast('Venta cancelada');
+              fetch();
+            } catch (err: any) {
+              errorToast(err?.message ?? 'Error al cancelar');
+            }
+          }, permiso: 'ventas:cancel'
+        });
       }
 
       if (user?.permisos.includes('ventas:detail')) {
@@ -137,11 +141,11 @@ const VentasList = () => {
 
   const getTableColumns = (): Column<VentaGetType>[] => {
     const base: Column<VentaGetType>[] = [
-        { id: 'id', label: 'Codigo', minWidth: 50},
-        { id: 'usuario', label: 'Usuario', minWidth: 150, format: (v) => v?.primerNombre ?? '' },
-        { id: 'estado', label: 'Estado', minWidth: 100, format: (v: EstadoType) => <Chip variant='outlined' label={v?.estado ?? ''} color={chipColorByEstado(v?.id ?? 0)} /> },
-      { id: 'total', label: 'Total', minWidth: 100 },
       { id: 'createdAt', label: 'Creado', minWidth: 120, format: (v) => formatDate(v as any) },
+      { id: 'total', label: 'Total', minWidth: 100 },
+      { id: 'estado', label: 'Estado', minWidth: 100, format: (v: EstadoType) => <Chip variant='outlined' label={v?.estado ?? ''} color={chipColorByEstado(v?.id ?? 0)} /> },
+      { id: 'id', label: 'Codigo', minWidth: 50 },
+      { id: 'usuario', label: 'Usuario', minWidth: 150, format: (v) => v?.primerNombre ?? '' },
     ];
 
     const actions = getTableActions();
@@ -160,7 +164,7 @@ const VentasList = () => {
           <Grid size={{ xs: 8, md: 2 }} display={'flex'} flexGrow={1} alignItems={'center'} justifyContent={'end'}>
             <Search onSearch={setSearchCodigo} placeholder="Buscar Por Codigo..." />
           </Grid>
-            <Grid size={{ xs: 8, md: 2 }} display={'flex'} flexGrow={1} alignItems={'center'} justifyContent={'end'}>
+          <Grid size={{ xs: 8, md: 2 }} display={'flex'} flexGrow={1} alignItems={'center'} justifyContent={'end'}>
             <Search onSearch={setSearchTerm} placeholder="Buscar ventas..." />
           </Grid>
           {user?.permisos.includes('ventas:create') && (
@@ -172,7 +176,12 @@ const VentasList = () => {
           )}
         </Grid>
         <Grid size={12}>
-          <TableCustom<VentaGetType> columns={getTableColumns()} rows={filteredItems} />
+          {/* actionsPosition: 'end' (default) places actions column at the end.
+              To move the actions column to the start, set actionsPosition=\"start\" */}
+          <TableCustom<VentaGetType>
+            columns={getTableColumns()}
+            rows={filteredItems}
+          />
         </Grid>
       </Grid>
     </>

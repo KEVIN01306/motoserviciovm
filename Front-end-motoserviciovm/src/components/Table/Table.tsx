@@ -27,11 +27,13 @@ export interface Column<T> {
 interface TableCustomProps<T> {
   columns: Column<T>[];
   rows: T[];
+  actionsPosition?: "start" | "end";
 }
 
 export default function TableCustom<T>({
   columns,
   rows,
+  actionsPosition = "start",
 }: TableCustomProps<T>) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -47,13 +49,22 @@ export default function TableCustom<T>({
     setPage(0);
   };
 
+  // ensure actions column is placed according to prop (default: end)
+  const actionsIndex = columns.findIndex((c) => c.id === "actions");
+  const orderedColumns =
+    actionsIndex === -1
+      ? columns
+      : actionsPosition === "start"
+      ? [columns[actionsIndex], ...columns.filter((_, i) => i !== actionsIndex)]
+      : [...columns.filter((_, i) => i !== actionsIndex), columns[actionsIndex]];
+
   return (
     <Paper sx={{ width: "100%", overflow: "auto",boxShadow:'0px 0px 3px rgb(0,0,0,0.1)' }} >
       <TableContainer sx={{ maxHeight: 600 }}>
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              {columns.map((column) => (
+              {orderedColumns.map((column) => (
                 <TableCell
                   key={String(column.id)}
                   align={column.align}
@@ -70,7 +81,7 @@ export default function TableCustom<T>({
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row, rowIndex) => (
                 <TableRow hover role="checkbox" tabIndex={-1} key={rowIndex}>
-                  {columns.map((column) => {
+                  {orderedColumns.map((column) => {
                     if (column.id === "actions") {
                       const actionsForRow = typeof column.actions === "function" ? column.actions(row) : column.actions;
                       return (
@@ -82,7 +93,7 @@ export default function TableCustom<T>({
                     const value = row[column.id as keyof typeof row];
                     return (
                       <TableCell key={String(column.id)} align={column.align}>
-                        {column.format ? column.format(value) : String(value)}
+                        {column.format ? column.format(value, row) : String(value)}
                       </TableCell>
                     );
                   })}

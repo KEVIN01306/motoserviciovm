@@ -65,11 +65,11 @@ const ServiciosList = () => {
 
   const columns = (): Column<ServicioGetType>[] => {
     const base: Column<ServicioGetType>[] = [
-      { id: 'id', label: 'Codigo', minWidth: 60 },
-      { id: 'descripcion', label: 'Descripción', minWidth: 220 },
+      { id: 'createdAt', label: 'Creado', minWidth: 160, format: (v) => formatDate(v as any) },
       { id: 'moto', label: 'Moto', minWidth: 120, format: (v) => v?.placa ?? '-' },
       { id: 'estado', label: 'Estado', minWidth: 100, format: (v: EstadoType) => <Chip variant='outlined' label={v?.estado ?? ''} color={chipColorByEstado(v?.id ?? 0)} /> },
-      { id: 'createdAt', label: 'Creado', minWidth: 160, format: (v) => formatDate(v as any) },
+      { id: 'id', label: 'Codigo', minWidth: 60 },
+      { id: 'descripcion', label: 'Descripción', minWidth: 220 },
     ];
 
     const actions = getTableActions();
