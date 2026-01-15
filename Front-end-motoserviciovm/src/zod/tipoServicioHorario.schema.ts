@@ -1,27 +1,13 @@
 import z from "zod";
-
-const horaSchema = z.object({
-  horaInicio: z.string().min(1, "horaInicio es obligatorio"),
-  horaFin: z.string().min(1, "horaFin es obligatorio"),
-});
-
-const diaConfigSchema = z.object({
-  diaId: z.number().int(),
-  cantidadPersonal: z.number().int().min(1, "cantidadPersonal debe ser >= 1"),
-  horas: z.array(horaSchema).default([]),
-});
+import { tipoServicioHorarioDiaSchema } from "./tipoServicioHorarioDia.schema";
 
 export const tipoServicioHorarioSchema = z.object({
-  id: z.number().optional(),
-  sucursalId: z.number().int(),
-  tipoHorarioId: z.number().int(),
-  cantidadPersonal: z.number().int().min(1, "cantidadPersonal debe ser >= 1").optional(),
-  fechaVijencia: z
-    .union([
-      z.string(),
-      z.date(),
-    ])
-    .transform((v) => (typeof v === "string" ? new Date(v) : v))
-    .optional(),
-  diasConfig: z.array(diaConfigSchema).default([]),
+  sucursalId: z.number().int().min(1, "Sucursal es obligatoria"),
+  tipoHorarioId: z.number().int().min(1, "Tipo de horario es obligatorio"),
+  fechaVijencia: z.string().min(1, "Fecha de vigencia es obligatoria"),
+  diasConfig: z.array(tipoServicioHorarioDiaSchema).default([]),
+});
+
+export const updateTipoServicioHorarioSchema = tipoServicioHorarioSchema.extend({
+  id: z.number().int(),
 });

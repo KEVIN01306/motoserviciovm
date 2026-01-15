@@ -390,7 +390,6 @@ const ServicioDetailSalida = () => {
                             )}
                         </Grid>
 
-                        <Typography mt={6} display={'flex'} justifyContent={'center'} color='red' fontWeight={400} variant='body2'>Este no es un documento contable</Typography>
                     </CardContent>
                 </Card>
             </Container>

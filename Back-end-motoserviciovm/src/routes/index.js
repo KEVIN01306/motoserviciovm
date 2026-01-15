@@ -31,5 +31,6 @@ router.use('/contabilidad', (await import('./contabilidad.routes.js')).default);
 router.use('/ingresos-egresos', (await import('./ingresosEgresos.routes.js')).default);
 router.use('/tipoHorario', (await import('./tipoHorario.routes.js')).default);
 router.use('/tipoServicioHorario', (await import('./tipoServicioHorario.routes.js')).default);
+router.use('/diasDisponibles', (await import('./diasDisponibles.routes.js')).default);
 
 export default router;

@@ -23,6 +23,7 @@ import { EnParqueoRoutes } from "../modules/EnParqueo/routes";
 import { EnReparacionRoutes } from "../modules/EnReparacion/routes";
 import AuthRouteGuard from "../modules/Auth/components/AuthRouteGuard";
 import { ServiciosRoutes } from "../modules/Servicios/routes";
+import horariosRoutes from "../modules/Horarios/routes";
 import homeRoutes from "../modules/Home/routes";
 
 const Home = lazy(() => import('../modules/LandingPages/index'))
@@ -71,6 +72,7 @@ const Router = [
                     ...MotosRoutes,
                     ...ServiciosRoutes,
                     ...homeRoutes,
+                    ...horariosRoutes,
                 ]
             },
 

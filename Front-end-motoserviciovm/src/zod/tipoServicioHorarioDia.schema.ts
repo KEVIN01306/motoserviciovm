@@ -10,3 +10,4 @@ export const tipoServicioHorarioDiaSchema = z.object({
   cantidadPersonal: z.number().int().min(1, "cantidadPersonal debe ser >= 1"),
   horas: z.array(horaSchema).default([]),
 });
+
