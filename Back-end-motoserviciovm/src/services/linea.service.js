@@ -11,6 +11,7 @@ const getLineas = async () => {
         include: {  
             estado: true,
         },
+        orderBy: { id: 'desc' },
     });
 
     if (!lineas) {

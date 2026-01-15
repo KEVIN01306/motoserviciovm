@@ -64,7 +64,7 @@ const getMotos = async () => {
         },
     
      },
-     orderBy: { id: 'asc' },
+     orderBy: { id: 'desc' },
     });
 
         const motosWithAvatars = motos.map((m) => ({ ...m, avatar: null }));

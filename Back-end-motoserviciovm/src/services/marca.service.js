@@ -11,6 +11,7 @@ const getMarcas = async () => {
         include: {
             estado: true,
         },
+        orderBy: { id: 'desc' },
     });
     if (!marcas) {
         const error = new Error('DATA_NOT_FOUND');
