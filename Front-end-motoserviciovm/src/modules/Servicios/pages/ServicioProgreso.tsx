@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab, Avatar, Paper, colors, TextField, Button } from '@mui/material';
+import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab, Avatar, Paper, colors, TextField, Button, Checkbox } from '@mui/material';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiToolsLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';
 import ErrorCard from '../../../components/utils/ErrorCard';
-import { getServicio, putServicioOpcionesTipoServicio, putProximoServicioItems, putServicioImagenes, putObservacionesServicio } from '../../../services/servicios.services';
+import { getServicio, putServicioOpcionesTipoServicio, putProximoServicioItems, putServicioImagenes, putObservacionesServicio, patchServicioEstado } from '../../../services/servicios.services';
 import { successToast, errorToast } from '../../../utils/toast';
 import ImagenesProgresoForm from '../components/ImagenesProgresoForm';
 
@@ -17,6 +17,7 @@ import { formatDate } from '../../../utils/formatDate';
 import type { VentaGetType, VentaProductoGetType, VentaType } from '../../../types/ventaType';
 import { estados } from '../../../utils/estados';
 import { useGoTo } from '../../../hooks/useGoTo';
+import { useAuthStore } from '../../../store/useAuthStore';
 import LinkStylesNavigate from '../../../components/utils/links';
 import { exportarAPDF } from '../../../utils/exportarPdf';
 import { ExposureTwoTone } from '@mui/icons-material';
@@ -28,7 +29,9 @@ const API_URL = import.meta.env.VITE_DOMAIN;
 
 const ServicioProgreso = () => {
 
-        const [savingImagenes, setSavingImagenes] = useState(false);
+    const [savingImagenes, setSavingImagenes] = useState(false);
+
+    const [savingEstadoPruebas, setSavingEstadoPruebas] = useState(false);
     const handleSaveImagenes = async ({ files, metas }: { files: File[]; metas: { descripcion?: string }[] }) => {
         if (!data?.id) return;
         setSavingImagenes(true);
@@ -70,6 +73,9 @@ const ServicioProgreso = () => {
         }
     };
     const [data, setData] = useState<ServicioGetType | null>(null);
+    const user = useAuthStore(s => s.user);
+
+    const hasRevision = !!user?.permisos?.includes('servicios:revision');
     const [obsText, setObsText] = useState<string>('');
     const [savingDesc, setSavingDesc] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -93,6 +99,10 @@ const ServicioProgreso = () => {
     useEffect(() => {
         setObsText(data?.observaciones ?? '');
     }, [data]);
+
+    const isPruebas = data?.estadoId === estados().pruebas;
+    const isListoEntrega = data?.estadoId === estados().listoEntrega;
+    const editable = hasRevision && (isPruebas || isListoEntrega);
 
 
     useEffect(() => {
@@ -164,16 +174,16 @@ const ServicioProgreso = () => {
         }
     };
     const totalVentasDescuentos = data?.ventas
-    ?.filter(venta => venta.estadoId === estados().confirmado) // Filtra solo las confirmadas
-    ?.reduce((acc, venta) => {
-        return acc + (venta.descuentoTotal || 0); // Suma el descuento acumulado
-    }, 0) || 0;
+        ?.filter(venta => venta.estadoId === estados().confirmado) // Filtra solo las confirmadas
+        ?.reduce((acc, venta) => {
+            return acc + (venta.descuentoTotal || 0); // Suma el descuento acumulado
+        }, 0) || 0;
     const totalServicio = (data.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0) || 0) + (data.total || 0);
 
     const dataTableTotales = [
         { label: 'Total Servicio', value: `Q ${data.total?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? '0.00'}` },
         { label: 'Repuestos', value: `Q ${data.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0 - totalVentasDescuentos).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? '0.00'}` },
-        { label: 'Gran Total', value: `Q ${(Number(totalServicio)-Number(totalVentasDescuentos)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+        { label: 'Gran Total', value: `Q ${(Number(totalServicio) - Number(totalVentasDescuentos)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
     ]
 
 
@@ -270,14 +280,15 @@ const ServicioProgreso = () => {
                             <ImageGallery imagenes={data.imagen ?? []} />
                         </Box>
                         <Box>
-                            {/* Formulario para agregar imágenes nuevas */}
-                            <ImagenesProgresoForm onSubmit={handleSaveImagenes} loading={savingImagenes} />
+                            {/* Formulario para agregar imágenes nuevas (solo si puede editar) */}
+                            {!(isPruebas && !hasRevision) && (
+                                <ImagenesProgresoForm onSubmit={handleSaveImagenes} loading={savingImagenes} />
+                            )}
                         </Box>
 
                         <Divider sx={{ my: 2 }} />
 
-                        {
-                            data.tipoServicio?.servicioCompleto &&
+                        {data.tipoServicio?.servicioCompleto && (
                             <>
                                 <Typography variant="h6" display={'flex'} justifyContent={'center'} gutterBottom>REVISION</Typography>
                                 <ProductsTable
@@ -291,34 +302,51 @@ const ServicioProgreso = () => {
                                     rows={data.servicioItems ?? []}
                                     headerColor="#1565c0"
                                 />
+
+                                {/* Opciones y próximos servicios: (handled más abajo) */}
                             </>
-                        }
+                        )}
 
 
                         <Divider sx={{ my: 2 }} />
 
                         <Typography variant="h5" textAlign={'center'} m={2} gutterBottom>{data.tipoServicio?.tipo ?? ''}</Typography>
 
-                        {/* Tabla editable de opcionesTipoServicio para mecánico */}
-                        {data.servicioOpcionesTipoServicio && data.servicioOpcionesTipoServicio.length > 0 && (
+                        {/* Tabla editable de opcionesTipoServicio para mecánico (solo editable si tiene permiso) */}
+                        {editable && data.servicioOpcionesTipoServicio && data.servicioOpcionesTipoServicio.length > 0 ? (
                             <ServicioOpcionesTipoServicioForm
                                 initial={data.servicioOpcionesTipoServicio}
                                 onSubmit={handleSaveOpcionesTipoServicio}
                                 loading={savingOpciones}
                             />
-                        )}
+                        ) :
+                            (
+                                <Box sx={{ mb: 4 }} >
+                                    <Typography variant="h6" gutterBottom>{data.tipoServicio?.tipo}</Typography>
+                                    <ProductsTable
+                                        columns={[
+                                            { id: 'opcion', label: 'Opcion', minWidth: 120, format: (v: any, row: ProgresoItemGetType) => row.opcionServicio.opcion ?? '' },
+                                            { id: 'checked', label: 'Check', minWidth: 100, align: 'right', format: (_v: boolean, row: ProgresoItemGetType) => <Checkbox color="primary" checked={!!row.checked} disabled /> },
+                                            { id: 'observaciones', label: 'observaciones', minWidth: 80, align: 'center', format: (v: string) => v ?? '' },
+                                        ] as any}
+                                        rows={data.servicioOpcionesTipoServicio ?? []}
+                                        headerColor="#1565c0"
+                                    />
+                                </Box>
+                            )
+                        }
 
 
                         <Divider sx={{ my: 2 }} />
                         {/* Tabla editable de proximoServicioItems para mecánico */}
-                        {data.proximoServicioItems && (
+                        {editable && data.proximoServicioItems && (
                             <ProximoServicioItemsForm
                                 initial={data.proximoServicioItems}
                                 onSubmit={handleSaveProximoServicioItems}
                                 loading={savingProximo}
                             />
                         )}
-                    
+
 
 
                         <Divider sx={{ my: 2 }} />
@@ -353,7 +381,7 @@ const ServicioProgreso = () => {
                                         <>
 
                                             <ProductsTable
-                                            maxHeight={'none'}
+                                                maxHeight={'none'}
                                                 columns={[
                                                     { id: 'nombre', label: 'CAMBIOS POR REALIZAR EN SIGUIENTE SERVICIO', minWidth: 180, format: (v: any) => v ?? '', align: 'center' },
                                                 ] as any}
@@ -378,25 +406,92 @@ const ServicioProgreso = () => {
                                     minRows={2}
                                     value={obsText}
                                     onChange={(e) => setObsText(e.target.value)}
+                                    disabled={!editable}
                                 />
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <Button variant="contained" color="primary" disabled={savingDesc} onClick={async () => {
-                                        if (!data?.id) return;
-                                        setSavingDesc(true);
-                                        try {
-                                            await putObservacionesServicio(data.id, obsText);
-                                            successToast('Observaciones actualizadas');
-                                            await fetch();
-                                        } catch (e: any) {
-                                            errorToast(e?.message ?? 'Error actualizando observaciones');
-                                        } finally {
-                                            setSavingDesc(false);
-                                        }
-                                    }}>{savingDesc ? 'Guardando...' : 'Actualizar Observaciones'}</Button>
+                                    {editable && (
+                                        <Button variant="contained" color="primary" disabled={savingDesc} onClick={async () => {
+                                            if (!data?.id) return;
+                                            setSavingDesc(true);
+                                            try {
+                                                await putObservacionesServicio(data.id, obsText);
+                                                successToast('Observaciones actualizadas');
+                                                await fetch();
+                                            } catch (e: any) {
+                                                errorToast(e?.message ?? 'Error actualizando observaciones');
+                                            } finally {
+                                                setSavingDesc(false);
+                                            }
+                                        }}>{savingDesc ? 'Guardando...' : 'Actualizar Observaciones'}</Button>
+                                    )}
                                 </Box>
                             </Box>
-                        </Grid>
 
+                        </Grid>
+                        <Grid size={10}>
+                            {/* Botones según permisos y estado:
+                                - Usuarios con permiso (`servicios:revision`):
+                                  * si está en `pruebas` -> mostrar "Marcar Listo para entrega"
+                                  * si NO está en `pruebas` -> mostrar "Marcar Pruebas"
+                                - Usuarios sin permiso:
+                                  * si NO está en `pruebas` -> mostrar "Marcar Pruebas"
+                                  * si está en `pruebas` -> no mostrar botones
+                            */}
+                            {hasRevision ? (
+                                isPruebas ? (
+                                    <Button variant="contained" color="secondary" sx={{ mt: 2 }} onClick={async () => {
+                                        if (!data?.id) return;
+                                        setSavingEstadoPruebas(true);
+                                        try {
+                                            await patchServicioEstado(data.id, { estadoId: estados().listoEntrega });
+                                            successToast('Estado actualizado a listo para entrega');
+                                            await fetch();
+                                        } catch (e: any) {
+                                            errorToast(e?.message ?? 'Error actualizando estado');
+                                        } finally {
+                                            setSavingEstadoPruebas(false);
+                                        }
+                                    }} disabled={savingEstadoPruebas}>
+                                        {savingEstadoPruebas ? 'Procesando...' : 'Marcar Listo para entrega'}
+                                    </Button>
+                                ) : (
+                                    <Button variant="contained" color="secondary" sx={{ mt: 2 }} onClick={async () => {
+                                        if (!data?.id) return;
+                                        setSavingEstadoPruebas(true);
+                                        try {
+                                            await patchServicioEstado(data.id, { estadoId: estados().pruebas });
+                                            successToast('Estado actualizado a pruebas');
+                                            await fetch();
+                                        } catch (e: any) {
+                                            errorToast(e?.message ?? 'Error actualizando estado');
+                                        } finally {
+                                            setSavingEstadoPruebas(false);
+                                        }
+                                    }} disabled={savingEstadoPruebas}>
+                                        {savingEstadoPruebas ? 'Procesando...' : 'Marcar Pruebas'}
+                                    </Button>
+                                )
+                            ) : (
+                                // usuario sin permiso
+                                !isPruebas ? (
+                                    <Button variant="contained" color="secondary" sx={{ mt: 2 }} onClick={async () => {
+                                        if (!data?.id) return;
+                                        setSavingEstadoPruebas(true);
+                                        try {
+                                            await patchServicioEstado(data.id, { estadoId: estados().pruebas });
+                                            successToast('Estado actualizado a pruebas');
+                                            await fetch();
+                                        } catch (e: any) {
+                                            errorToast(e?.message ?? 'Error actualizando estado');
+                                        } finally {
+                                            setSavingEstadoPruebas(false);
+                                        }
+                                    }} disabled={savingEstadoPruebas}>
+                                        {savingEstadoPruebas ? 'Procesando...' : 'Marcar Pruebas'}
+                                    </Button>
+                                ) : null
+                            )}
+                        </Grid>
                     </CardContent>
                 </Card>
             </Container>

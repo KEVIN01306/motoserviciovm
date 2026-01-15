@@ -56,7 +56,7 @@ const compressImage = async (file: File, maxSizeMB = 2, quality = 0.7): Promise<
   });
 };
 
-const getServicios = async (params?: { placa?: string; startDate?: string; endDate?: string }): Promise<ServicioGetType[]> => {
+const getServicios = async (params?: { placa?: string; startDate?: string; endDate?: string; estadoId?: number, mecanicoId?: number }): Promise<ServicioGetType[]> => {
   try {
     let url = API_SERVICIOS;
     if (params) {
@@ -64,6 +64,8 @@ const getServicios = async (params?: { placa?: string; startDate?: string; endDa
       if (params.placa) search.append('placa', params.placa);
       if (params.startDate) search.append('startDate', params.startDate);
       if (params.endDate) search.append('endDate', params.endDate);
+      if (params.estadoId !== undefined && params.estadoId !== null) search.append('estadoId', String(params.estadoId));
+      if (params.mecanicoId !== undefined && params.mecanicoId !== null) search.append('mecanicoId', String(params.mecanicoId));
       url += `?${search.toString()}`;
     }
     const response = await api.get<apiResponse<ServicioGetType[]>>(url);
@@ -328,4 +330,29 @@ export const putProximoServicioItems = async (
 };
 
 
-export { getServicios, getServicio, postServicio, putServicio, putServicioOpcionesTipoServicio, putObservacionesServicio };
+// PATCH /servicios/:id/estado -> actualizar estado del servicio (por ejemplo cambiar a entregado, en reparacion, etc.)
+const patchServicioEstado = async (id: string | number, payload: { estadoId: number; observaciones?: string }) => {
+  try {
+    const response = await api.patch<apiResponse<any>>(`${API_SERVICIOS}/${id}/estado`, payload, { headers: { 'Content-Type': 'application/json' } });
+    return response.data.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (!error.response) {
+        throw new Error('No se pudo conectar con el servidor (timeout o red).');
+      }
+      if (error.response) {
+        const status = error.response.status;
+        if (status === 404) throw new Error('NOT FOUND API OR NOT EXISTED IN THE SERVER');
+        if (status === 500) throw new Error('INTERNAL ERROR SERVER');
+        const serverMessage = error.response.data?.message;
+        if (serverMessage) throw new Error(serverMessage);
+        throw new Error('CONNECTION ERROR');
+      } else {
+        throw new Error('No se pudo conectar con el servidor (timeout o red).');
+      }
+    }
+    throw new Error((error as Error).message);
+  }
+};
+
+export { getServicios, getServicio, postServicio, putServicio, putServicioOpcionesTipoServicio, putObservacionesServicio, patchServicioEstado };

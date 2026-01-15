@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Grid, Fab, Chip } from '@mui/material';
+import { Grid, Fab, Chip, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiMoneyDollarCircleLine, RiToolsLine } from 'react-icons/ri';
@@ -14,7 +14,7 @@ import { getServicios } from '../../../services/servicios.services';
 import type { ServicioGetType } from '../../../types/servicioType';
 import { formatDate } from '../../../utils/formatDate';
 import { PiDeviceTabletFill } from 'react-icons/pi';
-import { estados } from '../../../utils/estados';
+import { estados, estadosServicio } from '../../../utils/estados';
 import type { EstadoType } from '../../../types/estadoType';
 import { MdBikeScooter } from 'react-icons/md';
 import { FaBarsProgress } from "react-icons/fa6";
@@ -26,13 +26,22 @@ const ServiciosList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [term, setTerm] = useState('');
+  const [selectedEstado, setSelectedEstado] = useState<number | 'all'>(estados().enServicio);
   const goTo = useGoTo();
   const user = useAuthStore(s => s.user);
 
   const fetch = async () => {
     try {
       setLoading(true);
-      const data = await getServicios();
+      const params: any = {};
+      if (selectedEstado !== 'all') params.estadoId = selectedEstado;
+
+      const canViewAll = !!user?.permisos?.includes('servicios:viewAll');
+      if (!canViewAll && user?.id) {
+        params.mecanicoId = Number(user.id);
+      }
+
+      const data = await getServicios(params);
       setItems(data);
     } catch (err: any) {
       setError(err.message || 'Error cargando servicios');
@@ -41,7 +50,7 @@ const ServiciosList = () => {
     }
   };
 
-  useEffect(() => { fetch(); }, []);
+  useEffect(() => { fetch(); }, [selectedEstado, user?.id, user?.permisos]);
 
   useEffect(() => {
     if (!term.trim()) { setFiltered(items); return; }
@@ -143,7 +152,24 @@ const ServiciosList = () => {
       <BreadcrumbsRoutes items={[{ label: 'Servicios', icon: <RiToolsLine fontSize="inherit" />, href: '/admin/servicios' }]} />
       <Grid container spacing={2} flexGrow={1} size={12} width="100%">
         <Grid flexGrow={1} container p={1} gap={2} justifyContent={{ sm: 'center', md: 'flex-end' }}>
-          <Grid size={{ xs: 8, md: 4 }} display={'flex'} flexGrow={1} alignItems={'center'} justifyContent={'end'}>
+          <Grid size={{ xs: 12, md: 2 }} display={'flex'} flexGrow={1} alignItems={'center'} justifyContent={'start'}>
+            <FormControl fullWidth size="small">
+              <InputLabel id="estado-select-label">Estado</InputLabel>
+              <Select
+                labelId="estado-select-label"
+                variant='standard'
+                value={selectedEstado}
+                label="Estado"
+                onChange={(e) => setSelectedEstado(e.target.value as number | 'all')}
+              >
+                <MenuItem value={'all'}>Todos</MenuItem>
+                {Object.entries(estadosServicio()).map(([key, val]: any) => (
+                  <MenuItem key={key} value={val.id}>{val.estado}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid size={{ xs: 12, md: 4 }} display={'flex'} flexGrow={1} alignItems={'center'} justifyContent={'end'}>
             <Search onSearch={setTerm} placeholder="Buscar servicios..." />
           </Grid>
           {user?.permisos.includes('servicios:create') && (

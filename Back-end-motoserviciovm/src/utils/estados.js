@@ -12,5 +12,7 @@ export const estados = () => {
         enEspera: 7,
         confirmado: 8,
         cancelado: 9,
+        pruebas: 10,
+        listoEntrega: 11,
     }
 }

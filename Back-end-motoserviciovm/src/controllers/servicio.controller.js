@@ -1,6 +1,6 @@
 import z from "zod";
 import { responseError, responseSucces, responseSuccesAll } from "../helpers/response.helper.js";
-import { getServicios, getServicio, postServicio, putServicio, deleteServicio, salidaServicio, putProgreso, putProximoServicioItems, addServicioImages, putObservacionesServicio } from "../services/servicio.service.js";
+import { getServicios, getServicio, postServicio, putServicio, deleteServicio, salidaServicio, putProgreso, putProximoServicioItems, addServicioImages, putObservacionesServicio, putServicioEstado } from "../services/servicio.service.js";
 import { estados } from "../utils/estados.js";
 import { servicioSchema, servicioProductoProximoSchema } from "../zod/servicio.schema.js";
 
@@ -8,11 +8,13 @@ const directorio = '/uploads/servicios/';
 
 const getServiciosHandler = async (req, res) => {
     try {
-        const { placa, startDate, endDate } = req.query;
+        const { placa, startDate, endDate, estadoId, mecanicoId } = req.query;
 
         const filters = {
             ...(placa && { placa }),
             ...(startDate && endDate && { startDate, endDate }),
+            ...(estadoId && { estadoId: parseInt(estadoId) }),
+            ...(mecanicoId && { mecanicoId: parseInt(mecanicoId) }),
         };
 
         const items = await getServicios(filters);
@@ -393,6 +395,24 @@ const putObservacionesServicioHandler = async (req, res) => {
     }
 };
 
+const patchServicioEstadoHandler = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { estadoId } = req.body;
+        const updated = await putServicioEstado(parseInt(id), estadoId);
+        return res.status(200).json(responseSucces("Estado del servicio actualizado", updated));
+    } catch (err) {
+        console.error("Error in patchServicioEstado:", err);
+        let code = 500;
+        let msg = "INTERNAL_SERVER_ERROR";
+        if (err.code === "DATA_NOT_FOUND") {
+            code = 404;
+            msg = err.code;
+        }
+        return res.status(code).json(responseError(msg));
+    }
+};
+
 export {
     getServiciosHandler,
     getServicioHandler,
@@ -403,5 +423,6 @@ export {
     putProgresoHandler,
     updateProximoServicioItemsHandler,
     addServicioImagesHandler,
+    patchServicioEstadoHandler,
     putObservacionesServicioHandler,
 }

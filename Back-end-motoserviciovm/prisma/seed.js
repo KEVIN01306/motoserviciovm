@@ -101,7 +101,8 @@ const PERMISOS_SEED = [
   { permiso: "servicios:salidaDetalle", modulo: "SERVICIOS", estadoId: 1 },
   { permiso: "servicios:progreso", modulo: "SERVICIOS", estadoId: 1 },
   { permiso: "servicios:repuestos", modulo: "SERVICIOS", estadoId: 1 },
-
+  { permiso: "servicios:revision", modulo: "SERVICIOS", estadoId: 1 },
+  { permiso: "servicios:viewAll", modulo: "SERVICIOS", estadoId: 1 },
 
   { permiso: "ingresos-egresos:create", modulo: "INGRESOSEGRESOS", estadoId: 1 },
   { permiso: "ingresos-egresos:view", modulo: "INGRESOSEGRESOS", estadoId: 1 },
@@ -111,6 +112,12 @@ const PERMISOS_SEED = [
   { permiso: "ingresos-egresos:finalize", modulo: "INGRESOSEGRESOS", estadoId: 1 },
   { permiso: "ingresos-egresos:cancel", modulo: "INGRESOSEGRESOS", estadoId: 1 },
 
+  { permiso: "horarios:create", modulo: "HORARIOS", estadoId: 1 },
+  { permiso: "horarios:view", modulo: "HORARIOS", estadoId: 1 },
+  { permiso: "horarios:edit", modulo: "HORARIOS", estadoId: 1 },
+  { permiso: "horarios:detail", modulo: "HORARIOS", estadoId: 1 },
+  { permiso: "horarios:delete", modulo: "HORARIOS", estadoId: 1 },
+  
   { permiso: "contabilidad:view", modulo: "CONTABILIDAD", estadoId: 1 },
 
   { permiso: "home:view", modulo: "HOME", estadoId: 1 },
@@ -128,6 +135,8 @@ async function main() {
       { id: 7, estado: 'En Espera' },
       { id: 8, estado: 'Confirmado' },
       { id: 9, estado: 'Cancelado' },
+      { id: 10, estado: 'Pruebas' },
+      { id: 11, estado: 'Listo para Entrega' },
     ],
     skipDuplicates: true,
   });

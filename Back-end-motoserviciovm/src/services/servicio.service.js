@@ -5,7 +5,7 @@ import { deleteImage } from "../utils/fileUtils.js";
 const pause = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 const getServicios = async (filters = {}) => {
-    const { placa, startDate, endDate } = filters;
+    const { placa, startDate, endDate, estadoId, mecanicoId} = filters;
 
     // Adjust endDate to include the entire day by adding one day
     const adjustedEndDate = endDate ? new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)) : undefined;
@@ -14,6 +14,8 @@ const getServicios = async (filters = {}) => {
         estadoId: { not: estados().inactivo },
         ...(placa && { moto: { placa: placa } }),
         ...(startDate && adjustedEndDate && { createdAt: { gte: new Date(startDate), lt: adjustedEndDate } }),
+        ...(estadoId && { estadoId: estadoId }),
+        ...(mecanicoId && { mecanicoId: mecanicoId }),
     };
 
     const items = await prisma.servicio.findMany({
@@ -437,6 +439,13 @@ const putObservacionesServicio = async (id, observaciones) => {
     return updated;
 }
 
+const putServicioEstado = async (id, estadoId) => {
+    const existing = await prisma.servicio.findFirst({ where: { id: id } });
+    if (!existing) { const error = new Error('DATA_NOT_FOUND'); error.code = 'DATA_NOT_FOUND'; throw error; }
+    const updated = await prisma.servicio.update({ where: { id: id }, data: { estadoId: estadoId } });
+    return updated;
+}
+
 export {
     getServicios,
     getServicio,
@@ -448,4 +457,5 @@ export {
     putProximoServicioItems,
     addServicioImages,
     putObservacionesServicio,
-}
+    putServicioEstado,  
+};

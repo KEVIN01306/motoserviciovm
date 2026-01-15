@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getServiciosHandler, getServicioHandler, postServicioHandler, putServicioHandler, deleteServicioHandler, salidaServicioHandler, putProgresoHandler, updateProximoServicioItemsHandler, addServicioImagesHandler, putObservacionesServicioHandler } from '../controllers/servicio.controller.js';
+import { getServiciosHandler, getServicioHandler, postServicioHandler, putServicioHandler, deleteServicioHandler, salidaServicioHandler, putProgresoHandler, updateProximoServicioItemsHandler, addServicioImagesHandler, putObservacionesServicioHandler, patchServicioEstadoHandler } from '../controllers/servicio.controller.js';
 import configureMulter from '../configs/multer.config.js';
 import path from 'path';
 
@@ -29,5 +29,6 @@ router.put('/:id/imagenes', upload.fields([
 ]), addServicioImagesHandler);
 router.delete('/:id', deleteServicioHandler);
 router.put('/:id/observaciones', putObservacionesServicioHandler);
+router.patch('/:id/estado', patchServicioEstadoHandler);
 
 export default router;

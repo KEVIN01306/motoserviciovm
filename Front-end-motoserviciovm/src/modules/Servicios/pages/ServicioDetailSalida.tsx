@@ -183,17 +183,17 @@ const ServicioDetailSalida = () => {
                             {/* CLIENTE */}
                             <Box sx={{ mb: 1, display: 'flex', gap: 1 }}>
                                 <Typography sx={{ color: '#05172b', fontWeight: 600 }}>CLIENTE:</Typography>
-                                <Typography>{data.cliente?.primerNombre} {data.cliente?.primerApellido}</Typography>
+                                <Typography>{data.cliente?.primerNombre ?? '-'} {data.cliente?.primerApellido ?? '-'}</Typography>
                             </Box>
                             <Box sx={{ mb: 1, display: 'flex', gap: 1 }}>
                                 <Typography sx={{ color: '#05172b', fontWeight: 600 }}>DOCUMENTO:</Typography>
-                                <Typography>{data.cliente.dpi?? data.cliente.nit}</Typography>
+                                <Typography>{(data?.cliente?.dpi ?? data?.cliente?.nit) ?? '-'}</Typography>
                             </Box>
 
                             {/* CONTACTO */}
                             <Box sx={{ mb: 1, display: 'flex', gap: 1 }}>
                                 <Typography sx={{ color: '#05172b', fontWeight: 600 }}>CONTACTO:</Typography>
-                                <Typography>{data.cliente?.numeroTel}</Typography>
+                                <Typography>{data.cliente?.numeroTel ?? '-'}</Typography>
                             </Box>
 
                             {/* MOTO */}
