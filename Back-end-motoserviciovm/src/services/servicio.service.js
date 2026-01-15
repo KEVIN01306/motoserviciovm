@@ -157,8 +157,10 @@ const postServicio = async (data) => {
 }
 
 const putServicio = async (id, data) => {
-    const { servicioItems, productosCliente, imagenesMeta, imagenFiles, ...base } = data;
+    const { servicioItems, productosCliente, imagenesMeta, imagenFiles, opcionesServicioManual, sucursalId, motoId, clienteId, mecanicoId, tipoServicioId, estadoId, ...base } = data;
     const uploaded = Array.isArray(imagenFiles) ? imagenFiles : [];
+
+    console.log("putServicio called with data:", data);
 
     try {
         const result = await prisma.$transaction(async (tx) => {
@@ -174,7 +176,16 @@ const putServicio = async (id, data) => {
                 if (missing.length > 0) { const error = new Error('DATA_NOT_FOUND_INVENTARIO'); error.code = 'DATA_NOT_FOUND_INVENTARIO'; throw error; }
             }
 
-            const updated = await tx.servicio.update({ where: { id: id }, data: base });
+            // Transform relation IDs to Prisma connect syntax
+            const updateData = { ...base };
+            if (sucursalId !== undefined) updateData.sucursal = { connect: { id: sucursalId } };
+            if (motoId !== undefined) updateData.moto = { connect: { id: motoId } };
+            if (clienteId !== undefined) updateData.cliente = clienteId ? { connect: { id: clienteId } } : { disconnect: true };
+            if (mecanicoId !== undefined) updateData.mecanico = { connect: { id: mecanicoId } };
+            if (tipoServicioId !== undefined) updateData.tipoServicio = { connect: { id: tipoServicioId } };
+            if (estadoId !== undefined) updateData.estado = { connect: { id: estadoId } };
+
+            const updated = await tx.servicio.update({ where: { id: id }, data: updateData });
 
             // servicioItems: upsert per inventarioId, then delete missing (like Venta behavior)
             if (Array.isArray(servicioItems)) {

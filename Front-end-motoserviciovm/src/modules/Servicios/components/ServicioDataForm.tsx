@@ -6,7 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ImagenesEditorInput from '../../../components/utils/ImagenesEditorInput';
 import SignatureField from '../../../components/utils/SignatureField';
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_DOMAIN;
 
 const ServicioDataForm = ({
   register,

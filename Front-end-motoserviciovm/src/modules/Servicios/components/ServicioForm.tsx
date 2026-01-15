@@ -189,17 +189,9 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
     if (imagenGuardada) {
       if (imagenGuardada instanceof File) {
         payload.firmaEntradaFile = imagenGuardada;
-      } else if (typeof imagenGuardada === 'string' && imagenGuardada.startsWith('data:image')) {
-        // Convertir base64 a File
-        const arr = imagenGuardada.split(',');
-        const mimeMatch = arr[0].match(/:(.*?);/);
-        const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
-        const bstr = atob(arr[1]);
-        let n = bstr.length;
-        const u8arr = new Uint8Array(n);
-        while (n--) u8arr[n] = bstr.charCodeAt(n);
-        const file = new File([u8arr], 'firma.jpg', { type: mime });
-        payload.firmaEntradaFile = file;
+      } else if (typeof imagenGuardada === 'string') {
+        // Cuando es string se trata como URL ya guardada en el servidor
+        payload.firmaEntrada = imagenGuardada;
       }
     }
     await onSubmit(payload);
