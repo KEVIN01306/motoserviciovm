@@ -102,7 +102,7 @@ const ServicioProgreso = () => {
 
     const isPruebas = data?.estadoId === estados().pruebas;
     const isListoEntrega = data?.estadoId === estados().listoEntrega;
-    const editable = hasRevision && (isPruebas || isListoEntrega);
+    const editable = hasRevision ? (isPruebas || isListoEntrega) : !(isPruebas || isListoEntrega);
 
 
     useEffect(() => {
@@ -280,8 +280,8 @@ const ServicioProgreso = () => {
                             <ImageGallery imagenes={data.imagen ?? []} />
                         </Box>
                         <Box>
-                            {/* Formulario para agregar imágenes nuevas (solo si puede editar) */}
-                            {!(isPruebas && !hasRevision) && (
+                            {/* Formulario para agregar imágenes nuevas (solo si está editable) */}
+                            {editable && (
                                 <ImagenesProgresoForm onSubmit={handleSaveImagenes} loading={savingImagenes} />
                             )}
                         </Box>
