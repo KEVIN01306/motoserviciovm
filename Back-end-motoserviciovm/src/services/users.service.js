@@ -105,6 +105,7 @@ const getUSer = async (id) => {
 }
 
 const postUser = async (data) => {
+    /*
     const existingUser = await prisma.user.findFirst({
         where: {
             OR: [
@@ -120,6 +121,7 @@ const postUser = async (data) => {
         error.code = 'CONFLICT';
         throw error;
     }
+        */
 
     const { roles: rolIds, sucursales: sucursalIds, motos: motoIds, ...userData } = data;
 
@@ -161,6 +163,7 @@ const postUser = async (data) => {
 
 
 const putUser = async (id, data) => {
+    /*
     const existingUser = await prisma.user.findFirst({
         where: {
             id: { not: id },
@@ -176,7 +179,7 @@ const putUser = async (id, data) => {
         const error = new Error('CONFLICT');
         error.code = 'CONFLICT';
         throw error;
-    }
+    }*/
 
     const user = await prisma.user.findUnique({
         where: { id: id },
