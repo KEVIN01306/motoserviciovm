@@ -341,10 +341,22 @@ const InputsForm = ({ control, register, errors }: Props) => {
               }
             }
             // Lógica para tomar foto (solo imagen)
-            const handleCalcomaniaFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
+            const handleCalcomaniaFileChange = async (e: React.ChangeEvent<HTMLInputElement>, field: any) => {
               const file = e.target.files?.[0];
               if (!file) return;
-              field.onChange(file);
+              try {
+                // If it's an image, resize/compress similarly to avatar handling
+                if (file.type.startsWith('image/')) {
+                  const resized = await resizeFile(file, 1024, 0.8);
+                  field.onChange(resized);
+                } else {
+                  // PDFs or other types: keep as-is
+                  field.onChange(file);
+                }
+              } catch (err) {
+                console.error('Error resizing calcomania image', err);
+                field.onChange(file);
+              }
             };
 
             // Modal/canvas para tomar foto en PC
@@ -382,7 +394,7 @@ const InputsForm = ({ control, register, errors }: Props) => {
               };
             }, [calcomaniaCameraModalOpen]);
 
-            const handleTakeCalcomaniaPhoto = (field: any) => {
+            const handleTakeCalcomaniaPhoto = async (field: any) => {
               const video = calcomaniaVideoRef.current;
               if (!video) return;
               const canvas = document.createElement('canvas');
@@ -403,8 +415,15 @@ const InputsForm = ({ control, register, errors }: Props) => {
               ctx.drawImage(video, 0, 0, drawW, drawH);
               canvas.toBlob(async (blob) => {
                 if (!blob) return;
-                const file = new File([blob], 'calcomania.jpg', { type: 'image/jpeg' });
-                field.onChange(file);
+                try {
+                  const file = new File([blob], 'calcomania.jpg', { type: 'image/jpeg' });
+                  const resized = await resizeFile(file, 1024, 0.8);
+                  field.onChange(resized);
+                } catch (err) {
+                  console.error('Error resizing captured calcomania image', err);
+                  const file = new File([blob], 'calcomania.jpg', { type: 'image/jpeg' });
+                  field.onChange(file);
+                }
               }, 'image/jpeg', 0.8);
               setCalcomaniaCameraModalOpen(false);
               if (calcomaniaStreamRef.current) {
