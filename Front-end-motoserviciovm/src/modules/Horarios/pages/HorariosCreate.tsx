@@ -160,7 +160,7 @@ const HorariosCreate = () => {
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <Autocomplete
                 options={sucursales}
                 getOptionLabel={(option) => option.nombre}
@@ -171,7 +171,7 @@ const HorariosCreate = () => {
                 )}
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <Autocomplete
                 options={tiposHorario}
                 getOptionLabel={(option) => option.tipo}
@@ -182,7 +182,7 @@ const HorariosCreate = () => {
                 )}
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <TextField
                 label="Fecha de Vigencia"
                 type="date"
@@ -205,7 +205,7 @@ const HorariosCreate = () => {
         {diasDisponibles.map((dia) => {
           const diaConfig = diasConfig.find((dc) => dc.diaId === dia.id);
           return (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={dia.id}>
+            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={dia.id}>
               <DiaCard
                 dia={dia}
                 diaConfig={diaConfig}

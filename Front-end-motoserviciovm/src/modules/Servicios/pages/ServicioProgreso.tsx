@@ -280,8 +280,8 @@ const ServicioProgreso = () => {
                             <ImageGallery imagenes={data.imagen ?? []} />
                         </Box>
                         <Box>
-                            {/* Formulario para agregar imágenes nuevas (solo si está editable) */}
-                            {editable && (
+                            {/* Formulario para agregar imágenes nuevas: editable OR cuando esté en reparación */}
+                            {(editable || data?.estadoId === estados().enReparacion || data.estadoId === estados().enParqueo) && (
                                 <ImagenesProgresoForm onSubmit={handleSaveImagenes} loading={savingImagenes} />
                             )}
                         </Box>

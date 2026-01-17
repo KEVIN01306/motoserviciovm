@@ -32,5 +32,6 @@ router.use('/ingresos-egresos', (await import('./ingresosEgresos.routes.js')).de
 router.use('/tipoHorario', (await import('./tipoHorario.routes.js')).default);
 router.use('/tipoServicioHorario', (await import('./tipoServicioHorario.routes.js')).default);
 router.use('/diasDisponibles', (await import('./diasDisponibles.routes.js')).default);
+router.use('/citas', (await import('./cita.routes.js')).default);
 
 export default router;

@@ -61,7 +61,7 @@ const postTipoServicioHorario = async (data) => {
 
     return createdTSH;
   });
-
+  
   const full = await prisma.tipoServicioHorario.findUnique({ where: { id: created.id }, include: includeAll });
   return full;
 };

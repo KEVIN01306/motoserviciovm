@@ -52,7 +52,7 @@ const HorariosDetail = () => {
           <Button
             startIcon={<EditIcon />}
             variant="contained"
-            onClick={() => navigate(`/admins/horarios/${id}/edit`)}
+            onClick={() => navigate(`/admin/horarios/${id}/edit`)}
           >
             Editar
           </Button>
@@ -63,7 +63,7 @@ const HorariosDetail = () => {
       </Box>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -100,7 +100,7 @@ const HorariosDetail = () => {
           </Card>
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -110,7 +110,7 @@ const HorariosDetail = () => {
               <Grid container spacing={2}>
                 {horario.diasConfig && horario.diasConfig.length > 0 ? (
                   horario.diasConfig.map((diaConfig) => (
-                    <Grid item xs={12} sm={6} md={4} key={diaConfig.id}>
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={diaConfig.id}>
                       <Paper elevation={2} sx={{ p: 2 }}>
                         <Typography variant="h6" gutterBottom>
                           {diaConfig.dia?.dia || "N/A"}
@@ -140,7 +140,7 @@ const HorariosDetail = () => {
                     </Grid>
                   ))
                 ) : (
-                  <Grid item xs={12}>
+                  <Grid size={{ xs: 12 }}>
                     <Typography variant="body2" color="text.secondary">
                       No hay días configurados
                     </Typography>
