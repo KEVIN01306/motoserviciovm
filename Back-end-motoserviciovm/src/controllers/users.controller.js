@@ -102,6 +102,8 @@ const postUserHandler = async (req,res) => {
         const data = req.body
 
         data.email = data.email === "" ? null : data.email;
+        data.dpi = data.dpi === "" ? null : data.dpi;
+        data.nit = data.nit === "" ? null : data.nit;
 
         const validationResult = userSchema.safeParse(data);
 
@@ -138,6 +140,8 @@ const putUserHandler = async (req,res) => {
         const data = req.body
 
         data.email = data.email === "" ? null : data.email;
+        data.dpi = data.dpi === "" ? null : data.dpi;
+        data.nit = data.nit === "" ? null : data.nit;
 
         const validationResult = userSchema.safeParse(data);
 
