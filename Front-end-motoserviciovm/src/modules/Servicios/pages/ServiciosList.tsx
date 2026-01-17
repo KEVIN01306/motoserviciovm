@@ -76,6 +76,7 @@ const ServiciosList = () => {
     const base: Column<ServicioGetType>[] = [
       { id: 'createdAt', label: 'Creado', minWidth: 160, format: (v) => formatDate(v as any) },
       { id: 'moto', label: 'Moto', minWidth: 120, format: (v) => v?.placa ?? '-' },
+      { id: 'moto', label: 'Linea', minWidth: 120, format: (v) => v?.modelo?.linea?.linea ?? '-' },
       { id: 'estado', label: 'Estado', minWidth: 100, format: (v: EstadoType) => <Chip variant='outlined' label={v?.estado ?? ''} color={chipColorByEstado(v?.id ?? 0)} /> },
       { id: 'id', label: 'Codigo', minWidth: 60 },
       { id: 'descripcion', label: 'Descripción', minWidth: 220 },
