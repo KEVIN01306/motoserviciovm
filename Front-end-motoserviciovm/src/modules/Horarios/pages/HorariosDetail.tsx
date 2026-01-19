@@ -56,7 +56,7 @@ const HorariosDetail = () => {
           >
             Editar
           </Button>
-          <Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/horarios")}>
+          <Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/admin/horarios")}>
             Volver
           </Button>
         </Box>

@@ -23,6 +23,28 @@ const getCitas = async (filters = {}) => {
   if (filters.tipoServicioId) {
     where.tipoServicioId = filters.tipoServicioId;
   }
+  
+  // Filtro por rango de fechas de creación
+  if (filters.fechaInicio || filters.fechaFin) {
+    where.createdAt = {};
+    if (filters.fechaInicio) {
+      where.createdAt.gte = new Date(filters.fechaInicio);
+    }
+    if (filters.fechaFin) {
+      where.createdAt.lte = new Date(filters.fechaFin);
+    }
+  }
+  
+  // Filtro por fecha específica de cita
+  if (filters.fechaCita) {
+    const fechaCitaDate = new Date(filters.fechaCita);
+    const inicioDia = new Date(fechaCitaDate.setHours(0, 0, 0, 0));
+    const finDia = new Date(fechaCitaDate.setHours(23, 59, 59, 999));
+    where.fechaCita = {
+      gte: inicioDia,
+      lte: finDia
+    };
+  }
 
   const citas = await prisma.cita.findMany({
     where,

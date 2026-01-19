@@ -5,4 +5,7 @@ export const citaQuerySchema = z.object({
   estadoId: z.coerce.number().int().optional(),
   clienteId: z.coerce.number().int().optional(),
   tipoServicioId: z.coerce.number().int().optional(),
+  fechaInicio: z.coerce.date().optional(),
+  fechaFin: z.coerce.date().optional(),
+  fechaCita: z.coerce.date().optional(),
 });

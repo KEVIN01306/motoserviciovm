@@ -11,8 +11,8 @@ const getCitasHandler = async (req, res) => {
       return res.status(400).json({ errors });
     }
     
-    const { sucursalId, estadoId, clienteId, tipoServicioId } = queryValidation.data;
-    const filters = { sucursalId, estadoId, clienteId, tipoServicioId };
+    const { sucursalId, estadoId, clienteId, tipoServicioId, fechaInicio, fechaFin, fechaCita } = queryValidation.data;
+    const filters = { sucursalId, estadoId, clienteId, tipoServicioId, fechaInicio, fechaFin, fechaCita };
     
     const citas = await getCitas(filters);
     res.status(200).json(responseSuccesAll("citas obtenidas exitosamente", citas));

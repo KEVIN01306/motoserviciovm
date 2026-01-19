@@ -117,6 +117,11 @@ const PERMISOS_SEED = [
   { permiso: "horarios:edit", modulo: "HORARIOS", estadoId: 1 },
   { permiso: "horarios:detail", modulo: "HORARIOS", estadoId: 1 },
   { permiso: "horarios:delete", modulo: "HORARIOS", estadoId: 1 },
+
+  { permiso: "citas:create", modulo: "CITAS", estadoId: 1 },
+  { permiso: "citas:view", modulo: "CITAS", estadoId: 1 },
+  { permiso: "citas:edit", modulo: "CITAS", estadoId: 1 },
+  { permiso: "citas:detail", modulo: "CITAS", estadoId: 1 },
   
   { permiso: "contabilidad:view", modulo: "CONTABILIDAD", estadoId: 1 },
 

@@ -25,6 +25,7 @@ import AuthRouteGuard from "../modules/Auth/components/AuthRouteGuard";
 import { ServiciosRoutes } from "../modules/Servicios/routes";
 import horariosRoutes from "../modules/Horarios/routes";
 import homeRoutes from "../modules/Home/routes";
+import CitasRoutes from "../modules/Citas/routes";
 
 const Home = lazy(() => import('../modules/LandingPages/index'))
 const HomePages = lazy(() => import('../modules/Home/pages/HomePages'))
@@ -73,6 +74,7 @@ const Router = [
                     ...ServiciosRoutes,
                     ...homeRoutes,
                     ...horariosRoutes,
+                    ...CitasRoutes
                 ]
             },
 
