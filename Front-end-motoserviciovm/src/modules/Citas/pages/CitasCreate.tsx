@@ -30,6 +30,7 @@ const CitasCreate = () => {
         descripcion: data.descripcion ?? '',
         fechaCita: data.fechaCita,
         horaCita: data.horaCita,
+        dpiNit: data.dpiNit,
         nombreContacto: data.nombreContacto,
         telefonoContacto: data.telefonoContacto,
         sucursalId: data.sucursalId ? Number(data.sucursalId) : undefined,

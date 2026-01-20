@@ -1,5 +1,6 @@
 import z from 'zod';
 import { citaSchema } from '../zod/cita.schema';
+import { estados } from '../utils/estados';
 
 export type CitaType = z.infer<typeof citaSchema>;
 
@@ -26,22 +27,22 @@ export const CitaInitialState: Partial<CitaType> = {
   tipoServicioId: undefined,
   motoId: undefined,
   placa: '',
-  estadoId: 1,
+  estadoId: estados().activo,
 };
 
 export const mergeCitaDataWithDefaults = (apiData: Partial<CitaGetType>): Partial<CitaType> => {
   return {
-    descripcion: apiData.descripcion ?? '',
-    fechaCita: apiData.fechaCita ? apiData.fechaCita.split('T')[0] : '',
-    horaCita: apiData.horaCita ?? '',
-    nombreContacto: apiData.nombreContacto ?? '',
-    telefonoContacto: apiData.telefonoContacto ?? '',
-    sucursalId: apiData.sucursalId ?? undefined,
-    clienteId: apiData.clienteId ?? undefined,
-    dpiNit: apiData.dpiNit ?? '',
-    tipoServicioId: apiData.tipoServicioId ?? undefined,
-    motoId: apiData.motoId ?? undefined,
-    placa: apiData.placa ?? '',
-    estadoId: apiData.estadoId ?? 1,
+    descripcion: apiData.descripcion ?? CitaInitialState.descripcion,
+    fechaCita: apiData.fechaCita ? apiData.fechaCita.split('T')[0] : CitaInitialState.fechaCita,
+    horaCita: apiData.horaCita ?? CitaInitialState.horaCita,
+    nombreContacto: apiData.nombreContacto ?? CitaInitialState.nombreContacto,
+    telefonoContacto: apiData.telefonoContacto ?? CitaInitialState.telefonoContacto,
+    sucursalId: apiData.sucursalId ?? CitaInitialState.sucursalId,
+    clienteId: apiData.clienteId ?? CitaInitialState.clienteId,
+    dpiNit: apiData.dpiNit ?? CitaInitialState.dpiNit,
+    tipoServicioId: apiData.tipoServicioId ?? CitaInitialState.tipoServicioId,
+    motoId: apiData.motoId ?? CitaInitialState.motoId,
+    placa: apiData.placa ?? CitaInitialState.placa,
+    estadoId: apiData.estadoId ?? CitaInitialState.estadoId,
   };
 };

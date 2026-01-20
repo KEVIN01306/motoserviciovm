@@ -192,4 +192,33 @@ const deleteMoto = async (id: motoType["id"]) => {
     }
 };
 
-export { getMotos, getMoto, postMoto, putMoto, deleteMoto };
+const getMotoByPlaca = async (placa: string): Promise<motoGetType> => {
+    try {
+        const response = await api.get<apiResponse<motoGetType>>(`${API_MOTOS}/placa/${encodeURIComponent(placa)}`);
+        const moto = response.data.data;
+
+        if (!moto) {
+            throw new Error("DATA_NOT_FOUND");
+        }
+
+        return moto;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            const status = error.response?.status;
+
+            if (status === 500) {
+                throw new Error("INTERNAL ERROR SERVER");
+            }
+
+            const serverMessage = error.response?.data?.message;
+            if (serverMessage) {
+                throw new Error(serverMessage);
+            }
+            throw new Error("CONNECTION ERROR");
+        }
+
+        throw new Error((error as Error).message);
+    }
+};
+
+export { getMotos, getMoto, getMotoByPlaca, postMoto, putMoto, deleteMoto };

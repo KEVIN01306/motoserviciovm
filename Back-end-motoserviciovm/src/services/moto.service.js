@@ -101,6 +101,32 @@ const getMoto = async (id) => {
     return  moto ;
 }
 
+
+const getMotoPlaca = async (placa) => {
+    const moto = await prisma.moto.findUnique({
+        include: {
+            modelo: {
+                include: {
+                    marca: true,
+                    cilindrada: true,
+                    linea: true,
+            },
+        },
+            users: true,
+            estado: true,
+        },
+        where: { placa:  placa,estadoId: {
+            not: estados().inactivo
+        } },
+    });
+    if (!moto) {
+        const error = new Error('DATA_NOT_FOUND');
+        error.code = 'DATA_NOT_FOUND';
+        throw error;
+    }
+    return  moto ;
+}
+
 const postMoto = async (data) => {
     const existingMoto = await prisma.moto.findUnique({
         where: { placa: data.placa },
@@ -183,6 +209,7 @@ const deleteMoto = async (id) => {
 export {
     getMotos,
     getMoto,
+    getMotoPlaca,
     postMoto,
     putMoto,
     deleteMoto,

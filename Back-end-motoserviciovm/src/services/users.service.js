@@ -105,6 +105,48 @@ const getUSer = async (id) => {
 }
 
 
+const getCliente = async (documento) => {
+
+	const user = await prisma.user.findFirst({
+		where: {
+			OR: [
+				{ dpi: documento },
+				{ nit: documento }
+			],
+			estadoId: {
+				not: estados().inactivo
+			}
+		},
+		include: {
+			roles: true,
+			sucursales: true,
+			estado: true,
+			motos: {
+				include: {
+					modelo: {
+						include: {
+							marca: true,
+							linea: true,
+							cilindrada: true,
+							estado: true,
+						}
+					},
+					estado: true,
+				}
+			},
+		}
+	});
+
+	if (!user) {
+		const error = new Error('DATA_NOT_FOUND');
+		error.code = 'DATA_NOT_FOUND';
+		throw error;
+	}
+
+	return user;
+}
+
+
 
 const postUser = async (data) => {
     
@@ -261,6 +303,7 @@ export {
 	postUser,
 	putUser,
 	patchUserActive,
+    getCliente,
 	getUSersMecanicos,
 	getUSersClientes
 }

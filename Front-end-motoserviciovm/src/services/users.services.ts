@@ -145,6 +145,35 @@ const getUser = async (id: UserGetType['id']): Promise<UserGetType> => {
     }
 }
 
+const getClienteByDocumento = async (documento: string): Promise<UserGetType> => {
+    try {
+        const response = await api.get<apiResponse<UserGetType>>(`${API_USERS}/clientes/${encodeURIComponent(documento)}`);
+        const cliente = response.data.data;
+
+        if (!cliente) {
+            throw new Error("DATA_NOT_FOUND");
+        }
+
+        return cliente;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            const status = error.response?.status;
+
+            if (status === 500) {
+                throw new Error("INTERNAL ERROR SERVER");
+            }
+
+            const serverMessage = error.response?.data?.message;
+            if (serverMessage) {
+                throw new Error(serverMessage);
+            }
+            throw new Error("CONNECTION ERROR");
+        }
+
+        throw new Error((error as Error).message);
+    }
+};
+
 
 
 const postUser = async (user: UserType) => {
@@ -271,5 +300,6 @@ export {
     putUser,
     patchUserActive,
     getUsersMecanicos,
-    getUsersClientes
+    getUsersClientes,
+    getClienteByDocumento,
 }

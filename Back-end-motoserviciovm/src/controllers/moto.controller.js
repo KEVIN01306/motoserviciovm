@@ -1,5 +1,5 @@
 import { responseError, responseSucces, responseSuccesAll } from "../helpers/response.helper.js";
-import { getMotos,getMoto,postMoto,putMoto,deleteMoto } from "../services/moto.service.js";
+import { getMotos,getMoto,getMotoPlaca,postMoto,putMoto,deleteMoto } from "../services/moto.service.js";
 import { parseArrayNumbers } from "../utils/parseArrayNumbers.js";
 import { motoSchema } from "../zod/moto.schema.js";
 
@@ -140,8 +140,28 @@ const deleteMotoHandler =  async (req, res) => {
 
 export {
     getMotosHandler,
+    getMotoPlacaHandler,
     getMotoHandler,
     postMotoHandler,
     putMotoHandler,
     deleteMotoHandler
+}
+
+const getMotoPlacaHandler = async (req, res) => {
+    try {
+        const { placa } = req.params;
+        const moto = await getMotoPlaca(placa);
+        res.status(200).json(responseSucces("Moto obtenido exitosamente", moto));
+    } catch (error) {
+        console.error(error);
+        let errorCode = 500;
+        let errorMessage = 'INTERNAL_SERVER_ERROR'
+        switch(error.code){
+            case 'DATA_NOT_FOUND':
+                errorCode = 404;
+                errorMessage = error.code;
+                break;
+        }
+        res.status(errorCode).json(responseError(errorMessage));
+    }
 }

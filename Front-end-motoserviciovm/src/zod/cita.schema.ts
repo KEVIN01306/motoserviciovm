@@ -19,6 +19,7 @@ export const citaCreateSchema = citaSchema.pick({
   descripcion: true,
   fechaCita: true,
   horaCita: true,
+  dpiNit: true,
   nombreContacto: true,
   telefonoContacto: true,
   sucursalId: true,

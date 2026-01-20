@@ -46,6 +46,7 @@ const CitasEdit = () => {
       const payload = {
         descripcion: data.descripcion ?? '',
         fechaCita: data.fechaCita,
+        dpiNit: data.dpiNit,
         horaCita: data.horaCita,
         nombreContacto: data.nombreContacto,
         telefonoContacto: data.telefonoContacto,

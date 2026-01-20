@@ -1,4 +1,4 @@
-import { Grid, TextField, Autocomplete, Box, Typography } from "@mui/material";
+import { Grid, TextField, Autocomplete, Box, Typography, Button, CircularProgress } from "@mui/material";
 import { LocalizationProvider, DatePicker, PickersDay } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { es } from 'date-fns/locale';
@@ -6,6 +6,8 @@ import {format} from 'date-fns/format';
 import { Controller, type Control, type UseFormRegister, type UseFormSetValue, type UseFormWatch, type FieldErrors } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { getTipos, getTipo } from '../../../services/tipoServicio.services';
+import { getClienteByDocumento } from '../../../services/users.services';
+import { getMotoByPlaca } from '../../../services/moto.services';
 import { tipoServicioHorarioServices } from '../../../services/tipoServicioHorario.services';
 import type { CitaType } from '../../../types/citaType';
 import { useAuthStore } from '../../../store/useAuthStore';
@@ -124,6 +126,11 @@ const InputsForm = ({ register, control, watch, setValue, errors }: InputsFormPr
 
   const user = useAuthStore(s => s.user);
 
+  const [buscandoCliente, setBuscandoCliente] = useState(false);
+  const [clienteFound, setClienteFound] = useState<any | null>(null);
+  const [buscandoMoto, setBuscandoMoto] = useState(false);
+  const [motoFound, setMotoFound] = useState<any | null>(null);
+
   return (
     <>
       <Grid size={{ xs: 12 }}>
@@ -224,10 +231,71 @@ const InputsForm = ({ register, control, watch, setValue, errors }: InputsFormPr
         <TextField {...register('telefonoContacto' as any)} label="Teléfono" fullWidth variant="standard" error={!!errors.telefonoContacto} helperText={errors.telefonoContacto?.message} />
       </Grid>
 
+      <Grid size={{ xs: 12 }}>
+        <TextField {...register('dpiNit' as any)} label="DPI / NIT" fullWidth variant="standard" error={!!errors.dpiNit} helperText={errors.dpiNit?.message} />
+      </Grid>
+
+      <Grid size={{ xs: 12 }}>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+          <Button variant="outlined" onClick={async () => {
+            const doc = (watch('dpiNit') || '').toString().trim();
+            if (!doc) return;
+            try {
+              setBuscandoCliente(true);
+              setClienteFound(null);
+              const found = await getClienteByDocumento(doc);
+              setClienteFound(found);
+              if (found && found.id) setValue('clienteId', found.id);
+            } catch (e) {
+              setClienteFound(null);
+            } finally { setBuscandoCliente(false); }
+          }}>
+            {buscandoCliente ? <CircularProgress size={18} /> : 'Buscar cliente'}
+          </Button>
+          {clienteFound && (
+            <Box>
+              <Typography><strong>Cliente:</strong> {clienteFound.nombre ?? clienteFound.name ?? '-'} </Typography>
+              <Typography variant="caption">DPI: {clienteFound.documento ?? clienteFound.dpi ?? '-'}</Typography>
+            </Box>
+          )}
+        </Box>
+      </Grid>
+
       
 
       <Grid size={12}>
         <TextField {...register('placa' as any)} label="Placa" fullWidth variant="standard" />
+      </Grid>
+
+      <Grid size={{ xs: 12 }}>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+          <Button variant="outlined" onClick={async () => {
+            const placaVal = (watch('placa') || '').toString().trim();
+            if (!placaVal) return;
+            try {
+              setBuscandoMoto(true);
+              setMotoFound(null);
+              const found = await getMotoByPlaca(placaVal);
+              setMotoFound(found);
+              if (found && found.id) setValue('motoId', found.id);
+              // if moto has users, optionally set cliente
+              if (found && Array.isArray(found.users) && found.users.length>0) {
+                setClienteFound(found.users[0]);
+                if (found.users[0].id) setValue('clienteId', found.users[0].id);
+              }
+            } catch (e) {
+              setMotoFound(null);
+            } finally { setBuscandoMoto(false); }
+          }}>
+            {buscandoMoto ? <CircularProgress size={18} /> : 'Buscar moto'}
+          </Button>
+          {motoFound && (
+            <Box>
+              <Typography><strong>Placa:</strong> {motoFound.placa ?? '-'}</Typography>
+              <Typography variant="caption">Modelo: {motoFound.modelo?.modelo ?? motoFound.modelo?.nombre ?? '-'}</Typography>
+            </Box>
+          )}
+        </Box>
       </Grid>
 
       {/* location capture removed - only POST fields are included */}
