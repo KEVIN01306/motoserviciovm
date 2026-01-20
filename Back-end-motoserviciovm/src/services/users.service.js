@@ -104,6 +104,8 @@ const getUSer = async (id) => {
 	return user;
 }
 
+
+
 const postUser = async (data) => {
     
     const existingUser = await prisma.user.findFirst({

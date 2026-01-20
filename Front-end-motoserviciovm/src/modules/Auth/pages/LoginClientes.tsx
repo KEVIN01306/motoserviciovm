@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import { Login as LoginIcon } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
+import { useEffect } from 'react';
 import { authClienteInitialState, type AuthClienteType } from '../../../types/authType';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { authClienteSchema } from '../../../zod/auth.schema';
@@ -38,10 +39,19 @@ const LoginClientes = () => {
     } = useForm<AuthClienteType>({
         resolver: zodResolver(authClienteSchema),
         mode: 'onSubmit',
-        defaultValues: authClienteInitialState,
+        defaultValues: { ...authClienteInitialState, placa: 'M' },
     });
 
     const userType = watch('userType');
+    const placaValue = watch('placa');
+
+    useEffect(() => {
+        if (typeof placaValue !== 'string') return;
+        if (!placaValue.startsWith('M')) {
+            const withoutMs = placaValue.replace(/^M+/, '');
+            setValue('placa', 'M' + withoutMs, { shouldValidate: true, shouldDirty: true });
+        }
+    }, [placaValue, setValue]);
 
     const handleLogin = async (data: AuthClienteType) => {
         try {

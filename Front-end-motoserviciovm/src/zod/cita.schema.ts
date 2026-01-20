@@ -16,6 +16,7 @@ export const citaSchema = z.object({
 });
 
 export const citaCreateSchema = citaSchema.pick({
+  descripcion: true,
   fechaCita: true,
   horaCita: true,
   nombreContacto: true,
