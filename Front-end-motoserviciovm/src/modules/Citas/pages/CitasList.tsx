@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { startOfWeek, endOfWeek, format } from 'date-fns';
 import { Grid, FormControl, InputLabel, Select, MenuItem, Button, TextField, Chip, Box } from '@mui/material';
 import { RiEdit2Line } from 'react-icons/ri';
 import { HiOutlineTrash } from 'react-icons/hi2';
@@ -38,7 +39,13 @@ const CitasList = () => {
   const [sucursalId, setSucursalId] = useState<number | undefined>(userSucursales.length ? Number(userSucursales[0].id) : undefined);
   const [tipoServicioId, setTipoServicioId] = useState<number | undefined>(undefined);
   const [tipoHorarioId, setTipoHorarioId] = useState<number | undefined>(undefined);
+  const defaultStartWeek = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
+  const defaultEndWeek = format(endOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
+
   const [fechaFilter, setFechaFilter] = useState<string | undefined>(undefined);
+  const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [fechaInicio, setFechaInicio] = useState<string | undefined>(defaultStartWeek);
+  const [fechaFin, setFechaFin] = useState<string | undefined>(defaultEndWeek);
   const [citaToDelete, setCitaToDelete] = useState<CitaGetType | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -53,6 +60,9 @@ const CitasList = () => {
       if (tipoServicioId) params.tipoServicioId = tipoServicioId;
       if (tipoHorarioId) params.tipoHorarioId = tipoHorarioId;
       if (fechaFilter) params.fechaCita = `${fechaFilter}T00:00:00.000Z`;
+      // creation date filters
+      if (fechaInicio) params.fechaInicio = `${fechaInicio}T00:00:00.000Z`;
+      if (fechaFin) params.fechaFin = `${fechaFin}T23:59:59.999Z`;
       // Only fetch citas in estados: confirmado and enEspera
       params.estadoIds = `${estados().confirmado},${estados().enEspera}`;
       const res = await getCitas(params);
@@ -62,7 +72,7 @@ const CitasList = () => {
     } finally { setLoading(false); }
   };
 
-  useEffect(() => { fetch(); }, [sucursalId, tipoServicioId, tipoHorarioId, fechaFilter]);
+  useEffect(() => { fetch(); }, [sucursalId, tipoServicioId, tipoHorarioId, fechaFilter, fechaInicio, fechaFin]);
 
   const toggleView = () => {
     const next = view === 'table' ? 'board' : 'table';
@@ -204,14 +214,27 @@ const CitasList = () => {
       <BreadcrumbsRoutes items={[{ label: 'Citas', icon: <PiDeviceTabletFill fontSize="inherit" />, href: '/admin/citas' }]} />
       <Grid container spacing={2} flexGrow={1} width="100%">
         <Grid flexGrow={1} container p={1} gap={2} justifyContent={{ sm: 'center', md: 'flex-end' }} alignItems="center">
-          <Grid size={{ xs: 12, md: 8 }} display={'flex'} alignItems={'center'} justifyContent={'end'}>
+          <Grid size={{ xs: 12, md: 6 }} display={'flex'} alignItems={'center'} justifyContent={'end'}>
             <Search onSearch={setSearchTerm} placeholder={'Buscar citas...'} />
           </Grid>
-          <Grid size={{ xs: 12, md: 1 }} display={'flex'} alignItems={'center'} justifyContent={'end'}>
+          {/* Sucursal visible siempre */}
+          <Grid size={{ xs: 12, md: 2 }} display={'flex'} alignItems={'center'} justifyContent={'end'}>
+            <FormControl fullWidth size="small">
+              <InputLabel id="sucursal-select-label">Sucursal</InputLabel>
+              <Select labelId="sucursal-select-label" value={sucursalId ?? ''} label="Sucursal" onChange={(e) => setSucursalId(e.target.value ? Number(e.target.value) : undefined)}>
+                {userSucursales.map((s: any) => (<MenuItem key={s.id} value={s.id}>{s.nombre}</MenuItem>))}
+              </Select>
+            </FormControl>
+          </Grid>
+            {/* single toggle button below controls filter visibility */}
+          <Grid size={{ xs: 4, md: 1 }} display={'flex'} alignItems={'center'} justifyContent={'end'}>
             <Button size="small" variant="outlined" onClick={toggleView}>{view === 'table' ? 'Ver tablero' : 'Ver tabla'}</Button>
           </Grid>
+          <Grid size={{ xs: 4, md: 1 }} display={'flex'} alignItems={'center'} justifyContent={'end'}>
+            <Button size="small" variant="outlined" onClick={() => setShowFilters(s => !s)}>{showFilters ? 'Cerrar filtros' : 'Ver filtros'}</Button>
+          </Grid>
           {user?.permisos?.includes('citas:create') && (
-            <Grid size={{ xs: 12, md: 3 }} display={'flex'} alignItems={'center'} justifyContent={'end'}>
+            <Grid size={{ xs: 4, md: 1 }} display={'flex'} alignItems={'center'} justifyContent={'end'}>
               <Fab size="small" color="primary" aria-label="add" onClick={() => goTo('/admin/citas/create')}>
                 <AddIcon />
               </Fab>
@@ -220,46 +243,48 @@ const CitasList = () => {
         </Grid>
 
         <Grid container spacing={2}  gap={2} p={1} width={'100%'} alignItems="center">
-          <Grid size={{xs: 12, md: 3}} >
-          <FormControl fullWidth size="small">
-            <InputLabel id="sucursal-select-label">Sucursal</InputLabel>
-            <Select labelId="sucursal-select-label" value={sucursalId ?? ''} label="Sucursal" onChange={(e) => setSucursalId(e.target.value ? Number(e.target.value) : undefined)}>
-              {userSucursales.map((s: any) => (<MenuItem key={s.id} value={s.id}>{s.nombre}</MenuItem>))}
-            </Select>
-          </FormControl>
-          </Grid>
-          <Grid size={{xs: 12, md: 3}}>
-          <FormControl fullWidth size="small">
-            <InputLabel id="tipo-select-label">Tipo Servicio</InputLabel>
-            <Select labelId="tipo-select-label" value={tipoServicioId ?? ''} label="Tipo Servicio" onChange={(e) => setTipoServicioId(e.target.value ? Number(e.target.value) : undefined)}>
-              <MenuItem value={''}>Todos</MenuItem>
-              {tipos.map(t => (<MenuItem key={t.id} value={t.id}>{t.tipo}</MenuItem>))}
-            </Select>
-          </FormControl>
-          </Grid>
-          <Grid size={{xs: 12, md: 3}}>
-          <FormControl fullWidth size="small">
-            <InputLabel id="tipoh-select-label">Tipo Horario</InputLabel>
-            <Select labelId="tipoh-select-label" value={tipoHorarioId ?? ''} label="Tipo Horario" onChange={(e) => setTipoHorarioId(e.target.value ? Number(e.target.value) : undefined)}>
-              <MenuItem value={''}>Todos</MenuItem>
-              {tiposHorario.map(t => (<MenuItem key={t.id} value={t.id}>{t.tipo}</MenuItem>))}
-            </Select>
-          </FormControl>
-          </Grid>
-          <Grid size={{xs: 12, md: 3}}>
-            <TextField
-              fullWidth
-              size="small"
-              label="Fecha"
-              type="date"
-              value={fechaFilter ?? ''}
-              onChange={(e) => setFechaFilter(e.target.value ? e.target.value : undefined)}
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid size={{xs: 12, md: 3}} display="flex" alignItems="center">
-            <Button fullWidth variant="outlined" onClick={() => { setSucursalId(undefined); setTipoServicioId(undefined); setTipoHorarioId(undefined); setFechaFilter(undefined); setSearchTerm(''); }}>Limpiar</Button>
-          </Grid>
+          {showFilters && (
+            <>
+              <Grid size={{xs: 12, md: 3}}>
+                <FormControl fullWidth size="small">
+                  <InputLabel id="tipo-select-label">Tipo Servicio</InputLabel>
+                  <Select labelId="tipo-select-label" value={tipoServicioId ?? ''} label="Tipo Servicio" onChange={(e) => setTipoServicioId(e.target.value ? Number(e.target.value) : undefined)}>
+                    <MenuItem value={''}>Todos</MenuItem>
+                    {tipos.map(t => (<MenuItem key={t.id} value={t.id}>{t.tipo}</MenuItem>))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{xs: 12, md: 3}}>
+                <FormControl fullWidth size="small">
+                  <InputLabel id="tipoh-select-label">Tipo Horario</InputLabel>
+                  <Select labelId="tipoh-select-label" value={tipoHorarioId ?? ''} label="Tipo Horario" onChange={(e) => setTipoHorarioId(e.target.value ? Number(e.target.value) : undefined)}>
+                    <MenuItem value={''}>Todos</MenuItem>
+                    {tiposHorario.map(t => (<MenuItem key={t.id} value={t.id}>{t.tipo}</MenuItem>))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{xs: 12, md: 3}}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Fecha (cita)"
+                  type="date"
+                  value={fechaFilter ?? ''}
+                  onChange={(e) => setFechaFilter(e.target.value ? e.target.value : undefined)}
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+              <Grid size={{xs: 12, md: 3}} display="flex" alignItems="center">
+                <Button fullWidth variant="outlined" onClick={() => { setTipoServicioId(undefined); setTipoHorarioId(undefined); setFechaFilter(undefined); setFechaInicio(defaultStartWeek); setFechaFin(defaultEndWeek); setSearchTerm(''); }}>Limpiar</Button>
+              </Grid>
+              <Grid size={{xs: 12, md: 3}}>
+                <TextField fullWidth size="small" label="Fecha inicio (creación)" type="date" value={fechaInicio ?? ''} onChange={(e) => setFechaInicio(e.target.value ? e.target.value : undefined)} InputLabelProps={{ shrink: true }} />
+              </Grid>
+              <Grid size={{xs: 12, md: 3}}>
+                <TextField fullWidth size="small" label="Fecha fin (creación)" type="date" value={fechaFin ?? ''} onChange={(e) => setFechaFin(e.target.value ? e.target.value : undefined)} InputLabelProps={{ shrink: true }} />
+              </Grid>
+            </>
+          )}
         </Grid>
         <Grid size={{xs: 12, md: 12}} p={1}>
           {view === 'board' ? (

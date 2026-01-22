@@ -2,7 +2,7 @@ import prisma from "../configs/db.config.js";
 
 const includeAll = {
   tipoServicio: true,
-  cliente: true,
+  cliente: { select: { id: true, primerNombre: true, primerApellido: true } },
   estado: true,
   moto: true,
   sucursal: true,

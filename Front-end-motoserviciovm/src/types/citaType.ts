@@ -27,7 +27,7 @@ export const CitaInitialState: Partial<CitaType> = {
   tipoServicioId: undefined,
   motoId: undefined,
   placa: '',
-  estadoId: estados().activo,
+  estadoId: estados().enEspera,
 };
 
 export const mergeCitaDataWithDefaults = (apiData: Partial<CitaGetType>): Partial<CitaType> => {
