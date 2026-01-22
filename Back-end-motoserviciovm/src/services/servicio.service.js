@@ -133,6 +133,8 @@ const postServicio = async (data) => {
                 }
             }
 
+            await tx.moto.update({ where: { id: created.motoId }, data: { estadoId: estados().enServicio } });
+
             const withNested = await tx.servicio.findFirst({
                 where: { id: created.id },
                 include: { imagen: true, servicioItems: true, productosCliente: true, moto: true, sucursal: true },
