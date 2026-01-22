@@ -1,17 +1,17 @@
 import z from 'zod';
 
 export const citaSchema = z.object({
-  descripcion: z.string().min(0).optional(),
+  descripcion: z.string().optional().nullable(),
   fechaCita: z.string().min(1, 'Fecha requerida'),
   horaCita: z.string().min(1, 'Hora requerida'),
   nombreContacto: z.string().min(1, 'Nombre contacto requerido'),
   telefonoContacto: z.string().min(1, 'Teléfono requerido'),
-  sucursalId: z.number().int().optional(),
+  sucursalId: z.number().int(),
   clienteId: z.number().int().nullable().optional(),
-  dpiNit: z.string().optional(),
-  tipoServicioId: z.number().int().optional(),
+  dpiNit: z.string(),
+  tipoServicioId: z.number().int(),
   motoId: z.number().int().nullable().optional(),
-  placa: z.string().optional(),
+  placa: z.string(),
   estadoId: z.number().int().optional(),
 });
 
@@ -23,7 +23,9 @@ export const citaCreateSchema = citaSchema.pick({
   nombreContacto: true,
   telefonoContacto: true,
   sucursalId: true,
+  clienteId: true,
   tipoServicioId: true,
+  motoId: true,
   placa: true,
 });
 

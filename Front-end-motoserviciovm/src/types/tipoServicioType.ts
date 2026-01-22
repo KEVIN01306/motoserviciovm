@@ -2,6 +2,7 @@ import { tipoServicioSchema } from "../zod/tipoServicio.schema";
 import z from "zod";
 import type { OpcionServicioType } from "./opcionServicioType";
 import type { TipoHorarioType } from "./tipoHorario";
+import { estados } from "../utils/estados";
 
 export type TipoServicioType = z.infer<typeof tipoServicioSchema>;
 
@@ -16,7 +17,7 @@ export const TipoServicioInitialState = {
     descripcion: "",
     opcionServicios: [],
     servicioCompleto: false,
-    estadoId: 1,
+    estadoId: estados().activo,
     tipoHorarioId: undefined,
 };
 

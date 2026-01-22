@@ -122,6 +122,8 @@ const PERMISOS_SEED = [
   { permiso: "citas:view", modulo: "CITAS", estadoId: 1 },
   { permiso: "citas:edit", modulo: "CITAS", estadoId: 1 },
   { permiso: "citas:detail", modulo: "CITAS", estadoId: 1 },
+  { permiso: "citas:confirm", modulo: "CITAS", estadoId: 1 },
+  { permiso: "citas:cancel", modulo: "CITAS", estadoId: 1 },
   
   { permiso: "contabilidad:view", modulo: "CONTABILIDAD", estadoId: 1 },
 

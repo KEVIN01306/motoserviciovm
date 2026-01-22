@@ -6,7 +6,7 @@ import type { CitaType, CitaGetType } from '../types/citaType';
 const API_URL = import.meta.env.VITE_DOMAIN;
 const API_CITAS = `${API_URL}citas`;
 
-const getCitas = async (params?: { sucursalId?: number; tipoServicioId?: number; tipoHorarioId?: number; fechaCita?: string; placa?: string; estadoId?: number }): Promise<CitaGetType[]> => {
+const getCitas = async (params?: { sucursalId?: number; tipoServicioId?: number; tipoHorarioId?: number; fechaCita?: string; placa?: string; estadoId?: number; estadoIds?: number[] | string }): Promise<CitaGetType[]> => {
   try {
     let url = API_CITAS;
     if (params) {
@@ -15,6 +15,10 @@ const getCitas = async (params?: { sucursalId?: number; tipoServicioId?: number;
       if (params.tipoServicioId !== undefined && params.tipoServicioId !== null) search.append('tipoServicioId', String(params.tipoServicioId));
       if (params.tipoHorarioId !== undefined && params.tipoHorarioId !== null) search.append('tipoHorarioId', String(params.tipoHorarioId));
       if (params.fechaCita) search.append('fechaCita', params.fechaCita);
+      if (params.estadoIds) {
+        const e = Array.isArray(params.estadoIds) ? params.estadoIds.join(',') : String(params.estadoIds);
+        if (e) search.append('estadoIds', e);
+      }
       if (params.placa) search.append('placa', params.placa);
       if (params.estadoId !== undefined && params.estadoId !== null) search.append('estadoId', String(params.estadoId));
       url += `?${search.toString()}`;
@@ -75,6 +79,7 @@ const postCita = async (payload: Partial<CitaType>) => {
 };
 
 const putCita = async (id: string | number, payload: Partial<CitaType>) => {
+  console.log('Putting cita with id:', id, 'and payload:', payload);
   try {
     const response = await api.put<apiResponse<CitaGetType>>(`${API_CITAS}/${id}`, payload);
     return response.data.data;
@@ -108,4 +113,22 @@ const deleteCita = async (id: string | number) => {
   }
 };
 
-export { getCitas, getCita, postCita, putCita, deleteCita };
+// PATCH /citas/:id/estado -> actualizar estado de la cita (confirmar, cancelar, etc.)
+const patchCitaEstado = async (id: string | number, payload: { estadoId: number }) => {
+  try {
+    const response = await api.patch<apiResponse<any>>(`${API_CITAS}/${id}/estado`, payload, { headers: { 'Content-Type': 'application/json' } });
+    return response.data.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (!error.response) throw new Error('No se pudo conectar con el servidor (timeout o red).');
+      const status = error.response.status;
+      if (status === 500) throw new Error('INTERNAL ERROR SERVER');
+      const serverMessage = error.response.data?.message;
+      if (serverMessage) throw new Error(serverMessage);
+      throw new Error('CONNECTION ERROR');
+    }
+    throw new Error((error as Error).message);
+  }
+};
+
+export { getCitas, getCita, postCita, putCita, deleteCita, patchCitaEstado };

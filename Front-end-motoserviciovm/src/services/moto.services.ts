@@ -181,7 +181,7 @@ const deleteMoto = async (id: motoType["id"]) => {
             }
             const serverMessage = error.response?.data?.message;
 
-            if (serverMessage) {
+            if (serverMessage) {    
                 throw new Error(serverMessage);
             }
 

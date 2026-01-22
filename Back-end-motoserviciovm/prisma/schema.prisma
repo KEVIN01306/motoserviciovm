@@ -501,7 +501,7 @@ model RepuestosReparacion {
 
 model Cita {
   id               Int      @id @default(autoincrement())
-  descripcion      String
+  descripcion      String?
   fechaCita        DateTime
   horaCita         String
   nombreContacto   String

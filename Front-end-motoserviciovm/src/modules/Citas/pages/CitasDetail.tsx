@@ -1,6 +1,6 @@
 import BreadcrumbsRoutes from "../../../components/utils/Breadcrumbs";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Loading from "../../../components/utils/Loading";
 import ErrorCard from "../../../components/utils/ErrorCard";
 import { getCita } from "../../../services/citas.services";
@@ -9,6 +9,7 @@ import { useGoTo } from "../../../hooks/useGoTo";
 import type { CitaGetType } from "../../../types/citaType";
 import { RiEBikeLine } from "react-icons/ri";
 import { formatDate } from "../../../utils/formatDate";
+import LinkStylesNavigate from "../../../components/utils/links";
 
 const CitasDetail = () => {
   const { id } = useParams();
@@ -64,9 +65,9 @@ const CitasDetail = () => {
             <Grid size={{ xs: 12, md: 8 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2 }}>
                 <Box>
-                  <Typography variant="h6" sx={{ fontWeight: 700 }}>{cita?.nombreContacto ?? '-'}</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>{(cita?.cliente ? <LinkStylesNavigate variant="h5" onClick={() => goTo('/admin/users/'+cita?.cliente?.id)} label={((cita?.cliente?.primerNombre ?? '') + ' ' + (cita?.cliente?.primerApellido ?? '-')) ?? '-'} /> : cita?.nombreContacto) ?? '-'}</Typography>
                   <Typography color="text.secondary">{cita?.telefonoContacto ?? '-'}</Typography>
-                  <Typography sx={{ mt: 1 }}><strong>Placa:</strong> {cita?.placa ?? '-'}</Typography>
+                  <Typography sx={{ mt: 1 }}><strong>Placa:</strong> {( cita?.moto?.placa ? <LinkStylesNavigate variant="body2" onClick={() => goTo('/admin/motos/'+cita?.moto?.id)} label={cita?.moto?.placa ?? '-'} /> : cita?.placa ) ?? '-'}</Typography>
                 </Box>
                 <Box sx={{ textAlign: 'right' }}>
                   <Typography><strong>Sucursal:</strong> {cita?.sucursal?.nombre ?? '-'}</Typography>

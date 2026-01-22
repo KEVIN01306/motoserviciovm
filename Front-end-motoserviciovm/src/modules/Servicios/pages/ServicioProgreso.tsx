@@ -361,7 +361,7 @@ const ServicioProgreso = () => {
                                             <ProductsTable
                                                 maxHeight={'none'}
                                                 columns={[
-                                                    { id: 'nombre', label: 'REPUESTOS PARA SERVICIO', minWidth: 180, format: (v: any) => v ?? '', align: 'center' },
+                                                    { id: 'nombre', label: 'CAMBIOS REALIZADOS DENTRO DEL SERVICIO', minWidth: 180, format: (v: any) => v ?? '', align: 'center' },
                                                 ] as any}
                                                 rows={dataTableCambiosServicio ?? []}
                                                 headerColor="#1565c0"

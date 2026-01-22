@@ -8,13 +8,24 @@ const includeAll = {
   sucursal: true,
 };
 
+
+const includeBasic = {
+  tipoServicio: { select: { id: true, tipo: true, tipoHorarioId: true } },
+  cliente: { select: { id: true, primerNombre: true, primerApellido: true } },
+  estado: { select: { id: true, estado: true } },
+  moto: { select: { id: true, placa: true } },
+  sucursal: { select: { id: true, nombre: true } },
+};
+
 const getCitas = async (filters = {}) => {
   const where = {};
-  
+
   if (filters.sucursalId) {
     where.sucursalId = filters.sucursalId;
   }
-  if (filters.estadoId) {
+  if (filters.estadoIds && Array.isArray(filters.estadoIds) && filters.estadoIds.length > 0) {
+    where.estadoId = { in: filters.estadoIds };
+  } else if (filters.estadoId) {
     where.estadoId = filters.estadoId;
   }
   if (filters.clienteId) {
@@ -23,7 +34,7 @@ const getCitas = async (filters = {}) => {
   if (filters.tipoServicioId) {
     where.tipoServicioId = filters.tipoServicioId;
   }
-  
+
   // Filtro por rango de fechas de creación
   if (filters.fechaInicio || filters.fechaFin) {
     where.createdAt = {};
@@ -34,7 +45,7 @@ const getCitas = async (filters = {}) => {
       where.createdAt.lte = new Date(filters.fechaFin);
     }
   }
-  
+
   // Filtro por fecha específica de cita
   if (filters.fechaCita) {
     const fechaCitaDate = new Date(filters.fechaCita);
@@ -48,7 +59,7 @@ const getCitas = async (filters = {}) => {
 
   const citas = await prisma.cita.findMany({
     where,
-    include: includeAll,
+    include: includeBasic,
     orderBy: { fechaCita: 'desc' },
   });
   return citas;
@@ -143,4 +154,22 @@ const deleteCita = async (id) => {
   });
 };
 
-export { getCitas, getCita, postCita, putCita, deleteCita };
+
+const patchEstado = async (id, estadoId) => {
+  const cita = await prisma.cita.findUnique({
+    where: { id },
+  });
+  if (!cita) {
+    const error = new Error('DATA_NOT_FOUND');
+    error.code = 'DATA_NOT_FOUND';
+    throw error;
+  }
+  const updatedCita = await prisma.cita.update({
+    where: { id },
+    data: { estadoId },
+    include: includeAll,
+  });
+  return updatedCita;
+}
+
+export { getCitas, getCita, postCita, putCita, deleteCita, patchEstado };

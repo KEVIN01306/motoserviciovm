@@ -2,29 +2,33 @@ import { Grid, TextField, Autocomplete, Box, Typography, Button, CircularProgres
 import { LocalizationProvider, DatePicker, PickersDay } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { es } from 'date-fns/locale';
-import {format} from 'date-fns/format';
+import { format, parse } from 'date-fns';
 import { Controller, type Control, type UseFormRegister, type UseFormSetValue, type UseFormWatch, type FieldErrors } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { getTipos, getTipo } from '../../../services/tipoServicio.services';
+import { getCitas } from '../../../services/citas.services';
+import { estados } from '../../../utils/estados';
 import { getClienteByDocumento } from '../../../services/users.services';
 import { getMotoByPlaca } from '../../../services/moto.services';
 import { tipoServicioHorarioServices } from '../../../services/tipoServicioHorario.services';
-import type { CitaType } from '../../../types/citaType';
+import type {  CitaGetType } from '../../../types/citaType';
+import TimePicker from '../../../components/TimePicker';
 import { useAuthStore } from '../../../store/useAuthStore';
 
 interface InputsFormProps {
-  register: UseFormRegister<CitaType>;
-  control: Control<CitaType, any>;
-  watch: UseFormWatch<CitaType>;
-  setValue: UseFormSetValue<CitaType>;
-  errors: FieldErrors<CitaType>;
+  register: UseFormRegister<CitaGetType>;
+  control: Control<CitaGetType, any>;
+  watch: UseFormWatch<CitaGetType>;
+  setValue: UseFormSetValue<CitaGetType>;
+  errors: FieldErrors<CitaGetType>;
+  id?: number;
 }
 
-const InputsForm = ({ register, control, watch, setValue, errors }: InputsFormProps) => {
+const InputsForm = ({ register, control, watch, setValue, errors,id  }: InputsFormProps) => {
   const [tipos, setTipos] = useState<any[]>([]);
   const [horarios, setHorarios] = useState<any[]>([]);
   const [maxDate, setMaxDate] = useState<string | null>(null);
-  const [availableHours, setAvailableHours] = useState<{ label: string; start: string; end: string }[]>([]);
+  const [availableHours, setAvailableHours] = useState<{ label: string; start: string; end: string; capacity?: number }[]>([]);
   const [filteredHorarios, setFilteredHorarios] = useState<any[]>([]);
 
   const sucursalId = watch('sucursalId');
@@ -58,6 +62,11 @@ const InputsForm = ({ register, control, watch, setValue, errors }: InputsFormPr
 
   const fechaCita = watch('fechaCita');
 
+  const currentCitaId = watch('id');
+
+  const [citasFecha, setCitasFecha] = useState<CitaGetType[]>([]);
+  const [horarioErrors, setHorarioErrors] = useState<string[]>([]);
+
   // Normaliza texto para comparar sin acentos y en minúsculas
   const normalize = (s: string | undefined) => (s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
 
@@ -89,24 +98,74 @@ const InputsForm = ({ register, control, watch, setValue, errors }: InputsFormPr
     const diaEs = diasEs[date.getDay()];
 
     // recolectar todas las horas de todos los horarios que aplican a la fecha
-    const collected: { label: string; start: string; end: string }[] = [];
+    const collected: { label: string; start: string; end: string; capacity?: number }[] = [];
+    const localErrors: string[] = [];
     for (const sel of filteredHorarios) {
       if (!Array.isArray(sel.diasConfig)) continue;
       const matched = sel.diasConfig.find((d: any) => normalize(d?.dia?.dia) === normalize(diaEs));
-      if (!matched || !Array.isArray(matched.horas)) continue;
+      if (!matched) continue;
+      if (!Array.isArray(matched.horas) || matched.horas.length === 0) {
+        localErrors.push(`El horario ${sel?.id ?? sel?.tipoHorarioId ?? ''} no tiene horas para ${diaEs}`);
+        continue;
+      }
       for (const h of matched.horas) {
         const start = typeof h.horaInicio === 'string' ? h.horaInicio.slice(0,5) : String(h.horaInicio).slice(0,5);
         const end = typeof h.horaFin === 'string' ? h.horaFin.slice(0,5) : String(h.horaFin).slice(0,5);
-        collected.push({ label: `${start} - ${end}`, start, end });
+        // cantidadPersonal from matched may indicate capacity for this slot
+        const capacity = (matched && (typeof matched.cantidadPersonal === 'number')) ? Number(matched.cantidadPersonal) : undefined;
+        collected.push({ label: `${start} - ${end}`, start, end, capacity });
       }
     }
 
     // deduplicar por start (y end) y ordenar
-    const dedupMap = new Map<string, { label: string; start: string; end: string }>();
-    for (const it of collected) dedupMap.set(it.start + '|' + it.end, it);
+    // Deduplicate by start|end. If multiple entries for same slot exist, merge capacities:
+    // - if any entry has undefined capacity, resulting capacity is undefined (conservative)
+    // - otherwise sum capacities
+    const dedupMap = new Map<string, { label: string; start: string; end: string; capacity?: number }>();
+    for (const it of collected) {
+      const key = it.start + '|' + it.end;
+      const existing = dedupMap.get(key);
+      if (!existing) dedupMap.set(key, { ...it });
+      else {
+        if (existing.capacity === undefined || it.capacity === undefined) existing.capacity = undefined;
+        else existing.capacity = Number(existing.capacity) + Number(it.capacity);
+        dedupMap.set(key, existing);
+      }
+    }
     const list = Array.from(dedupMap.values()).sort((a, b) => a.start.localeCompare(b.start));
     setAvailableHours(list);
+    if ((!list || list.length === 0) && Array.isArray(filteredHorarios) && filteredHorarios.length > 0) {
+      localErrors.push('No se encontraron horas disponibles en los horarios para la fecha seleccionada.');
+    }
+    // combinar errores (evitar duplicados)
+    setHorarioErrors(prev => Array.from(new Set([...(prev || []), ...localErrors])));
   }, [fechaCita, filteredHorarios]);
+
+  // fetch citas for selected fechaCita to mark occupied hours
+  useEffect(() => {
+    let mounted = true;
+    const fetchCitas = async () => {
+      if (!fechaCita) { setCitasFecha([]); return; }
+      try {
+        // API expects an ISO-ish fechaCita; using Z to avoid timezone shifts
+        const fechaIso = `${fechaCita}T00:00:00.000Z`;
+        const params: any = { fechaCita: fechaIso };
+        if (sucursalId) params.sucursalId = Number(sucursalId);
+        // Only consider citas in estados confirmado and enEspera for occupancy
+        params.estadoIds = `${estados().confirmado},${estados().enEspera}`;
+        const res = await getCitas(params);
+        if (!mounted) return;
+        setCitasFecha(res || []);
+      } catch (e) {
+        if (!mounted) return;
+        setCitasFecha([]);
+      }
+    };
+    fetchCitas();
+    return () => { mounted = false; };
+  }, [fechaCita, sucursalId]);
+
+  
 
   // Si no hay horas disponibles, limpiar horaCita para que no quede valor inválido
   useEffect(() => {
@@ -146,7 +205,7 @@ const InputsForm = ({ register, control, watch, setValue, errors }: InputsFormPr
             getOptionLabel={(opt: any) => opt?.nombre ?? ''}
             value={user?.sucursales?.find((s: any) => String(s.id) === String(field.value)) ?? null}
             onChange={(_, v: any) => field.onChange(v ? v.id : undefined)}
-            renderInput={(params) => <TextField {...params} label="Sucursal" variant="standard" fullWidth />}
+            renderInput={(params) => <TextField {...params} label="Sucursal" variant="standard" fullWidth error={!!errors.sucursalId} helperText={errors.sucursalId?.message} />}
           />
         )} />
       </Grid>
@@ -158,14 +217,14 @@ const InputsForm = ({ register, control, watch, setValue, errors }: InputsFormPr
             getOptionLabel={(opt:any) => opt?.tipo ?? ''}
             value={tipos.find(t=>String(t.id)===String(field.value)) ?? null}
             onChange={(_, v:any) => field.onChange(v ? v.id : undefined)}
-            renderInput={(params) => <TextField {...params} label="Tipo de Servicio" variant="standard" fullWidth />}
+            renderInput={(params) => <TextField {...params} label="Tipo de Servicio" variant="standard" fullWidth error={!!errors.tipoServicioId} helperText={errors.tipoServicioId?.message} />}
           />
         )} />
       </Grid>
 
       <Grid size={6}>
         <Controller name="fechaCita" control={control} render={({ field }) => {
-          const value = field.value ? new Date(field.value + 'T00:00:00') : null;
+          const value = field.value ? parse(field.value, 'yyyy-MM-dd', new Date()) : null;
           return (
             <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
               <DatePicker
@@ -209,17 +268,35 @@ const InputsForm = ({ register, control, watch, setValue, errors }: InputsFormPr
 
       {maxDate && <Grid size={12}><Box mt={1}><Typography variant="caption">Fecha de vigencia máxima: {maxDate}</Typography></Box></Grid>}
 
-      <Grid size={6}>
-        {availableHours && availableHours.length>0 ? (
-          <Autocomplete
-            options={availableHours}
-            getOptionLabel={(opt:any) => opt?.label ?? ''}
-            value={availableHours.find((o) => o.start === watch('horaCita')) ?? null}
-            onChange={(_, v:any) => setValue('horaCita', v ? v.start : '')}
-            renderInput={(params) => <TextField {...params} label="Hora disponible" variant="standard" fullWidth error={!!errors.horaCita} helperText={errors.horaCita?.message} />}
+      <Grid size={12} display={'flex'} justifyContent={'center'}>
+          {availableHours && availableHours.length > 0 ? (
+          // Use TimePicker component to select from available hours and mark occupied ones
+          <TimePicker
+            dataHoras={availableHours.map(h => ({ id: h.start, horaInicio: h.start, horaFin: h.end, capacity: h.capacity }))}
+            citas={citasFecha}
+            selectedId={watch('horaCita') || null}
+            excludeCitaId={id ? Number(id) : undefined}
+            onSelectionChange={(slot) => setValue('horaCita', slot ? slot.horaInicio : '')}
           />
         ) : (
-          <TextField {...register('horaCita' as any)} label="Hora" type="time" fullWidth variant="standard" InputLabelProps={{ shrink: true }} error={!!errors.horaCita} helperText={errors.horaCita?.message} disabled={true} />
+          <Box>
+            <Typography variant="body2" color="text.secondary">No hay horas disponibles para la fecha seleccionada.</Typography>
+            {errors.horaCita?.message && (
+              <Typography variant="caption" color="error" sx={{ display: 'block', mt: 1 }}>{String(errors.horaCita?.message)}</Typography>
+            )}
+          </Box>
+        )}
+        {availableHours && availableHours.length > 0 && horarioErrors && horarioErrors.length > 0 && (
+          <Box mt={1}>
+            {horarioErrors.map((err, i) => (
+              <Typography key={i} variant="caption" color="error" sx={{ display: 'block' }}>{err}</Typography>
+            ))}
+          </Box>
+        )}
+        {errors.horaCita?.message && (
+          <Box mt={1}>
+            <Typography variant="caption" color="error">{String(errors.horaCita?.message)}</Typography>
+          </Box>
         )}
       </Grid>
 
@@ -254,7 +331,7 @@ const InputsForm = ({ register, control, watch, setValue, errors }: InputsFormPr
           </Button>
           {clienteFound && (
             <Box>
-              <Typography><strong>Cliente:</strong> {clienteFound.nombre ?? clienteFound.name ?? '-'} </Typography>
+              <Typography><strong>Cliente:</strong> {(clienteFound?.primerNombre ?? '') + ' ' + (clienteFound?.primerApellido ?? '-')} </Typography>
               <Typography variant="caption">DPI: {clienteFound.documento ?? clienteFound.dpi ?? '-'}</Typography>
             </Box>
           )}
@@ -264,7 +341,7 @@ const InputsForm = ({ register, control, watch, setValue, errors }: InputsFormPr
       
 
       <Grid size={12}>
-        <TextField {...register('placa' as any)} label="Placa" fullWidth variant="standard" />
+        <TextField {...register('placa' as any)} label="Placa" fullWidth variant="standard" error={!!errors.placa} helperText={errors.placa?.message} />
       </Grid>
 
       <Grid size={{ xs: 12 }}>

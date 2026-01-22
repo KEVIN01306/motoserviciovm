@@ -54,8 +54,11 @@ const CitasEdit = () => {
         tipoServicioId: data.tipoServicioId ? Number(data.tipoServicioId) : undefined,
         placa: data.placa ?? '',
         estadoId: data.estadoId ?? 1,
+        motoId: data.motoId ?? undefined,
+        clienteId: data.clienteId ?? undefined,
       };
       await putCita(Number(id), payload);
+      console.log('PUT /citas/{id} payload:', payload);
       successToast('Cita actualizada');
       goTo('/admin/citas');
     } catch (e:any) { errorToast(e?.message ?? 'Error actualizando cita'); }
@@ -71,7 +74,7 @@ const CitasEdit = () => {
       ) : (
         <FormEstructure handleSubmit={handleSubmit(onSubmit)}>
           {serverErrors && serverErrors.length>0 && (<ErrorCard errorText={serverErrors.join('; ')} restart={() => setServerErrors(null)} />)}
-          <InputsForm register={register} control={control} watch={watch} setValue={setValue} errors={formState.errors as any} />
+          <InputsForm id={Number(id)} register={register} control={control} watch={watch} setValue={setValue} errors={formState.errors as any} />
           <Button type='submit' variant='contained' disabled={formState.isSubmitting}>{formState.isSubmitting ? 'Guardando...' : 'Guardar'}</Button>
         </FormEstructure>
       )}

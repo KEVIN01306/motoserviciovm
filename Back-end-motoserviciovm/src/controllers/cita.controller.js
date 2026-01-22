@@ -1,5 +1,5 @@
 import { responseError, responseSucces, responseSuccesAll } from "../helpers/response.helper.js";
-import { getCitas, getCita, postCita, putCita, deleteCita } from "../services/cita.service.js";
+import { getCitas, getCita, postCita, putCita, deleteCita, patchEstado } from "../services/cita.service.js";
 import { citaSchema } from "../zod/cita.schema.js";
 import { citaQuerySchema } from "../zod/cita.query.schema.js";
 
@@ -11,8 +11,8 @@ const getCitasHandler = async (req, res) => {
       return res.status(400).json({ errors });
     }
     
-    const { sucursalId, estadoId, clienteId, tipoServicioId, fechaInicio, fechaFin, fechaCita } = queryValidation.data;
-    const filters = { sucursalId, estadoId, clienteId, tipoServicioId, fechaInicio, fechaFin, fechaCita };
+    const { sucursalId, estadoId, estadoIds, clienteId, tipoServicioId, fechaInicio, fechaFin, fechaCita } = queryValidation.data;
+    const filters = { sucursalId, estadoId, estadoIds, clienteId, tipoServicioId, fechaInicio, fechaFin, fechaCita };
     
     const citas = await getCitas(filters);
     res.status(200).json(responseSuccesAll("citas obtenidas exitosamente", citas));
@@ -117,4 +117,25 @@ const deleteCitaHandler = async (req, res) => {
   }
 };
 
-export { getCitasHandler, getCitaHandler, postCitaHandler, putCitaHandler, deleteCitaHandler };
+const patchEstadoHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { estadoId } = req.body;
+    if (typeof estadoId !== 'number') {
+      return res.status(400).json(responseError('estadoId must be a number'));
+    }
+    const updatedCita = await patchEstado(parseInt(id), estadoId);
+    res.status(200).json(responseSucces("Estado de cita actualizado exitosamente", updatedCita));
+  } catch (error) {
+    console.error(error);
+    let errorCode = 500;
+    let errorMessage = 'INTERNAL_SERVER_ERROR';
+    if (error.code === 'DATA_NOT_FOUND') {
+      errorCode = 404;
+      errorMessage = error.code;
+    }
+    res.status(errorCode).json(responseError(errorMessage));
+  }
+};
+
+export { getCitasHandler, getCitaHandler, postCitaHandler, putCitaHandler, deleteCitaHandler, patchEstadoHandler };

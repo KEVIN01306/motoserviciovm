@@ -37,6 +37,8 @@ const CitasCreate = () => {
         tipoServicioId: data.tipoServicioId ? Number(data.tipoServicioId) : undefined,
         placa: data.placa ?? '',
         estadoId: data.estadoId ?? 1,
+        motoId: data.motoId ?? undefined,
+        clienteId: data.clienteId ?? undefined,
       };
       console.log('POST /citas payload:', payload);
       await postCita(payload);

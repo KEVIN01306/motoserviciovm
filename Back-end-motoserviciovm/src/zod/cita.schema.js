@@ -2,7 +2,7 @@ import z from "zod";
 
 export const citaSchema = z.object({
   id: z.number().optional(),
-  descripcion: z.string().min(1, "descripcion es obligatoria").max(500),
+  descripcion: z.string().max(500).optional().nullable(),
   fechaCita: z
     .union([z.string(), z.date()])
     .transform((v) => (typeof v === "string" ? new Date(v) : v)),

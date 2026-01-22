@@ -16,7 +16,7 @@ export type CitaGetType = CitaType & {
 };
 
 export const CitaInitialState: Partial<CitaType> = {
-  descripcion: '',
+  descripcion: null,
   fechaCita: '',
   horaCita: '',
   nombreContacto: '',

@@ -14,7 +14,7 @@ const API_TIPO_SERVICIO_HORARIO = `${API_URL}tipoServicioHorario`;
 
 // GET con filtros
 const getTiposServicioHorario = async (filters: TipoServicioHorarioFilters): Promise<TipoServicioHorario[]> => {
-  try {
+  try { 
     const params = new URLSearchParams({
       tipoHorarioId: filters.tipoHorarioId.toString(),
       sucursalId: filters.sucursalId.toString(),
