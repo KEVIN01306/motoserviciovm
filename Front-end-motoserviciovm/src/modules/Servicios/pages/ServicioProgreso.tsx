@@ -492,6 +492,13 @@ const ServicioProgreso = () => {
                                 ) : null
                             )}
                         </Grid>
+                         {
+                            user?.permisos.includes('servicios:salida') && estados().entregado != data.estadoId && (
+                                <Grid size={{xs: 5, md: 3}} m={2} textAlign="center">
+                                <Button variant="contained" color='success'  onClick={() => goTo(`/admin/servicios/${data.id}/salida`)}>Dar Salida</Button>
+                                </Grid>
+                            )
+                        }
                     </CardContent>
                 </Card>
             </Container>

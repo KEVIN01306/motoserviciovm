@@ -29,6 +29,7 @@ const getModelos = async () => {
             cilindrada: true,
             estado: true,
         },
+        orderBy: { id: 'desc' },
     });
 
     if (!modelos) {

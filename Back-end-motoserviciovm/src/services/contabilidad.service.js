@@ -41,6 +41,7 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
     const Servicios = await prisma.servicio.findMany({
         where: { estadoId: estados().entregado, sucursalId: { in: sucursalIds }, updatedAt: { gte: fechaInicio, lte: fechaFin } },
         include: { moto: true },
+        orderBy: { id: 'desc' },
     });
 
     // GASTOS TALLER

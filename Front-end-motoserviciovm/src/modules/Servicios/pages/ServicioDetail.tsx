@@ -254,7 +254,8 @@ const ServicioDetail = () => {
                 <>
                   <Box  sx={{ mb: 4, mt: 3 }} >
                     <Typography variant="h6" gutterBottom>En Reparación</Typography>
-                    <Typography variant='body2' gutterBottom>{data.enReparaciones[0].descripcion}</Typography>
+                    <Typography variant='body2' gutterBottom><Link href={`/admin/enreparacion/${data.enReparaciones[0].id}`}  rel="noopener noreferrer" underline="hover">{data.enReparaciones[0].descripcion}</Link></Typography>
+                    <Typography variant='body2' >{data.enReparaciones[0].observaciones}</Typography>
                     <Typography variant="h6" sx={{ mt: 2 }}>
                         {`Total Reparacion ${data.enReparaciones[0].total ? `Q ${data.enReparaciones[0].total.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 'Q 0.00'}`}
                     </Typography> 

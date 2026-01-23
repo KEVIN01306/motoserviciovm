@@ -9,10 +9,11 @@ import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import FormEstructure from '../../../components/utils/FormEstructure';
 import { citaCreateSchema } from '../../../zod/cita.schema';
 import { getCita, putCita } from '../../../services/citas.services';
-import { mergeCitaDataWithDefaults } from '../../../types/citaType';
+import { CitaInitialState, mergeCitaDataWithDefaults } from '../../../types/citaType';
 import { useGoTo } from '../../../hooks/useGoTo';
 import { successToast, errorToast } from '../../../utils/toast';
 import InputsForm from '../components/InputsForm';
+import { estados } from '../../../utils/estados';
 
 const CitasEdit = () => {
   const { id } = useParams();
@@ -53,7 +54,7 @@ const CitasEdit = () => {
         sucursalId: data.sucursalId ? Number(data.sucursalId) : undefined,
         tipoServicioId: data.tipoServicioId ? Number(data.tipoServicioId) : undefined,
         placa: data.placa ?? '',
-        estadoId: data.estadoId ?? 1,
+        estadoId: data.estadoId ?? CitaInitialState.estadoId ?? estados().enEspera,
         motoId: data.motoId ?? undefined,
         clienteId: data.clienteId ?? undefined,
       };

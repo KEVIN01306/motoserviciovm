@@ -122,7 +122,7 @@ export default function CitasBoard({ appointments }: CitasBoardProps) {
   const gridScrollRef = useRef<HTMLDivElement | null>(null);
   const headerScrollRef = useRef<HTMLDivElement | null>(null);
 
-  const DATA = Array.isArray(appointments) && appointments.length > 0 ? appointments : APPOINTMENTS_DATA;
+  const DATA = Array.isArray(appointments) && appointments.length > 0 ? appointments : [];
 
   const getDynamicDateRange = () => {
     if (DATA.length === 0) return [];

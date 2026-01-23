@@ -247,50 +247,7 @@ const ServicioDetailSalida = () => {
                             </Typography>
                         </Grid>
 
-                        {
-                            data.enReparaciones && data.enReparaciones.length > 0 && (
-                                <>
-                                    <Box sx={{ mb: 4, mt: 3 }} >
-                                        <Typography variant="h6" gutterBottom>En Reparación</Typography>
-                                        <Typography variant='body2' gutterBottom>{data.enReparaciones[0].descripcion}</Typography>
-
-                                        <Chip label={data.enReparaciones[0]?.estado.estado ?? ''} color={chipColorByEstado(data.enReparaciones[0]?.estado.id)} sx={{ mb: 2 }} variant='outlined' />
-                                    </Box>
-
-                                    <ProductsTable
-                                        columns={[
-                                            { id: 'repuesto', label: 'Repuesto', minWidth: 120, format: (v: any, row: repuestoReparacionType) => row.nombre ?? '' },
-                                            { id: 'descripcion', label: 'Descripción', minWidth: 180, format: (v: any, row: repuestoReparacionType) => row.descripcion ?? '' },
-                                            { id: 'refencia', label: 'Referencia', minWidth: 100, format: (v: any, row: repuestoReparacionType) => row.refencia ? (<Link href={row.refencia} target="_blank" rel="noopener noreferrer" underline="hover" >Link</Link>) : 'No hay' },
-                                            { id: 'cantidad', label: 'Cantidad', minWidth: 80, align: 'center', format: (v: any) => String(v) },
-                                        ] as any}
-                                        rows={data.enReparaciones[0].repuestos ?? []}
-                                        headerColor="#1565c0"
-                                    />
-                                </>
-                            )
-                        }
-
-                        {
-                            data.enParqueos && data.enParqueos.length > 0 && (
-                                <>
-                                    <Divider sx={{ my: 4 }} />
-                                    <Box sx={{ mb: 2, mt: 3 }} >
-                                        <Typography variant="h6" gutterBottom>En Parqueo</Typography>
-                                        <Typography variant='body2' gutterBottom>{data.enParqueos[0].descripcion}</Typography>
-                                        <Typography variant='body2' gutterBottom>{`Desde: ${data.enParqueos[0].fechaEntrada ? formatDate(data.enParqueos[0].fechaEntrada as any) : '-'}`}</Typography>
-                                        <Typography variant='body2' gutterBottom>{`Fecha Salida: ${data.enParqueos[0].fechaSalida ? formatDate(data.enParqueos[0].fechaSalida as any) : '-'}`}</Typography>
-                                        <Typography variant="body2" >
-                                            Dias en parqueo: {new Date().getDate() - new Date(data.enParqueos[0].createdAt ? data.enParqueos[0].createdAt : '').getDate()}
-                                        </Typography>
-
-                                        <Chip label={data.enParqueos[0]?.estado.estado ?? ''} color={chipColorByEstado(data.enParqueos[0]?.estado.id)} sx={{ mb: 2 }} variant='outlined' />
-                                    </Box>
-                                    <Divider sx={{ my: 4 }} />
-                                </>
-                            )
-                        }
-
+                        
                         <Typography variant="h5" m={2} gutterBottom>{data.tipoServicio?.tipo ?? ''}</Typography>
                         {
                             data.tipoServicio?.cantidadOpcionesServicio === 0 ? (
@@ -389,6 +346,52 @@ const ServicioDetailSalida = () => {
                                 <Typography variant="caption" color="textSecondary" align="center">{data.dpiClienteMoto}</Typography>
                             )}
                         </Grid>
+
+                        {
+                            data.enReparaciones && data.enReparaciones.length > 0 && (
+                                <>
+                                    <Box sx={{ mb: 4, mt: 3 }} >
+                                        <Typography variant="h6" gutterBottom>En Reparación</Typography>
+                                        <Typography variant='body2' gutterBottom>{data.enReparaciones[0].descripcion}</Typography>
+                    <Typography variant='body2' >{data.enReparaciones[0].observaciones}</Typography>
+
+                                        <Chip label={data.enReparaciones[0]?.estado.estado ?? ''} color={chipColorByEstado(data.enReparaciones[0]?.estado.id)} sx={{ mb: 2 }} variant='outlined' />
+                                    </Box>
+
+                                    <ProductsTable
+                                        columns={[
+                                            { id: 'repuesto', label: 'Repuesto', minWidth: 120, format: (v: any, row: repuestoReparacionType) => row.nombre ?? '' },
+                                            { id: 'descripcion', label: 'Descripción', minWidth: 180, format: (v: any, row: repuestoReparacionType) => row.descripcion ?? '' },
+                                            { id: 'refencia', label: 'Referencia', minWidth: 100, format: (v: any, row: repuestoReparacionType) => row.refencia ? (<Link href={row.refencia} target="_blank" rel="noopener noreferrer" underline="hover" >Link</Link>) : 'No hay' },
+                                            { id: 'cantidad', label: 'Cantidad', minWidth: 80, align: 'center', format: (v: any) => String(v) },
+                                        ] as any}
+                                        rows={data.enReparaciones[0].repuestos ?? []}
+                                        headerColor="#1565c0"
+                                    />
+                                </>
+                            )
+                        }
+
+                        {
+                            data.enParqueos && data.enParqueos.length > 0 && (
+                                <>
+                                    <Divider sx={{ my: 4 }} />
+                                    <Box sx={{ mb: 2, mt: 3 }} >
+                                        <Typography variant="h6" gutterBottom>En Parqueo</Typography>
+                                        <Typography variant='body2' gutterBottom>{data.enParqueos[0].descripcion}</Typography>
+                                        <Typography variant='body2' gutterBottom>{`Desde: ${data.enParqueos[0].fechaEntrada ? formatDate(data.enParqueos[0].fechaEntrada as any) : '-'}`}</Typography>
+                                        <Typography variant='body2' gutterBottom>{`Fecha Salida: ${data.enParqueos[0].fechaSalida ? formatDate(data.enParqueos[0].fechaSalida as any) : '-'}`}</Typography>
+                                        <Typography variant="body2" >
+                                            Dias en parqueo: {new Date().getDate() - new Date(data.enParqueos[0].createdAt ? data.enParqueos[0].createdAt : '').getDate()}
+                                        </Typography>
+
+                                        <Chip label={data.enParqueos[0]?.estado.estado ?? ''} color={chipColorByEstado(data.enParqueos[0]?.estado.id)} sx={{ mb: 2 }} variant='outlined' />
+                                    </Box>
+                                    <Divider sx={{ my: 4 }} />
+                                </>
+                            )
+                        }
+
 
                     </CardContent>
                 </Card>

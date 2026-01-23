@@ -12,6 +12,7 @@ import { postCita } from '../../../services/citas.services';
 import { successToast, errorToast } from '../../../utils/toast';
 import { useGoTo } from '../../../hooks/useGoTo';
 import InputsForm from '../components/InputsForm';
+import { estados } from '../../../utils/estados';
 
 const CitasCreate = () => {
   const goTo = useGoTo();
@@ -36,7 +37,7 @@ const CitasCreate = () => {
         sucursalId: data.sucursalId ? Number(data.sucursalId) : undefined,
         tipoServicioId: data.tipoServicioId ? Number(data.tipoServicioId) : undefined,
         placa: data.placa ?? '',
-        estadoId: data.estadoId ?? 1,
+        estadoId: data.estadoId ?? CitaInitialState.estadoId ?? estados().enEspera,
         motoId: data.motoId ?? undefined,
         clienteId: data.clienteId ?? undefined,
       };
