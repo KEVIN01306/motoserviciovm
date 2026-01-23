@@ -18,6 +18,7 @@ import { estados, estadosServicio } from '../../../utils/estados';
 import type { EstadoType } from '../../../types/estadoType';
 import { MdBikeScooter } from 'react-icons/md';
 import { FaBarsProgress } from "react-icons/fa6";
+import type { UserGetType } from '../../../types/userType';
 
 
 const ServiciosList = () => {
@@ -55,7 +56,7 @@ const ServiciosList = () => {
   useEffect(() => {
     if (!term.trim()) { setFiltered(items); return; }
     const l = term.toLowerCase();
-    setFiltered(items.filter(i => String(i.id).toLowerCase().includes(l) || (i.descripcion ?? '').toLowerCase().includes(l) || (i.moto?.placa ?? '').toLowerCase().includes(l)));
+    setFiltered(items.filter(i => String(i.id).toLowerCase().includes(l) || (i.descripcion ?? '').toLowerCase().includes(l) || (i.moto?.placa ?? '').toLowerCase().includes(l) || (i.mecanico?.primerNombre ?? '').toLowerCase().includes(l)));
   }, [term, items]);
 
     const chipColorByEstado = (id: number) => {
@@ -78,6 +79,7 @@ const ServiciosList = () => {
       { id: 'moto', label: 'Moto', minWidth: 120, format: (v) => v?.placa ?? '-' },
       { id: 'moto', label: 'Linea', minWidth: 120, format: (v) => v?.modelo?.linea?.linea ?? '-' },
       { id: 'estado', label: 'Estado', minWidth: 100, format: (v: EstadoType) => <Chip variant='outlined' label={v?.estado ?? ''} color={chipColorByEstado(v?.id ?? 0)} /> },
+      { id: 'mecanico', label: 'Mecánico', minWidth: 120, format: (v: UserGetType) => v?.primerNombre ?? '-' },
       { id: 'id', label: 'Codigo', minWidth: 60 },
       { id: 'descripcion', label: 'Descripción', minWidth: 220 },
     ];
