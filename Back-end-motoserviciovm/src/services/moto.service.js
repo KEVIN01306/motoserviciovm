@@ -154,13 +154,10 @@ const postMoto = async (data) => {
         }
     }
 
-    // modelo opcional: conectar si es válido (>0), de lo contrario dejar null
+    // modelo opcional: conectar si es válido (>0); si es null/undefined, simplemente no conectar
     const normalizedModeloId = (modeloId === null || modeloId === undefined) ? modeloId : Number(modeloId);
     if (normalizedModeloId && Number.isFinite(normalizedModeloId) && normalizedModeloId > 0) {
         createData.modelo = { connect: { id: normalizedModeloId } };
-    } else {
-        // explícitamente null para evitar FK inválido como 0
-        createData.modeloId = null;
     }
 
     const newMoto = await prisma.moto.create({
