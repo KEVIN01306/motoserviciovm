@@ -1,4 +1,4 @@
-import z from "zod";
+import { z } from 'zod';
 
 export const motoSchema = z.object({
     id:             z.string().optional(),
@@ -6,9 +6,9 @@ export const motoSchema = z.object({
     // avatar can be a stored path (string) or a File when user uploads a new image
     avatar:         z.union([z.string(), z.instanceof(File)]).optional(),
     calcomania:     z.union([z.string(), z.instanceof(File)]).optional(),    
-    modeloId:       z.number().int(),
+    modeloId:       z.number().int().optional().nullable(),
     estadoId:       z.number().int(),
     users:          z.array(z.number().int()).optional(),
     createdAt:      z.date().optional(),
     updatedAt:      z.date().optional(),
-})
+})      

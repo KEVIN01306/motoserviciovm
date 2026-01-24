@@ -5,7 +5,7 @@ export const motoSchema = z.object({
     placa:          z.string().min(7).max(7),
     avatar:         z.string().optional(),
     calcomania:     z.string().optional(),
-    modeloId:       z.number().int(),
+    modeloId:       z.number().int().optional().nullable(),
     estadoId:       z.number().int(),
     users:          z.array(z.number().int()).optional(),
 });

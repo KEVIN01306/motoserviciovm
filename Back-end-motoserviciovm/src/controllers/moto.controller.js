@@ -53,7 +53,14 @@ const postMotoHandler = async (req, res) => {
                 data.calcomania = directorio + req.files.calcomania[0].filename;
             }
         }
-        data.modeloId = parseInt(data.modeloId);
+        if (typeof data.modeloId !== 'undefined') {
+            if (data.modeloId === '' || data.modeloId === null) {
+                data.modeloId = null;
+            } else {
+                const n = parseInt(data.modeloId);
+                if (Number.isFinite(n)) data.modeloId = n; else delete data.modeloId;
+            }
+        }
         data.estadoId = parseInt(data.estadoId);
         data.users = parseArrayNumbers(data.users);
         const validationResult = motoSchema.safeParse(data);
@@ -92,7 +99,14 @@ const putMotoHandler = async (req, res) => {
                 data.calcomania = directorio + req.files.calcomania[0].filename;
             }
         }
-        data.modeloId = parseInt(data.modeloId);
+        if (typeof data.modeloId !== 'undefined') {
+            if (data.modeloId === '' || data.modeloId === null) {
+                data.modeloId = null;
+            } else {
+                const n = parseInt(data.modeloId);
+                if (Number.isFinite(n)) data.modeloId = n; else delete data.modeloId;
+            }
+        }
         data.estadoId = parseInt(data.estadoId);
         data.users = parseArrayNumbers(data.users);
         const validationResult = motoSchema.safeParse(data);

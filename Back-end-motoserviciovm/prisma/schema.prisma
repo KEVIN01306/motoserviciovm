@@ -179,14 +179,14 @@ model Moto {
   id         Int        @id @default(autoincrement())
   placa      String     @unique
   avatar     String?
-  modeloId   Int
+  modeloId   Int?
   estadoId   Int
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   calcomania String?
   citas      Cita[]
   estado     Estado     @relation(fields: [estadoId], references: [id])
-  modelo     Modelo     @relation(fields: [modeloId], references: [id])
+  modelo     Modelo?     @relation(fields: [modeloId], references: [id])
   servicios  Servicio[]
   users      User[]     @relation("UserMotos")
 
@@ -392,6 +392,7 @@ model Venta {
   id             Int             @id @default(autoincrement())
   usuarioId      Int
   servicioId     Int?
+  reparacionId   Int?
   total          Float
   estadoId       Int
   createdAt      DateTime        @default(now())
@@ -406,6 +407,7 @@ model Venta {
   sucursal       Sucursal?       @relation(fields: [sucursalId], references: [id])
   usuario        User            @relation(fields: [usuarioId], references: [id])
   productos      VentaProducto[] @relation("Venta_VentaProducto")
+  reparacion    EnReparacion?  @relation(fields: [reparacionId], references: [id])
 
   @@index([estadoId], map: "Venta_estadoId_fkey")
   @@index([servicioId], map: "Venta_servicioId_fkey")
@@ -470,6 +472,7 @@ model EnReparacion {
   estado        Estado                @relation(fields: [estadoId], references: [id])
   servicio      Servicio?             @relation(fields: [servicioId], references: [id])
   sucursal      Sucursal?             @relation(fields: [sucursalId], references: [id])
+  ventas        Venta[]
   repuestos     RepuestosReparacion[]
 
   @@index([estadoId], map: "EnReparacion_estadoId_fkey")

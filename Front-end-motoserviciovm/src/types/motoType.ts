@@ -16,7 +16,7 @@ export const MotoInitialState = {
     placa: "",
     calcomania: "",
     avatar: "",
-    modeloId: 0,
+    modeloId: null,
     estadoId: 1,
     users: [] as number[],
 };

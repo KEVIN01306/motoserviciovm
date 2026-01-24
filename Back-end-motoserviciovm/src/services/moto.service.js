@@ -137,17 +137,34 @@ const postMoto = async (data) => {
         throw error;
     }
 
-    const { users, ...motoData } = data;
+    const { users, modeloId, estadoId, ...motoData } = data;
 
     const usersConnect = users ? users.map(userId => ({ id: userId })) : [];
 
+    const createData = {
+        ...motoData,
+        users: { connect: usersConnect },
+    };
+
+    // conectar estado si viene estadoId
+    if (estadoId !== undefined && estadoId !== null) {
+        const e = Number(estadoId);
+        if (Number.isFinite(e) && e > 0) {
+            createData.estado = { connect: { id: e } };
+        }
+    }
+
+    // modelo opcional: conectar si es válido (>0), de lo contrario dejar null
+    const normalizedModeloId = (modeloId === null || modeloId === undefined) ? modeloId : Number(modeloId);
+    if (normalizedModeloId && Number.isFinite(normalizedModeloId) && normalizedModeloId > 0) {
+        createData.modelo = { connect: { id: normalizedModeloId } };
+    } else {
+        // explícitamente null para evitar FK inválido como 0
+        createData.modeloId = null;
+    }
+
     const newMoto = await prisma.moto.create({
-        data: {
-            ...motoData,
-            users: {
-                connect: usersConnect,
-            },
-        },
+        data: createData,
     });
 
     return { ...newMoto };
@@ -163,7 +180,7 @@ const putMoto = async (id, data) => {
         throw error;
     }
 
-    const { users, ...motoData } = data;
+    const { users, modeloId, estadoId, ...motoData } = data;
 
     const usersConnect = users ? users.map(userId => ({ id: userId })) : [];
 
@@ -177,14 +194,32 @@ const putMoto = async (id, data) => {
             }
     }
 
+    const updateData = {
+        ...motoData,
+        users: { set: usersConnect },
+    };
+
+    // Manejo de modelo opcional en update
+    if (modeloId !== undefined) {
+        const n = Number(modeloId);
+        if (modeloId === null || !Number.isFinite(n) || n <= 0) {
+            updateData.modelo = { disconnect: true };
+        } else {
+            updateData.modelo = { connect: { id: n } };
+        }
+    }
+
+    // Manejo de estado por relación (no enviar estadoId directo)
+    if (estadoId !== undefined && estadoId !== null) {
+        const e = Number(estadoId);
+        if (Number.isFinite(e) && e > 0) {
+            updateData.estado = { connect: { id: e } };
+        }
+    }
+
     const updatedMoto = await prisma.moto.update({
         where: { id: id },
-        data: {
-            ...motoData,
-            users: {
-                set: usersConnect,
-            },
-        },
+        data: updateData,
     });
 
     return { ...updatedMoto };

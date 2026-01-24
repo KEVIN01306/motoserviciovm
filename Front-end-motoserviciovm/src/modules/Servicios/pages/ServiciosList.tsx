@@ -27,7 +27,23 @@ const ServiciosList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [term, setTerm] = useState('');
-  const [selectedEstado, setSelectedEstado] = useState<number | 'all'>(estados().enServicio);
+  const [selectedEstado, setSelectedEstado] = useState<number | 'all'>(() => {
+    try {
+      const v = localStorage.getItem('servicios_selectedEstado');
+      if (!v) return estados().enServicio;
+      if (v === 'all') return 'all';
+      const n = Number(v);
+      return Number.isNaN(n) ? estados().enServicio : n;
+    } catch (e) {
+      return estados().enServicio;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('servicios_selectedEstado', String(selectedEstado));
+    } catch (e) {}
+  }, [selectedEstado]);
   const goTo = useGoTo();
   const user = useAuthStore(s => s.user);
 

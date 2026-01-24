@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { getOpciones } from '../../../services/opcionServicio.services';
 import { Grid, TextField, Autocomplete, Paper, Button, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Checkbox, FormControlLabel, Typography, Box } from '@mui/material';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ImagenesEditorInput from '../../../components/utils/ImagenesEditorInput';
@@ -128,34 +130,41 @@ const ServicioDataForm = ({
           renderInput={(params) => <TextField {...params} label="Tipo Servicio" variant="standard" fullWidth />}
         />
       </Grid>
-      {/* Tabla de opciones servicio manual si aplica */}
+      {/* Opciones de servicio manual: Autocomplete múltiple con checkboxes */}
       {tipoServicioSelected?.cantidadOpcionesServicio === 0 && opcionesServicio.length > 0 && (
         <Grid size={12}>
           <Paper sx={{ p: 2, mb: 2 }}>
             <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Opciones de Servicio</Typography>
-            <TableContainer>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Opción</TableCell>
-                    <TableCell>Seleccionar</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {opcionesServicio.map((op: any) => (
-                    <TableRow key={op.id}>
-                      <TableCell>{op.opcion}</TableCell>
-                      <TableCell>
-                        <Checkbox
-                          checked={opcionesSeleccionadas.includes(op.id)}
-                          onChange={e => handleCheckOpcion(op.id, e.target.checked)}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+            <Autocomplete
+              multiple
+              options={opcionesServicio}
+              disableCloseOnSelect
+              getOptionLabel={(opt: any) => opt?.opcion ?? ''}
+              value={opcionesSeleccionadas.map(id => opcionesServicio.find(o => o.id === id)).filter(Boolean) as any}
+              onChange={(_e, newValue: any[]) => {
+                const ids = newValue.map(v => v.id);
+                setOpcionesSeleccionadas(ids);
+              }}
+              renderOption={(props, option, { selected }) => (
+                <li {...props}>
+                  <Checkbox
+                    icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                    checkedIcon={<CheckBoxIcon fontSize="small" />}
+                    style={{ marginRight: 8 }}
+                    checked={selected}
+                  />
+                  {option.opcion}
+                </li>
+              )}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant="standard"
+                  label="Opciones de servicio"
+                  placeholder="Seleccionar opciones"
+                />
+              )}
+            />
           </Paper>
         </Grid>
       )}
