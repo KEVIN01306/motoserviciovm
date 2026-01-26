@@ -1,4 +1,6 @@
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Box } from '@mui/material';
+import DownloadIcon from '@mui/icons-material/Download';
+import * as XLSX from 'xlsx';
 import type { Column } from './Table';
 
 type Props<T> = {
@@ -9,11 +11,62 @@ type Props<T> = {
   /** optional maximum height for scroll */
   maxHeight?: number;
   colorHeader?: string;
+  showExportButton?: boolean;
+  exportFileName?: string;
 };
 
-export default function ProductsTable<T>({ columns, rows, footerRow, headerColor = '#1976d2', maxHeight = 400, colorHeader = '#ffffff' }: Props<T>) {
+export default function ProductsTable<T>({ columns, rows, footerRow, headerColor = '#1976d2', maxHeight = 400, colorHeader = '#ffffff', showExportButton = false, exportFileName = 'export.xlsx' }: Props<T>) {
+  // Helper to convert formatted cell values to plain text
+  const cellToText = (val: any) => {
+    if (val === null || val === undefined) return '';
+    if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') return String(val);
+    try {
+      return String(val);
+    } catch (e) {
+      return '';
+    }
+  };
+
+  const exportXlsx = (fileName = 'export.xlsx') => {
+    let name = fileName || 'export.xlsx';
+    if (!name.toLowerCase().endsWith('.xlsx')) name = `${name}.xlsx`;
+    const headers = columns.map(c => String(c.label ?? ''));
+    const data: any[][] = [];
+    data.push(headers);
+
+    for (const row of rows) {
+      const rowData = columns.map(col => {
+        if (col.id === 'actions') return '';
+        const value = (row as any)[col.id as keyof typeof row];
+        const formatted = col.format ? col.format(value, row) : value;
+        return cellToText(formatted);
+      });
+      data.push(rowData);
+    }
+
+    if (footerRow) {
+      const footerData = columns.map(col => {
+        const v = (footerRow as any)[col.id as keyof typeof footerRow];
+        return cellToText(v);
+      });
+      data.push(footerData);
+    }
+
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+        XLSX.writeFile(wb, name);
+  };
+
   return (
+    <>
+    {showExportButton && (
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }}>
+          <Button startIcon={<DownloadIcon />} variant="outlined" size="small" onClick={() => exportXlsx(exportFileName)}>Exportar</Button>
+        </Box>
+      )}
     <Paper sx={{ width: '100%', overflow: 'auto', backgroundColor: '#ffffff' }} elevation={1}>
+      {/* Export button area (right) */}
       <TableContainer sx={{ maxHeight }}>{/* white background is on Paper */}
         <Table stickyHeader aria-label="products-table">
           <TableHead>
@@ -77,5 +130,6 @@ export default function ProductsTable<T>({ columns, rows, footerRow, headerColor
         </Table>
       </TableContainer>
     </Paper>
+    </>
   );
 }

@@ -319,6 +319,8 @@ const Contabilidad: React.FC = () => {
               descripcion: 'Totales',
               monto: "Q " + (data.ingresosEgresosDetalle.reduce((sum, row) => sum + (row.monto || 0), 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})
             }}
+            exportFileName="Ingresos_Egresos_Generales_Contabilidad"
+            showExportButton={true}
 
           />
 
@@ -347,6 +349,8 @@ const Contabilidad: React.FC = () => {
               Subtotal: "Q " + (data.serviciosDetalle.reduce((sum, row) =>  sum + (row.total || 0), 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
               total: "Q " + (data.serviciosDetalle.reduce((sum, row) =>  sum + ((row.total || 0) - (row.descuentosServicio || 0)), 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
             }}
+            exportFileName="Detalle_Servicios_Contabilidad"
+            showExportButton={true}
           />
 
           <Box mt={4} /> 
@@ -363,6 +367,8 @@ const Contabilidad: React.FC = () => {
               descripcion: 'Totales',
               monto: "Q " + (data.gastosTallerDetalle.reduce((sum, row) => sum + (row.monto || 0), 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
             }}
+            exportFileName="Ingresos_Egresos_Taller_Contabilidad"
+            showExportButton={true}
 
           />
 
@@ -392,6 +398,8 @@ const Contabilidad: React.FC = () => {
                 gananciaTotal: "Q " + (data.ventasDetalle.reduce((sum, row) => sum + (row.gananciaTotal || 0), 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
               total: "Q " + (data.ventasDetalle.reduce((sum, row) => sum + (row.total || 0), 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
             }}
+            exportFileName="Detalle_Ventas_Contabilidad"
+            showExportButton={true}
           />
           
           <Box mt={4} /> 
@@ -405,7 +413,8 @@ const Contabilidad: React.FC = () => {
               descripcion: 'Totales',
               monto: "Q " + (data.gastosRepuestosDetalle.reduce((sum, row) => sum + (row.monto || 0), 0)).toFixed(2),
             }}
-
+            exportFileName="Ingresos_Egresos_Repuestos_Contabilidad"
+            showExportButton={true}
           />
 
           
