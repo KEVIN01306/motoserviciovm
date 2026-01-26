@@ -1,4 +1,4 @@
-import { Grid, TextField, MenuItem, FormControl, InputLabel, Select } from "@mui/material";
+import { Grid, TextField, Autocomplete } from "@mui/material";
 import { Controller, type Control } from "react-hook-form";
 import { useEffect, useState } from "react";
 import type { modeloType } from "../../../types/modeloType";
@@ -52,63 +52,78 @@ const InputsForm = ({ control, register, errors }: Props) => {
             </Grid>
 
             <Grid size={{ xs: 12 }}>
-                <FormControl fullWidth variant="standard" error={!!errors.marcaId}>
-                    <InputLabel id="marca-label">Marca</InputLabel>
-                    <Controller
-                        name="marcaId"
-                        control={control}
-                        render={({ field }) => (
-                            <Select labelId="marca-label" label="Marca" {...field}>
-                                <MenuItem value={0}>Seleccione una marca</MenuItem>
-                                {marcas.map((m) => (
-                                    <MenuItem key={m.id} value={m.id}>
-                                        {m.marca}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        )}
-                    />
-                </FormControl>
+                <Controller
+                    name="marcaId"
+                    control={control}
+                    render={({ field }) => (
+                        <Autocomplete
+                            options={marcas}
+                            getOptionLabel={(opt) => opt?.marca ?? ''}
+                            isOptionEqualToValue={(option, value) => option.id === value?.id}
+                            value={marcas.find((m:any) => m.id === field.value) ?? null}
+                            onChange={(_, newVal) => field.onChange(newVal ? newVal.id : 0)}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label="Marca"
+                                    variant="standard"
+                                    error={!!errors.marcaId}
+                                    helperText={errors.marcaId?.message as string}
+                                />
+                            )}
+                        />
+                    )}
+                />
             </Grid>
 
             <Grid size={{ xs: 12 }}>
-                <FormControl fullWidth variant="standard" error={!!errors.lineaId}>
-                    <InputLabel id="linea-label">Línea</InputLabel>
-                    <Controller
-                        name="lineaId"
-                        control={control}
-                        render={({ field }) => (
-                            <Select labelId="linea-label" label="Línea" {...field}>
-                                <MenuItem value={0}>Seleccione una línea</MenuItem>
-                                {lineas.map((l) => (
-                                    <MenuItem key={l.id} value={l.id}>
-                                        {l.linea}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        )}
-                    />
-                </FormControl>
+                <Controller
+                    name="lineaId"
+                    control={control}
+                    render={({ field }) => (
+                        <Autocomplete
+                            options={lineas}
+                            getOptionLabel={(opt) => opt?.linea ?? ''}
+                            isOptionEqualToValue={(option, value) => option.id === value?.id}
+                            value={lineas.find((l:any) => l.id === field.value) ?? null}
+                            onChange={(_, newVal) => field.onChange(newVal ? newVal.id : 0)}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label="Línea"
+                                    variant="standard"
+                                    error={!!errors.lineaId}
+                                    helperText={errors.lineaId?.message as string}
+                                />
+                            )}
+                        />
+                    )}
+                />
             </Grid>
 
             <Grid size={{ xs: 12 }}>
-                <FormControl fullWidth variant="standard" error={!!errors.cilindradaId}>
-                    <InputLabel id="cilindrada-label">Cilindrada</InputLabel>
-                    <Controller
-                        name="cilindradaId"
-                        control={control}
-                        render={({ field }) => (
-                            <Select labelId="cilindrada-label" label="Cilindrada" {...field}>
-                                <MenuItem value={0}>Seleccione una cilindrada</MenuItem>
-                                {cilindradas.map((c) => (
-                                    <MenuItem key={c.id} value={c.id}>
-                                        {c.cilindrada}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        )}
-                    />
-                </FormControl>
+                <Controller
+                    name="cilindradaId"
+                    control={control}
+                    render={({ field }) => (
+                        <Autocomplete
+                            options={cilindradas}
+                            getOptionLabel={(opt: any) => opt?.cilindrada ?? ''}
+                            isOptionEqualToValue={(option, value) => option.id === value?.id}
+                            value={cilindradas.find((c:any) => c.id === field.value) ?? null}
+                            onChange={(_, newVal) => field.onChange(newVal ? newVal.id : 0)}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label="Cilindrada"
+                                    variant="standard"
+                                    error={!!errors.cilindradaId}
+                                    helperText={errors.cilindradaId?.message as string}
+                                />
+                            )}
+                        />
+                    )}
+                />
             </Grid>
         </>
     );
