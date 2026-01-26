@@ -367,6 +367,17 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
                         </Button>
                       </Grid>
                     )
+                    
+                  }
+                                    {
+                    initial.enReparaciones[0]?.estado.id !== estados().entregado && (
+                      <Grid size={6}>
+                        <Button variant="outlined" color="primary" sx={{ mt: 2 }} onClick={() => { goTo('/admin/enreparacion/' + initial.enReparaciones[0].id + '/edit') }}>
+                          Editar
+                        </Button>
+                      </Grid>
+                    )
+                    
                   }
 
 
