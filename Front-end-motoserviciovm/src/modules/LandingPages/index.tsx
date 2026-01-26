@@ -295,7 +295,7 @@ const App = () => {
                    >
                      {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
                    </button>
-                   <button className="p-2 text-red-600"><LogIn size={20} /></button>
+                   <button className="p-2 text-red-600" onClick={() => window.location.href = '/public/auth/login-clientes'}><LogIn size={20} /></button>
                 </div>
 
               </div>
