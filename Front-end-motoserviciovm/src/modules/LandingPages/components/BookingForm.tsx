@@ -4,6 +4,7 @@ import ContactDetail from './ContactDetail';
 import CalendarIcon from '@mui/icons-material/CalendarToday';
 import MapPinIcon from '@mui/icons-material/LocationOn';
 import PhoneIcon from '@mui/icons-material/Phone';
+import NutDecoration from './NutDecoration';
 
 const BookingForm: React.FC = () => {
   const today = new Date().toISOString().split('T')[0];
@@ -45,14 +46,14 @@ const BookingForm: React.FC = () => {
   };
 
   return (
-    <section id="contacto" className="py-16 sm:py-24 bg-primary-dark text-white">
+    <section id="contacto" className="py-16 sm:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-4xl sm:text-5xl font-extrabold mb-12 text-center text-white">Agenda tu Servicio</h2>
-        <p className="text-center mb-10 text-gray-300 max-w-3xl mx-auto">Selecciona tu sucursal, la fecha y hora que más te convenga, el tipo de servicio que deseas y déjanos tus datos.</p>
+        <h2 className="text-2xl font-bold mb-4 flex items-center text-gray-900 dark:text-white border-b border-indigo-500 pb-2 justify-center"><NutDecoration size={20} className="mr-2" />Agenda tu Servicio<NutDecoration size={20} className="ml-2" /></h2>
+        <p className="text-center mb-10 text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">Selecciona tu sucursal, la fecha y hora que más te convenga, el tipo de servicio que deseas y déjanos tus datos.</p>
 
-        <div className="MuiPaper-root grid md:grid-cols-2 gap-12 bg-gray-800 rounded-xl shadow-2xl p-6 md:p-10 border border-gray-700">
-          <div className="space-y-6 md:space-y-8 p-4 bg-gray-900 rounded-xl shadow-inner border border-gray-700">
-            <h3 className="text-2xl font-bold text-accent-orange border-b border-gray-700 pb-3 flex items-center gap-2"><CalendarIcon />Paso 1: Selecciona Sucursal, Fecha y Hora</h3>
+        <div className="MuiPaper-root grid md:grid-cols-2 gap-12 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl border border-indigo-500/30">
+          <div className="space-y-6 md:space-y-8 p-4 bg-white dark:bg-gray-800 rounded-xl">
+            <h3 className="text-xl font-bold mb-4 flex items-center text-gray-900 dark:text-white border-b border-indigo-500 pb-2"><CalendarIcon className="mr-2"/>Paso 1: Selecciona Sucursal, Fecha y Hora</h3>
             <div>
               <label htmlFor="branch" className="block text-sm font-medium text-gray-300 mb-1">1. Selecciona la Sucursal (Obligatorio)</label>
               <select id="branch" value={selectedBranch} onChange={(e) => { setSelectedBranch(e.target.value); setSelectedDate(today); setSelectedTime(''); }} required className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-white">
@@ -88,7 +89,7 @@ const BookingForm: React.FC = () => {
           </div>
 
           <div className="p-4 space-y-5">
-            <h3 className="text-2xl font-bold text-accent-orange border-b border-gray-700 pb-3">Paso 2: Confirma tus Datos</h3>
+            <h3 className="text-xl font-bold mb-4 flex items-center text-gray-900 dark:text-white border-b border-indigo-500 pb-2">Paso 2: Confirma tus Datos</h3>
             <form onSubmit={handleSubmit} className="space-y-5">
               <MuiTextFieldWrapper label="Nombre" id="nombre" type="text" placeholder="Tu nombre completo" value={name} onChange={(e) => setName(e.target.value)} required />
               <MuiTextFieldWrapper label="Placa de la Moto (Obligatorio)" id="placa" type="text" placeholder="Ej: M123ABC" value={placa} onChange={(e) => setPlaca(e.target.value)} required />
@@ -112,9 +113,9 @@ const BookingForm: React.FC = () => {
         </div>
 
         {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-70 z-100 flex items-center justify-center p-4">
-            <div className="bg-white p-8 rounded-xl max-w-md w-full space-y-6 border-t-8 border-accent-orange">
-              <h3 className="text-2xl font-bold text-primary-dark">¡Cita Agendada con Éxito!</h3>
+            <div className="fixed inset-0 bg-black bg-opacity-70 z-100 flex items-center justify-center p-4">
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl max-w-md w-full space-y-6 border border-indigo-500/30">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white">¡Cita Agendada con Éxito!</h3>
               <div className="text-gray-700 space-y-2">
                 <ul className='list-none space-y-1 text-sm bg-gray-50 p-3 rounded-lg border'>
                   <li><strong>Tipo de Servicio:</strong> {lastSubmission.serviceType}</li>

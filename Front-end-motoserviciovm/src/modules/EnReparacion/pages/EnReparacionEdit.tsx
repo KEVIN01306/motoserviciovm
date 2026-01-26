@@ -101,7 +101,7 @@ const EnReparacionEdit = () => {
             </Grid>
         </FormEstructure>
         <Divider sx={{ my: 4 }} />
-        <Grid width={'100%'}>
+        <Grid width={'100%'} >
           <RepuestosReparacionForm initial={{ enReparaciones: [{id: Number(data?.id), repuestos: data?.repuestos || []} ]}} />
         </Grid>
     </>

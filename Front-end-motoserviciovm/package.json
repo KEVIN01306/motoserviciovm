@@ -26,6 +26,7 @@
     "dayjs": "^1.11.19",
     "dotenv": "^17.2.3",
     "heroicons": "^2.2.0",
+    "lucide-react": "^0.563.0",
     "print-js": "^1.6.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

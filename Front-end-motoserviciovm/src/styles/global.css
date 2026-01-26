@@ -1,8 +1,26 @@
-@import 'tailwindcss';
-@plugin "daisyui";
+@import "tailwindcss";
 
+/* Configuración para modo oscuro basado en clase para Tailwind v4 */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui;
+}
 
-@import "./parts.css";
+/* Esta directiva le dice a Tailwind que use el selector .dark */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Mantenemos tu transición suave para el cambio de tema */
+html {
+  transition: background-color 0.3s ease;
+}
+
+/* Opcional: asegurar que el esquema de color del sistema respete la clase */
+:root {
+  color-scheme: light;
+}
+
+:root.dark {
+  color-scheme: dark;
+}
 
 #root{
     background-color: "rgb(251, 251, 252)"
@@ -12,6 +30,21 @@
 html {
   background-color: "rgb(251, 251, 252)"
 }
+
+:root{
+  --workshop-metal:#2b2b2b;
+  --workshop-accent:#ff6600;
+  --workshop-contrast:#f5f5f5;
+  --workshop-muted:#6b6b6b;
+}
+
+.workshop-section{
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+}
+
+.section-title-decor{ display:flex; align-items:center; justify-content:center; gap:10px }
+.section-title-decor .nut-rotate{ transform: rotate(-15deg); opacity: 0.9 }
+.workshop-list-scroll{ max-height: 180px; overflow-y: auto; padding-right: 8px }
 
 
 @media print {
