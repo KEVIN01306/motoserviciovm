@@ -21,7 +21,7 @@ const getServicios = async (filters = {}) => {
     const items = await prisma.servicio.findMany({
         where: whereClause,
         orderBy: { createdAt: 'desc' },
-        include: { moto: {include: { modelo: {include: { linea: true }} }}, sucursal: true, cliente: true, mecanico: true, estado: true },
+        include: { moto: {include: { modelo: {include: { linea: true }} }}, sucursal: true, cliente: true, mecanico: true, estado: true, enReparaciones: true, enParqueos: true},
     });
 
     /*if (!items || items.length === 0) {

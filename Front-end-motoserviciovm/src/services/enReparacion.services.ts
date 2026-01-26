@@ -139,4 +139,23 @@ const putRepuestosReparacion = async (
 };
 
 
-export { getEnReparaciones, getEnReparacion, postEnReparacion, putEnReparacionSalida, putRepuestosReparacion };
+const putEnReparacion = async (id: EnReparacionType["id"], payload: Partial<EnReparacionType>) => {
+  try {
+    const response = await api.put<apiResponse<EnReparacionGetType>>(`${API_ENREPARACION}/${id}`, payload);
+    if (!response.data.data) throw new Error("DATA_NOT_FOUND");
+    return response.data.data ?? "";
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
+      if (status === 404) throw new Error("NOT FOUND API OR NOT EXISTED IN THE SERVER");
+      if (status === 500) throw new Error("INTERNAL ERROR SERVER");
+      const serverMessage = error.response?.data?.message;
+      if (serverMessage) throw new Error(serverMessage);
+      throw new Error("CONNECTION ERROR");
+    }
+    throw new Error((error as Error).message);
+  }
+};
+
+
+export { getEnReparaciones, getEnReparacion, postEnReparacion, putEnReparacionSalida, putRepuestosReparacion, putEnReparacion };

@@ -12,13 +12,15 @@ export type EnReparacionGetType = EnReparacionType & {
     servicio: ServicioGetType;
     estado: EstadoType;
     repuestos: repuestoReparacionType[];
+    createdAt: string;
+    updatedAt: string;
 };
 
 export const EnReparacionInitialState: EnReparacionType = {
     descripcion:  "",
     fechaEntrada: new Date(),
     total:        0,
-    observaciones: null,
+    observaciones: "",
     servicioId:       0,
     estadoId:     estados().activo,
     firmaSalida: null
@@ -40,11 +42,19 @@ export const mergeEnReparacionDataWithDefaults = (apiData: Partial<EnReparacionT
 
 /** Prepara los datos para el envío al backend, incluyendo solo los campos necesarios
  */
+
+export const mergeEnReparacionDataForSubmissionEdit = (formData: Partial<EnReparacionType>): Partial<EnReparacionType> => {
+    return {
+        descripcion:  formData.descripcion ?? EnReparacionInitialState.descripcion,
+        observaciones: formData.observaciones ?? EnReparacionInitialState.observaciones,
+        total:        formData.total ?? EnReparacionInitialState.total,
+    };
+}
 export const mergeEnReparacionDataForSubmission = (formData: Partial<EnReparacionType>): Partial<EnReparacionType> => {
     return {
         total: formData.total ?? EnReparacionInitialState.total,       
-        observaciones: formData.observaciones,
-        firmaSalida: formData.firmaSalida, // Incluir firmaSalida para el envío
+        observaciones: formData.observaciones ?? EnReparacionInitialState.observaciones,
+        firmaSalida: formData.firmaSalida ?? EnReparacionInitialState.firmaSalida, // Incluir firmaSalida para el envío
     };
 };
 

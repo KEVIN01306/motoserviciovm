@@ -121,7 +121,37 @@ const ServiciosList = () => {
         }
           return actions;
       }
-      if (row.estadoId === estados().enReparacion || row.estadoId === estados().enParqueo) {
+      if (row.estadoId === estados().enReparacion) {
+         if (user?.permisos.includes('servicios:detail')) {
+          actions.push({ label: (<><PiDeviceTabletFill /><span className="ml-1.5">Detalle</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}`), permiso: 'servicios:detail' });
+            }
+          
+          if (user?.permisos.includes('servicios:salida')) {
+            actions.push({ label: (<><MdBikeScooter /><span className="ml-1.5">Salida</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/salida`), permiso: 'servicios:edit' });
+          }
+
+          if (user?.permisos.includes('servicios:progreso')) {
+            actions.push({ label: (<><FaBarsProgress /><span className="ml-1.5">Progreso</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/progreso`), permiso: 'servicios:progreso' });
+          
+          if (user?.permisos.includes('enreparacion:edit')) {
+            actions.push({
+              label: (<><RiMoneyDollarCircleLine /><span className="ml-1.5">Editar Reparacion</span></>),
+              onClick: (r) => {
+                
+                if (r.enReparaciones && r.enReparaciones.length > 0) {
+                  const id = r.enReparaciones[0].id;
+                  goTo(`/admin/enreparacion/${id}/edit`);
+                  console.log(`/admin/enreparacion/${id}/edit`);
+                }
+              },
+              permiso: 'enreparacion:edit'
+            });
+          }
+      }
+      return actions;
+      }
+
+      if (row.estadoId === estados().enParqueo) {
          if (user?.permisos.includes('servicios:detail')) {
           actions.push({ label: (<><PiDeviceTabletFill /><span className="ml-1.5">Detalle</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}`), permiso: 'servicios:detail' });
             }
@@ -133,9 +163,7 @@ const ServiciosList = () => {
           if (user?.permisos.includes('servicios:progreso')) {
             actions.push({ label: (<><FaBarsProgress /><span className="ml-1.5">Progreso</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/progreso`), permiso: 'servicios:progreso' });
       }
-
-      return actions;
-          
+      return actions;   
       }
 
        if (user?.permisos.includes('servicios:detail')) {
@@ -152,10 +180,6 @@ const ServiciosList = () => {
           if (user?.permisos.includes('servicios:progreso')) {
             actions.push({ label: (<><FaBarsProgress /><span className="ml-1.5">Progreso</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/progreso`), permiso: 'servicios:progreso' });
       }
-      
-
-
-      
 
       return actions.filter(a => user?.permisos.includes(a.permiso));
     };

@@ -7,26 +7,45 @@ import { RiBikeFill } from "react-icons/ri";
 import Loading from "../../../components/utils/Loading";
 import ErrorCard from "../../../components/utils/ErrorCard";
 
-import type { EnReparacionGetType } from "../../../types/enReparacionType";
+import { EnReparacionInitialState, mergeEnReparacionDataForSubmissionEdit, type EnReparacionGetType, type EnReparacionType } from "../../../types/enReparacionType";
 import RepuestosTable from "../components/RepuestosTable";
-import { getEnReparacion as getEnReparacionService } from "../../../services/enReparacion.services";
+import { getEnReparacion as getEnReparacionService, putEnReparacion, putEnReparacionSalida } from "../../../services/enReparacion.services";
 import CardForm from "../../../components/utils/cards/CardForm";
 import { Padding } from "@mui/icons-material";
 import FormEstructure from "../../../components/utils/FormEstructure";
+import InputsForm from "../components/InputsForm";
+import { enReparacionSchema } from "../../../zod/enReparacion.schema";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { errorToast, successToast } from "../../../utils/toast";
+import RepuestosReparacionForm from "../../Servicios/components/RepuestosReparacionForm";
 
 const EnReparacionEdit = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [item, setItem] = useState<EnReparacionGetType | null>(null);
+  const [data, setData] = useState<EnReparacionGetType | null>(null);
 
+  const { register, handleSubmit, reset, control, formState, getValues } = useForm<EnReparacionType>({
+    resolver: zodResolver(enReparacionSchema) as any,
+    defaultValues: EnReparacionInitialState as any,
+  });
+
+  const { isSubmitting } = formState;
+  
+  // Log RHF errors whenever they change to help debugging
+  useEffect(() => {
+    console.log('RHF formState.errors:', formState.errors);
+  }, [formState.errors]);
+  
   useEffect(() => {
     const load = async () => {
       try {
         setLoading(true);
         if (id) {
           const data = await getEnReparacionService(Number(id));
-          setItem(data);
+          setData(data);
+          reset(data);
         }
       } catch (err: any) {
         setError(err.message);
@@ -37,30 +56,52 @@ const EnReparacionEdit = () => {
     load();
   }, [id]);
 
+  const onSubmit = async (data: EnReparacionType) => {
+    try {
+      const dataClean  = mergeEnReparacionDataForSubmissionEdit(data);
+      const response = await putEnReparacion(Number(id), dataClean);
+      console.log("Response from update:", response.descripcion);
+      
+      successToast('Reparación actualizada');
+    } catch (err: any) {
+      errorToast(err?.message ?? 'Error al actualizar');
+    }
+  };
+
   if (loading) return <Loading />;
   if (error) return <ErrorCard errorText={error} restart={() => window.location.reload()} />;
 
   return (
     <>
       <BreadcrumbsRoutes items={[{ label: "En Reparación", icon: <RiBikeFill fontSize="inherit" />, href: "/admin/enreparacion" }, { label: "Editar", icon: <RiBikeFill fontSize="inherit" /> }]} />
-        <FormEstructure handleSubmit={() => {}} sx={{ padding: "10px" }}>
+        <FormEstructure handleSubmit={handleSubmit(onSubmit)} sx={{ padding: "10px" }}>
             <Grid container spacing={2} size={12} sx={{ padding: "10px" }}>
-                <Grid size={12}>
-                    <TextField variant="standard" label="Descripción" fullWidth value={item?.descripcion ?? ""} disabled />
-                </Grid>
-
-                <Grid size={12}>
-                    <TextField variant="standard" fullWidth label="Fecha Entrada" type="date" InputLabelProps={{ shrink: true }} value={item?.fechaEntrada ? new Date(item.fechaEntrada).toISOString().slice(0, 10) : ""} disabled />
-                </Grid>
+                <InputsForm register={register} errors={formState.errors} control={control} />
+            </Grid>
+            <Divider sx={{ my: 2 }} />
+            <Grid size={12} sx={{ mt: 2 }}>
+                <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={isSubmitting}
+                    fullWidth
+                    onClick={() => handleSubmit(onSubmit, (errs) => {
+                      console.log('RHF validation errors callback:', errs);
+                      try {
+                        const vals = getValues();
+                        const parsed = enReparacionSchema.safeParse(vals);
+                        console.log('Zod safeParse result:', parsed);
+                      } catch (e) {
+                        console.error('Error parsing with zod:', e);
+                      }
+                    })()}
+                >
+                    {isSubmitting ? "Guardando..." : "Actualizar Reparación"}
+                </Button>
             </Grid>
         </FormEstructure>
-
-      <Grid size={12}>
-        <Divider sx={{ my: 2 }} />
-      </Grid>
-      {item && (
-          <RepuestosTable reparacionId={item.id as number} initial={item.repuestos ?? []} />
-      )}
+        <Divider sx={{ my: 4 }} />
+        <RepuestosReparacionForm initial={{ enReparaciones: [{id: Number(data?.id), repuestos: data?.repuestos || []} ]}} />
     </>
   );
 };

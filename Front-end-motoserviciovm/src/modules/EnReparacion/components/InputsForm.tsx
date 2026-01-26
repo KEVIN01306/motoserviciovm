@@ -35,40 +35,11 @@ const InputsForm = ({ control, register, errors, setValue }: Props) => {
       </Grid>
 
       <Grid size={12}>
-        <Controller
-          control={control}
-          name="fechaEntrada"
-          render={({ field }) => (
-            <TextField
-              variant="standard"
-              {...field}
-              fullWidth
-              type="date"
-              label="Fecha Entrada"
-              InputLabelProps={{ shrink: true }}
-              error={!!errors.fechaEntrada}
-              helperText={errors.fechaEntrada?.message}
-            />
-          )}
-        />
+        <TextField variant="standard" fullWidth label="total" {...register("total", { valueAsNumber: true })} error={!!errors.total} helperText={errors.total?.message} />
       </Grid>
 
       <Grid size={12}>
-        <Controller
-          control={control}
-          name="motoId"
-          render={({ field }) => (
-            <Autocomplete
-              options={motos}
-              getOptionLabel={(o) => o.placa || String(o.id)}
-              onChange={(_, v) => field.onChange(v?.id ?? null)}
-              isOptionEqualToValue={(a, b) => a.id === b.id}
-              renderInput={(params) => (
-                <TextField variant="standard" {...params} label="Moto (placa)" error={!!errors.motoId} helperText={errors.motoId?.message} />
-              )}
-            />
-          )}
-        />
+        <TextField variant="standard" fullWidth label="observaciones" {...register("observaciones")} error={!!errors.observaciones} helperText={errors.observaciones?.message} />
       </Grid>
     </>
   );

@@ -77,7 +77,7 @@ const putEnReparacion = async (id, data) => {
         throw error;
     }
 
-    const updated = await prisma.enReparacion.update({ where: { id }, data: { ...data }, include: { moto: { include: { modelo: true, users: true } }, estado: true } });
+    const updated = await prisma.enReparacion.update({ where: { id }, data: data} );
     return updated;
 };
 
@@ -139,33 +139,34 @@ const putEnReparacionSalida = async (id, data, firmaSalidaFile) => {
         throw new Error('INTERNAL_SERVER_ERROR');
     }
 };
-
 const putRepuestosReparacion = async (enReparacionId, repuestos) => {
     try {
+        // 1. Preparamos los datos FUERA de la transacción para ahorrar tiempo
+        const dataParaInsertar = repuestos.map(repuesto => ({
+            nombre: repuesto.nombre,
+            descripcion: repuesto.descripcion,
+            refencia: repuesto.refencia || "",
+            cantidad: repuesto.cantidad,
+            checked: repuesto.checked || false,
+            reparacionId: enReparacionId, // Usamos el ID directo
+            estadoId: repuesto.estadoId || estados().activo 
+        }));
+
+        // 2. Ejecutamos la transacción
         await prisma.$transaction(async (tx) => {
-            // Delete existing repuestos for the given enReparacionId
+            // Eliminar existentes
             await tx.repuestosReparacion.deleteMany({
                 where: { reparacionId: enReparacionId },
             });
 
-            // Insert new repuestos
-            for (const repuesto of repuestos) {
-                await tx.repuestosReparacion.create({
-                    data: {
-                        nombre: repuesto.nombre,
-                        descripcion: repuesto.descripcion,
-                        refencia: repuesto.refencia || "",
-                        cantidad: repuesto.cantidad,
-                        checked: repuesto.checked || false,
-                        reparacion: {
-                            connect: { id: enReparacionId },
-                        },
-                        estado: repuesto.estadoId
-                            ? { connect: { id: repuesto.estadoId } } 
-                            : { connect: { id: estados().activo } }
-                    },
-                });
-            }
+            // Insertar todos de un solo golpe (Mucho más rápido que un loop)
+            await tx.repuestosReparacion.createMany({
+                data: dataParaInsertar,
+            });
+        }, {
+            // AQUÍ es donde se pone el timeout
+            maxWait: 5000,
+            timeout: 15000 
         });
 
         return { success: true };

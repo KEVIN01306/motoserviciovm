@@ -374,7 +374,7 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
               </Grid>
               {/* Aqui van los repuestos */}
               {
-                initial.enReparaciones[0]?.repuestos && initial.enReparaciones[0].repuestos.length > 0 && initial.enReparaciones[0].estadoId == estados().entregado ? (
+                initial.enReparaciones[0]?.repuestos && initial.enReparaciones[0].repuestos.length > 0 && (
                   <ProductsTable
                     columns={[
                       { id: 'repuesto', label: 'Repuesto', minWidth: 120, format: (v: any, row: repuestoReparacionType) => row.nombre ?? '' },
@@ -388,7 +388,6 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
                     headerColor="#1565c0"
                   />
                 )
-                  : (<RepuestosReparacionForm initial={initial} />)
               }
             </Grid>
           </>
@@ -467,7 +466,7 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
             </Alert>
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField {...register('descripcionAccion' as any)} label="Descripcion de la reparacion" type="text" fullWidth variant="standard" />
-              <TextField {...register('totalSalidaAnticipado' as any)} label="Total Salida Anticipado" type="text" fullWidth variant="standard" />
+              <TextField {...register('totalSalidaAnticipado' as any)} label="Costo de reparacion" type="text" fullWidth variant="standard" />
             </Grid>
           </>
         )

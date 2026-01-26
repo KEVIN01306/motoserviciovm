@@ -39,7 +39,7 @@ const SalidaForm = ({ control, register, errors, readOnlyValues }: Props) => {
           control={control}
           name="observaciones"
           render={({ field }) => (
-            <TextField variant="standard" {...field} fullWidth label="Observaciones" multiline rows={3} error={!!errors?.observaciones} helperText={errors?.observaciones?.message} />
+            <TextField variant="standard" {...field} fullWidth value={""} label="Observaciones" multiline rows={3} error={!!errors?.observaciones} helperText={errors?.observaciones?.message} />
           )}
         />
       </Grid>

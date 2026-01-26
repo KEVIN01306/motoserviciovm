@@ -8,8 +8,6 @@ export const enReparacionSchema = z.object({
   observaciones: z.string().max(500).optional().nullable(),
   servicioId: z.number().int().positive(),
   estadoId: z.number().int().positive().optional(),
-  createdAt: z.date().optional(),
-  updatedAt: z.date().optional(),
   firmaSalida: z.union([z.string(), z.instanceof(File)]).optional().nullable(),
 });
 
