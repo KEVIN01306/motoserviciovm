@@ -14,9 +14,10 @@ import { useState } from "react";
 
 type ModalMotoCreateProps = {
     onFinish?: () => void;
+    placa?: motoType['placa'];
 };
 
-const ModalMotoCreate: React.FC<ModalMotoCreateProps> = ({ onFinish }) => {
+const ModalMotoCreate: React.FC<ModalMotoCreateProps> = ({ onFinish,placa }) => {
     const [open, setOpen] = useState(false);
     const {
         register,
@@ -27,7 +28,7 @@ const ModalMotoCreate: React.FC<ModalMotoCreateProps> = ({ onFinish }) => {
     } = useForm<motoType>({
         resolver: zodResolver(motoSchema) as unknown as Resolver<motoType>,
         mode: "onSubmit",
-        defaultValues: MotoInitialState,
+        defaultValues: { ...MotoInitialState, placa },
     });
 
     const handlerSubmit = async (data: motoType) => {
@@ -35,7 +36,7 @@ const ModalMotoCreate: React.FC<ModalMotoCreateProps> = ({ onFinish }) => {
             const payload = { ...data, estadoId: 1 } as motoType;
             const response = await postMoto(payload);
             successToast(`Moto creada: ${response || payload.placa}`);
-            reset(MotoInitialState);
+            reset({ ...MotoInitialState, placa });
             setOpen(false);
             if (onFinish) onFinish();
         } catch (err: any) {

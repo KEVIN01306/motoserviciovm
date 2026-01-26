@@ -255,6 +255,7 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
               setValue('motoId' as any, nueva.id);
             }
           }}
+          placa={placaInput}
         />
       )}
 
