@@ -25,7 +25,7 @@ import horariosRoutes from "../modules/Horarios/routes";
 import homeRoutes from "../modules/Home/routes";
 import CitasRoutes from "../modules/Citas/routes";
 
-const Home = lazy(() => import('../modules/LandingPages/index'))
+const Home = lazy(() => import('../modules/LandingPages/index.tsx'))
 const NotFound = lazy(() => import('../components/PagesNotFound'))
 
 
