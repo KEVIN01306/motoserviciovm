@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import { UsersRoutes } from "../modules/Users/routes";
 import { authRoutes } from "../modules/Auth/routes";
@@ -31,7 +31,6 @@ const NotFound = lazy(() => import('../components/PagesNotFound'))
 
 const FullLayout = lazy(() => import("../layouts/Full/FullLayout"));
 const BlankLayout = lazy(() => import("../layouts/Blanck/BlankLayout"));
-const LoadingComponent = lazy(() => import("../components/LoadingLogo"));
 
 const Router = [
     { index: true, element: <Index />},
@@ -83,7 +82,7 @@ const Router = [
     },
 
     { 
-        path: '*', element: <Suspense fallback={<LoadingComponent />}><NotFound/></Suspense>
+        path: '*', element: <NotFound/>
     }
 ]
 
