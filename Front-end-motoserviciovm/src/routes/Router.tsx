@@ -1,7 +1,5 @@
-import { lazy } from "react";
-import FullLayout from "../layouts/Full/FullLayout";
+import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
-import BlankLayout from "../layouts/Blanck/BlankLayout";
 import { UsersRoutes } from "../modules/Users/routes";
 import { authRoutes } from "../modules/Auth/routes";
 import { RolesRoutes } from "../modules/Roles/routes";
@@ -28,15 +26,18 @@ import homeRoutes from "../modules/Home/routes";
 import CitasRoutes from "../modules/Citas/routes";
 
 const Home = lazy(() => import('../modules/LandingPages/index'))
-const HomePages = lazy(() => import('../modules/Home/pages/HomePages'))
 const NotFound = lazy(() => import('../components/PagesNotFound'))
 
 
+const FullLayout = lazy(() => import("../layouts/Full/FullLayout"));
+const BlankLayout = lazy(() => import("../layouts/Blanck/BlankLayout"));
+const LoadingComponent = lazy(() => import("../components/LoadingLogo"));
+
 const Router = [
-    { index: true, element: <Home /> },
+    { index: true, element: <Suspense fallback={<LoadingComponent />} ><Home /></Suspense> },
     {
         path: "/public",
-        element: <BlankLayout />,
+        element: <Suspense fallback={<LoadingComponent />}><BlankLayout /></Suspense>,
         children: [
             ...authRoutes,
         ]
@@ -48,7 +49,7 @@ const Router = [
         children: [
             {
                 element: (
-                    <FullLayout />
+                    <Suspense fallback={<LoadingComponent />}><FullLayout /></Suspense>
                 ),
                 children: [
                     
