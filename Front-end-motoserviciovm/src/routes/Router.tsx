@@ -34,7 +34,7 @@ const BlankLayout = lazy(() => import("../layouts/Blanck/BlankLayout"));
 const LoadingComponent = lazy(() => import("../components/LoadingLogo"));
 
 const Router = [
-    { index: true, element: <Suspense fallback={<LoadingComponent />} ><Home /></Suspense> },
+    { index: true, element: <Home />},
     {
         path: "/public",
         element: <Suspense fallback={<LoadingComponent />}><BlankLayout /></Suspense>,
