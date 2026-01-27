@@ -10,7 +10,7 @@ import HeroSlider from './components/HeroSlider';
 import Nav from './components/Nav';
 
 
-const App = () => {
+const Index = () => {
     const [isDarkMode, setIsDarkMode] = useState(() => {
       try {
         const s = localStorage.getItem('landing:theme');
@@ -100,4 +100,4 @@ const App = () => {
     );
 };
 
-export default App;
+export default Index;

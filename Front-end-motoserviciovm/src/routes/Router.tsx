@@ -25,7 +25,7 @@ import horariosRoutes from "../modules/Horarios/routes";
 import homeRoutes from "../modules/Home/routes";
 import CitasRoutes from "../modules/Citas/routes";
 
-const Home = lazy(() => import('../modules/LandingPages/Index'))
+const Index = lazy(() => import('../modules/LandingPages/Index'))
 const NotFound = lazy(() => import('../components/PagesNotFound'))
 
 
@@ -34,10 +34,10 @@ const BlankLayout = lazy(() => import("../layouts/Blanck/BlankLayout"));
 const LoadingComponent = lazy(() => import("../components/LoadingLogo"));
 
 const Router = [
-    { index: true, element: <Home />},
+    { index: true, element: <Index />},
     {
         path: "/public",
-        element: <Suspense fallback={<LoadingComponent />}><BlankLayout /></Suspense>,
+        element: <BlankLayout />,
         children: [
             ...authRoutes,
         ]
@@ -49,7 +49,7 @@ const Router = [
         children: [
             {
                 element: (
-                    <Suspense fallback={<LoadingComponent />}><FullLayout /></Suspense>
+                    <FullLayout />
                 ),
                 children: [
                     
