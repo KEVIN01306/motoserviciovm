@@ -24,13 +24,13 @@ import { ServiciosRoutes } from "../modules/Servicios/routes";
 import horariosRoutes from "../modules/Horarios/routes";
 import homeRoutes from "../modules/Home/routes";
 import CitasRoutes from "../modules/Citas/routes";
+import FullLayout from "../layouts/Full/FullLayout";
+import BlankLayout from "../layouts/Blanck/BlankLayout";
 
 const Index = lazy(() => import('../modules/LandingPages/Index'))
 const NotFound = lazy(() => import('../components/PagesNotFound'))
 
 
-const FullLayout = lazy(() => import("../layouts/Full/FullLayout"));
-const BlankLayout = lazy(() => import("../layouts/Blanck/BlankLayout"));
 
 const Router = [
     { index: true, element: <Index />},
