@@ -121,7 +121,7 @@ const ServicioDetailSalida = () => {
                 <Card sx={{ boxShadow: 'none' }} id="servicio-detail-container">
                     <Grid size={12}>
                         <Box display={'flex'} width={'100%'} justifyContent={'space-around'}>
-                            <Avatar variant='square' sx={{ width: '22%', height: 'auto' }} src="/public/icons/logo_corto.png" alt="Logo Moto Servicio VM" />
+                            <Avatar variant='square' sx={{ width: '22%', height: 'auto' }} src="/icons/logo_corto.png" alt="Logo Moto Servicio VM" />
                             <Box width={'40%'} display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'}>
                                 <Typography
                                     sx={{
@@ -142,7 +142,7 @@ const ServicioDetailSalida = () => {
                                 >
                                     MOTO SERVICIO VELASQUEZ MONZON
                                 </Typography>                        </Box>
-                            <Avatar variant='square' sx={{ width: '22%', height: 'auto' }} src="/public/icons/logo_corto.png" alt="Logo Moto Servicio VM" />
+                            <Avatar variant='square' sx={{ width: '22%', height: 'auto' }} src="/icons/logo_corto.png" alt="Logo Moto Servicio VM" />
                         </Box>
 
                     </Grid>
