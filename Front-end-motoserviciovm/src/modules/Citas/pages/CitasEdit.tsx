@@ -22,7 +22,7 @@ const CitasEdit = () => {
   const [error, setError] = useState<string | null>(null);
   const [serverErrors, setServerErrors] = useState<string[] | null>(null);
 
-  const { register, handleSubmit, setValue, watch, formState, control, reset } = useForm({ resolver: zodResolver(citaCreateSchema) as any });
+  const { register, handleSubmit, setValue, watch, formState, control, reset } = useForm({ resolver: zodResolver(citaCreateSchema) as any, defaultValues: CitaInitialState as any });
   
 
   useEffect(() => {

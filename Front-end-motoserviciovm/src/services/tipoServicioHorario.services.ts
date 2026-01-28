@@ -4,7 +4,6 @@ import type { apiResponse } from '../types/apiResponse';
 import type { 
   TipoServicioHorario, 
   CreateTipoServicioHorario, 
-  UpdateTipoServicioHorario,
   TipoServicioHorarioFilters,
   UpsertTipoServicioHorarioDia
 } from '../types/tipoServicioHorarioType';

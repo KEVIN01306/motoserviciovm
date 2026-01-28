@@ -1,22 +1,15 @@
 import { 
   Card, 
   CardContent, 
-  CardMedia, 
   Typography, 
   Chip, 
   Box, 
   Divider,
-  Paper,
   Button
 } from '@mui/material';
-import { 
-  ConfirmationNumber, 
-  CalendarToday
-} from '@mui/icons-material';
+
 import type { motoGetType } from '../../../types/motoType';
 import GuatemalaMotorcyclePlate from '../../../components/utils/PlacaView';
-const API_URL = import.meta.env.VITE_DOMAIN;
-
 
 /**
  * Componente MotoCard

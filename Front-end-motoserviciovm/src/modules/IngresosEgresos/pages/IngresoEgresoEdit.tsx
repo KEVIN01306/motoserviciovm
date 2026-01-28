@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import IngresosEgresosForm from '../components/IngresosEgresosForm';
 import { getIngresoEgreso, putIngresoEgreso } from '../../../services/ingresosEgresos.services';
 import { useParams, useNavigate } from 'react-router-dom';

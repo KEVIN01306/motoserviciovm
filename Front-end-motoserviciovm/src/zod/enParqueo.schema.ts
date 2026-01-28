@@ -1,7 +1,6 @@
 import z from "zod";
 
 export const enParqueoSchema = z.object({
-    id: z.number().int().positive().optional(),
     descripcion: z.string().min(3, { message: "La descripción debe tener al menos 3 caracteres" }).max(255, { message: "La descripción no puede exceder los 255 caracteres" }),
     fechaEntrada: z.coerce.date({ message: "La fecha de entrada es obligatoria" }),
     fechaSalida: z.date({ message: "La fecha de salida debe ser una fecha válida" }).optional().nullable(),

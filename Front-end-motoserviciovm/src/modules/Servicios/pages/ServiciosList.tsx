@@ -108,7 +108,6 @@ const ServiciosList = () => {
 
   const getTableActions = () => {
     return (row: ServicioGetType) => {
-      const isEnEspera = row.estadoId === estados().enEspera;
       const actions: { label: any; onClick: (r: ServicioGetType) => void; permiso: string }[] = [];
 
       if (row.estadoId === estados().entregado) {

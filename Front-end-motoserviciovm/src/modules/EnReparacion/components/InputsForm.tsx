@@ -1,7 +1,5 @@
 import { Grid, TextField } from "@mui/material";
-import { Controller } from "react-hook-form";
 import { useEffect, useState } from "react";
-import Autocomplete from "@mui/material/Autocomplete";
 import { getMotos } from "../../../services/moto.services";
 import type { motoGetType } from "../../../types/motoType";
 
@@ -13,8 +11,8 @@ type Props = {
   watch?: any;
 };
 
-const InputsForm = ({ control, register, errors, setValue }: Props) => {
-  const [motos, setMotos] = useState<motoGetType[]>([]);
+const InputsForm = ({ register, errors }: Props) => {
+  const [, setMotos] = useState<motoGetType[]>([]);
 
   useEffect(() => {
     const load = async () => {

@@ -9,9 +9,6 @@ import {
   Typography,
   IconButton,
   Paper,
-  ThemeProvider,
-  createTheme,
-  CssBaseline
 } from '@mui/material';
 import { 
   Edit as EditIcon, 
@@ -20,34 +17,33 @@ import {
   Close as CloseIcon 
 } from '@mui/icons-material';
 
-const theme = createTheme({
-  palette: {
-    primary: { main: '#2563eb' },
-  },
-  shape: { borderRadius: 8 },
-});
-
 
 /**
  * Props:
  * - onSaveSignature: callback para enviar la firma (base64 o File)
  * - initialValue: string (url or base64) para mostrar firma inicial
  */
-const SignatureField = ({ onSaveSignature, initialValue, text }) => {
+type SignatureFieldProps = {
+  onSaveSignature: (signature: string | File | null) => void;
+  initialValue?: string | null;
+  text?: string;
+};
+const SignatureField = ({ onSaveSignature, initialValue, text }: SignatureFieldProps) => {
   const [open, setOpen] = useState(false);
   const [internalSignature, setInternalSignature] = useState(initialValue ?? null); 
-  const canvasRef = useRef(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
 
   const handleOpen = () => {
     setOpen(true);
     setTimeout(() => {
-      const canvas = canvasRef.current;
+      const canvas = canvasRef.current as unknown as HTMLCanvasElement;
       if (canvas) {
         const rect = canvas.getBoundingClientRect();
         canvas.width = rect.width;
         canvas.height = rect.height;
         const ctx = canvas.getContext('2d');
+        if (!ctx) return;
         ctx.strokeStyle = '#000';
         ctx.lineWidth = 2;
         ctx.lineCap = 'round';
@@ -61,36 +57,40 @@ const SignatureField = ({ onSaveSignature, initialValue, text }) => {
     }, 100);
   };
 
-  const getPos = (e) => {
-    const canvas = canvasRef.current;
+  const getPos = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current as unknown as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    const clientX = (e as any).touches ? (e as any).touches[0].clientX : (e as any).clientX;
+    const clientY = (e as any).touches ? (e as any).touches[0].clientY : (e as any).clientY;
     return { x: clientX - rect.left, y: clientY - rect.top };
   };
 
-  const startDrawing = (e) => {
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     setIsDrawing(true);
     const { x, y } = getPos(e);
-    const ctx = canvasRef.current.getContext('2d');
+    const ctx = (canvasRef.current as unknown as HTMLCanvasElement).getContext('2d');
+    if (!ctx) return;
     ctx.beginPath();
     ctx.moveTo(x, y);
   };
 
-  const draw = (e) => {
+  const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     if (!isDrawing) return;
     const { x, y } = getPos(e);
-    const ctx = canvasRef.current.getContext('2d');
+    const ctx = (canvasRef.current as unknown as HTMLCanvasElement).getContext('2d');
+    if (!ctx) return;
     ctx.lineTo(x, y);
     ctx.stroke();
   };
 
   const save = () => {
-    const canvas = canvasRef.current;
+    const canvas = canvasRef.current as unknown as HTMLCanvasElement;
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = canvas.width;
     tempCanvas.height = canvas.height;
     const tempCtx = tempCanvas.getContext('2d');
+      if (!tempCtx) return;
     tempCtx.fillStyle = '#fff';
     tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
     tempCtx.drawImage(canvas, 0, 0);
@@ -112,8 +112,9 @@ const SignatureField = ({ onSaveSignature, initialValue, text }) => {
   };
 
   const clear = () => {
-    const ctx = canvasRef.current.getContext('2d');
-    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    const ctx = (canvasRef.current as unknown as HTMLCanvasElement).getContext('2d');
+    if (!ctx) return;
+    ctx.clearRect(0, 0, (canvasRef.current as unknown as HTMLCanvasElement).width, (canvasRef.current as unknown as HTMLCanvasElement).height);
   };
 
   const removeSignature = () => {

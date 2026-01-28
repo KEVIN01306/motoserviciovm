@@ -1,22 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab, Avatar, Paper, colors, Link } from '@mui/material';
+import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab, Avatar, Link } from '@mui/material';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiToolsLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';
 import ErrorCard from '../../../components/utils/ErrorCard';
 import { getServicio } from '../../../services/servicios.services';
-import type { ServicioGetType, ServicioItemType } from '../../../types/servicioType';
+import type { ServicioGetType } from '../../../types/servicioType';
 import ProductsTable from '../../../components/Table/ProductsTable';
 import { formatDate } from '../../../utils/formatDate';
-import type { VentaGetType, VentaProductoGetType, VentaType } from '../../../types/ventaType';
+import type { VentaGetType, VentaProductoGetType } from '../../../types/ventaType';
 import { estados } from '../../../utils/estados';
-import { useGoTo } from '../../../hooks/useGoTo';
-import LinkStylesNavigate from '../../../components/utils/links';
-import { exportarAPDF } from '../../../utils/exportarPdf';
-import { ExposureTwoTone } from '@mui/icons-material';
 import { PiExportDuotone } from 'react-icons/pi';
-import ImageGallery from '../../../components/utils/GaleryImagenes';
 import type { OpcionServicioType } from '../../../types/opcionServicioType';
 import { useAuthStore } from '../../../store/useAuthStore';
 import type { repuestoReparacionType } from '../../../types/repuestoReparacionType';
@@ -28,14 +23,13 @@ const ServicioDetailSalida = () => {
     const [data, setData] = useState<ServicioGetType | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const goTo = useGoTo();
     const { hash } = useLocation();
     const userlogged = useAuthStore(state => state.user);
 
     const fetch = async () => {
         try {
             setLoading(true);
-            const res = await getServicio(id);
+            const res = await getServicio(id ?? '');
             setData(res);
             console.log(res);
         } catch (err: any) {
@@ -114,23 +108,6 @@ const ServicioDetailSalida = () => {
                 return "primary";
         }
     };
-    const totalVentasDescuentos = data?.ventas
-        ?.filter(venta => venta.estadoId === estados().confirmado) // Filtra solo las confirmadas
-        ?.reduce((acc, venta) => {
-            return acc + (venta.descuentoTotal || 0); // Suma el descuento acumulado
-        }, 0) || 0;
-    const totalServicio = (data.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0) || 0) + (data.total || 0);
-
-    const dataTableTotales = [
-        { label: 'Total Reparacion', value: `Q ${data.enReparaciones?.[0]?.total ? data.enReparaciones[0].total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}` },
-        { label: 'Total Parqueo', value: `Q ${data.enParqueos?.[0]?.total ? data.enParqueos[0].total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}` },
-        { label: 'Total Servicio', value: `Q ${data.total?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? '0.00'}` },
-        { label: 'Repuestos', value: `Q ${data.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0 - totalVentasDescuentos).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? '0.00'}` },
-        { label: 'Gran Total', value: `Q ${(Number(totalServicio) + (data.enReparaciones?.[0]?.total || 0) + (data.enParqueos?.[0]?.total || 0) - Number(totalVentasDescuentos)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
-    ]
-
-
-
 
     return (
         <>
@@ -360,9 +337,9 @@ const ServicioDetailSalida = () => {
 
                                     <ProductsTable
                                         columns={[
-                                            { id: 'repuesto', label: 'Repuesto', minWidth: 120, format: (v: any, row: repuestoReparacionType) => row.nombre ?? '' },
-                                            { id: 'descripcion', label: 'Descripción', minWidth: 180, format: (v: any, row: repuestoReparacionType) => row.descripcion ?? '' },
-                                            { id: 'refencia', label: 'Referencia', minWidth: 100, format: (v: any, row: repuestoReparacionType) => row.refencia ? (<Link href={row.refencia} target="_blank" rel="noopener noreferrer" underline="hover" >Link</Link>) : 'No hay' },
+                                            { id: 'repuesto', label: 'Repuesto', minWidth: 120, format: (_: any, row: repuestoReparacionType) => row.nombre ?? '' },
+                                            { id: 'descripcion', label: 'Descripción', minWidth: 180, format: (_: any, row: repuestoReparacionType) => row.descripcion ?? '' },
+                                            { id: 'refencia', label: 'Referencia', minWidth: 100, format: (_: any, row: repuestoReparacionType) => row.refencia ? (<Link href={row.refencia} target="_blank" rel="noopener noreferrer" underline="hover" >Link</Link>) : 'No hay' },
                                             { id: 'cantidad', label: 'Cantidad', minWidth: 80, align: 'center', format: (v: any) => String(v) },
                                         ] as any}
                                         rows={data.enReparaciones[0].repuestos ?? []}

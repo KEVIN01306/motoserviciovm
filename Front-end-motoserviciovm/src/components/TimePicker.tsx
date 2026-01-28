@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -12,7 +12,7 @@ import {
   Zoom,
   Fade,
 } from '@mui/material';
-import { FiAlertCircle, FiClock, FiCheckCircle } from 'react-icons/fi';
+import { FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
 
 type HoraSlot = {
   id: number | string;

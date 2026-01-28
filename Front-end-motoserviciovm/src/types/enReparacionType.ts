@@ -9,6 +9,7 @@ import type { ServicioGetType } from "./servicioType";
 export type EnReparacionType = z.infer<typeof enReparacionSchema> ;
 
 export type EnReparacionGetType = EnReparacionType & {
+    id: number;
     servicio: ServicioGetType;
     estado: EstadoType;
     repuestos: repuestoReparacionType[];

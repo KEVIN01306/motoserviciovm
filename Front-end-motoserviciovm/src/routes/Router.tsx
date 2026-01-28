@@ -31,7 +31,6 @@ const Index = lazy(() => import('../modules/LandingPages/Index'))
 const NotFound = lazy(() => import('../components/PagesNotFound'))
 
 
-
 const Router = [
     { index: true, element: <Index />},
     {

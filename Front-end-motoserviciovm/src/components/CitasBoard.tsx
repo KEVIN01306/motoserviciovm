@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -21,7 +21,6 @@ import {
   Person as PersonIcon,
   Build as BuildIcon,
   AccessTime as TimeIcon,
-  Event as EventIcon
 } from '@mui/icons-material';
 
 const theme = createTheme({
@@ -35,31 +34,6 @@ const theme = createTheme({
     MuiPaper: { styleOverrides: { root: { borderRadius: 8 } } },
   },
 });
-
-// Datos de ejemplo (fallback)
-const APPOINTMENTS_DATA = [
-  {
-    id: 3,
-    fechaCita: '2026-01-27T00:00:00.000Z',
-    horaCita: '13:00',
-    nombreContacto: 'Juan Pérez',
-    tipoServicio: { tipo: 'CAMBIO DE EMPAQUE CLOUTCH', tipoHorarioId: 1 }
-  },
-  {
-    id: 4,
-    fechaCita: '2026-01-27T00:00:00.000Z',
-    horaCita: '13:00',
-    nombreContacto: 'Kevin Sanchez',
-    tipoServicio: { tipo: 'REVISIÓN ELÉCTRICA', tipoHorarioId: 2 }
-  },
-  {
-    id: 6,
-    fechaCita: '2026-01-27T00:00:00.000Z',
-    horaCita: '09:00',
-    nombreContacto: 'Daniel Sanchez',
-    tipoServicio: { tipo: 'SERVICIO MAYOR', tipoHorarioId: 1 }
-  }
-];
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 const HOUR_HEIGHT = 60;

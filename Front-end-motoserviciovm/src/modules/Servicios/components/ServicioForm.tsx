@@ -52,7 +52,7 @@ const ServicioForm = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVenta
   const [tipoServicioSelected,setTipoServicioSelected]=useState<TipoServicioGetType|null>(initial?.tipoServicio ? initial.tipoServicio : null);
   const [mecanicos,setMecanicos] = useState<UserGetType[]>([])
   const [mecanicoSelected,setMecanicoSelected] = useState<UserGetType|null>(initial?.mecanico? initial.mecanico : null )
-  const [clientes,setClientes] = useState<UserGetType[]>([])
+  const [,setClientes] = useState<UserGetType[]>([])
   const [clienteSelected,setClienteSelected] = useState<UserGetType|null>(initial?.cliente? initial.cliente : null )
   // Puede ser File (nuevo) o string (url/base64)
   const [imagenGuardada, setImagenGuardada] = useState<any>(initial?.firmaEntrada ? initial.firmaEntrada : null);

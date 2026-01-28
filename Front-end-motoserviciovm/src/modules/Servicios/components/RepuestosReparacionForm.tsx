@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, Checkbox } from '@mui/material';
+import { Box, Button, IconButton, Paper, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, Checkbox } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import type { repuestoReparacionType } from '../../../types/repuestoReparacionType';
@@ -11,8 +11,8 @@ interface Props {
 }
 
 const RepuestosReparacionForm: React.FC<Props> = ({ initial }) => {
-  const [repuestos, setRepuestos] = useState<Omit<repuestoReparacionType, 'imagen'>[]>(initial?.enReparaciones?.[0]?.repuestos ?? []);
-  const [tmp, setTmp] = useState<Omit<repuestoReparacionType, 'imagen'>>({ ...repuestoReparacionInitialState, imagen: undefined });
+  const [repuestos, setRepuestos] = useState<repuestoReparacionType[]>(initial?.enReparaciones?.[0]?.repuestos ?? []);
+  const [tmp, setTmp] = useState<repuestoReparacionType>({ ...repuestoReparacionInitialState});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string|null>(null);
   const [success, setSuccess] = useState<string|null>(null);
@@ -20,7 +20,7 @@ const RepuestosReparacionForm: React.FC<Props> = ({ initial }) => {
   const handleAdd = () => {
     if (!tmp.nombre.trim()) return;
     setRepuestos(arr => [...arr, { ...tmp }]);
-    setTmp({ ...repuestoReparacionInitialState, imagen: undefined });
+    setTmp({ ...repuestoReparacionInitialState });
   };
 
   const handleRemove = (idx: number) => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getIngresoEgreso, finalizarIngresoEgreso, cancelarIngresoEgreso } from '../../../services/ingresosEgresos.services';
 import Loading from '../../../components/utils/Loading';

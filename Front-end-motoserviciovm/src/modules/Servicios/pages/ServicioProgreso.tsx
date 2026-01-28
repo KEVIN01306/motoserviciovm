@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab, Avatar, Paper, colors, TextField, Button, Checkbox } from '@mui/material';
+import { Container, Card, CardContent, Box, Typography, Divider, Grid, Fab, Avatar, TextField, Button, Checkbox } from '@mui/material';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiToolsLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';
@@ -11,21 +11,15 @@ import ImagenesProgresoForm from '../components/ImagenesProgresoForm';
 
 import ProximoServicioItemsForm from '../components/ProximoServicioItemsForm';
 import ServicioOpcionesTipoServicioForm from '../components/ServicioOpcionesTipoServicioForm';
-import type { ServicioGetType, ServicioItemType, ProgresoItemType, ProgresoItemGetType } from '../../../types/servicioType';
+import type { ServicioGetType, ProgresoItemGetType } from '../../../types/servicioType';
 import ProductsTable from '../../../components/Table/ProductsTable';
 import { formatDate } from '../../../utils/formatDate';
-import type { VentaGetType, VentaProductoGetType, VentaType } from '../../../types/ventaType';
+import type { VentaGetType, VentaProductoGetType } from '../../../types/ventaType';
 import { estados } from '../../../utils/estados';
 import { useGoTo } from '../../../hooks/useGoTo';
 import { useAuthStore } from '../../../store/useAuthStore';
-import LinkStylesNavigate from '../../../components/utils/links';
-import { exportarAPDF } from '../../../utils/exportarPdf';
-import { ExposureTwoTone } from '@mui/icons-material';
-import { PiExportDuotone } from 'react-icons/pi';
 import ImageGallery from '../../../components/utils/GaleryImagenes';
-import type { OpcionServicioType } from '../../../types/opcionServicioType';
-
-const API_URL = import.meta.env.VITE_DOMAIN;
+import { PiExportDuotone } from 'react-icons/pi';
 
 const ServicioProgreso = () => {
 
@@ -86,7 +80,7 @@ const ServicioProgreso = () => {
     const fetch = async () => {
         try {
             setLoading(true);
-            const res = await getServicio(id);
+            const res = await getServicio(id ?? '');
             setData(res);
             console.log(res);
         } catch (err: any) {
@@ -160,32 +154,6 @@ const ServicioProgreso = () => {
         { label: 'Servicios', href: '/admin/servicios', icon: <RiToolsLine fontSize="inherit" /> },
         { label: `Servicio #${data.id}`, icon: <RiToolsLine fontSize="inherit" /> },
     ];
-
-    const chipColorByEstado = (id: number) => {
-        switch (id) {
-            case estados().enEspera:
-                return "warning";
-            case estados().confirmado:
-                return "success";
-            case estados().cancelado:
-                return "error";
-            default:
-                return "primary";
-        }
-    };
-    const totalVentasDescuentos = data?.ventas
-        ?.filter(venta => venta.estadoId === estados().confirmado) // Filtra solo las confirmadas
-        ?.reduce((acc, venta) => {
-            return acc + (venta.descuentoTotal || 0); // Suma el descuento acumulado
-        }, 0) || 0;
-    const totalServicio = (data.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0) || 0) + (data.total || 0);
-
-    const dataTableTotales = [
-        { label: 'Total Servicio', value: `Q ${data.total?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? '0.00'}` },
-        { label: 'Repuestos', value: `Q ${data.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0 - totalVentasDescuentos).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? '0.00'}` },
-        { label: 'Gran Total', value: `Q ${(Number(totalServicio) - Number(totalVentasDescuentos)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
-    ]
-
 
     return (
         <>
@@ -315,7 +283,7 @@ const ServicioProgreso = () => {
                         {/* Tabla editable de opcionesTipoServicio para mecánico (solo editable si tiene permiso) */}
                         {editable && data.servicioOpcionesTipoServicio && data.servicioOpcionesTipoServicio.length > 0 ? (
                             <ServicioOpcionesTipoServicioForm
-                                initial={data.servicioOpcionesTipoServicio}
+                                initial={data.servicioOpcionesTipoServicio as any}
                                 onSubmit={handleSaveOpcionesTipoServicio}
                                 loading={savingOpciones}
                             />
@@ -325,7 +293,7 @@ const ServicioProgreso = () => {
                                     <Typography variant="h6" gutterBottom>{data.tipoServicio?.tipo}</Typography>
                                     <ProductsTable
                                         columns={[
-                                            { id: 'opcion', label: 'Opcion', minWidth: 120, format: (v: any, row: ProgresoItemGetType) => row.opcionServicio.opcion ?? '' },
+                                            { id: 'opcion', label: 'Opcion', minWidth: 120, format: (_: any, row: ProgresoItemGetType) => row.opcionServicio.opcion ?? '' },
                                             { id: 'checked', label: 'Check', minWidth: 100, align: 'right', format: (_v: boolean, row: ProgresoItemGetType) => <Checkbox color="primary" checked={!!row.checked} disabled /> },
                                             { id: 'observaciones', label: 'observaciones', minWidth: 80, align: 'center', format: (v: string) => v ?? '' },
                                         ] as any}

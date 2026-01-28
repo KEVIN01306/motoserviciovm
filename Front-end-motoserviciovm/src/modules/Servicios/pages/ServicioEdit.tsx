@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container, Card, CardContent } from '@mui/material';
+import { Container, CardContent } from '@mui/material';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiToolsLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';
@@ -21,7 +21,7 @@ const ServicioEdit = () => {
   const fetch = async () => {
     try {
       setLoading(true);
-      const res = await getServicio(id);
+      const res = await getServicio(id ?? '');
       setData(res);
     } catch (err: any) {
       setError(err?.message ?? 'Error cargando servicio');
@@ -33,7 +33,7 @@ const ServicioEdit = () => {
   const handleSubmit = async (payload: any) => {
     try {
       const normalizedServicioItems = mergeServicioDataWithDefaults(payload);
-      await putServicio(id, normalizedServicioItems);
+      await putServicio(id ?? '', normalizedServicioItems);
       successToast('Servicio actualizado');
       goTo('/admin/servicios');
     } catch (err: any) {

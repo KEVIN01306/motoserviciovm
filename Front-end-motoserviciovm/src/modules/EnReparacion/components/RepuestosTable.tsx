@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { Grid, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Box, TextField, Button, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Divider } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { repuestoReparacionSchema } from "../../../zod/repuestosReparacion.schema";
@@ -24,16 +22,13 @@ type Props = {
 
 const RepuestosTable = ({ reparacionId, initial = [], editable = true }: Props) => {
   const [items, setItems] = useState<repuestoReparacionType[]>(initial);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [toDelete, setToDelete] = useState<repuestoReparacionType | null>(null);
   const [cameraModalOpen, setCameraModalOpen] = useState(false);
-  const cameraInputRef = useRef<HTMLInputElement | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
-  const { register, handleSubmit, reset, setValue, watch, formState: {isSubmitting,errors},} = useForm<repuestoReparacionType>({
+  const { register, handleSubmit, reset, setValue, formState: {isSubmitting,errors},} = useForm<repuestoReparacionType>({
     resolver: zodResolver(repuestoReparacionSchema) as any,
     mode: "onSubmit",
 
@@ -141,17 +136,6 @@ const RepuestosTable = ({ reparacionId, initial = [], editable = true }: Props) 
       reader.readAsDataURL(file);
     });
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try {
-      const resized = await resizeFile(file, 1024, 0.8);
-      setValue("imagen", resized as any, { shouldValidate: true, shouldDirty: true });
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   useEffect(() => {
     if (!cameraModalOpen) return;
     let cancelled = false;
@@ -210,7 +194,7 @@ const RepuestosTable = ({ reparacionId, initial = [], editable = true }: Props) 
       if (!blob) return;
       const file = new File([blob], 'imagen.jpg', { type: 'image/jpeg' });
       const resized = await resizeFile(file, 1024, 0.8);
-      setValue("imagen", resized as any, { shouldValidate: true, shouldDirty: true });
+      setValue( resized as any, { shouldValidate: true, shouldDirty: true });
     }, 'image/jpeg', 0.8);
     setCameraModalOpen(false);
     if (streamRef.current) {
@@ -258,87 +242,6 @@ const RepuestosTable = ({ reparacionId, initial = [], editable = true }: Props) 
               error={!!errors.cantidad}
               helperText={errors.cantidad?.message}
             />
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 4 }}>
-            {/* Imagen: preview + file inputs (camera or file) */}
-            {(() => {
-              const imgVal = watch("imagen");
-              let srcToShow: string | undefined = undefined;
-              if (imgVal instanceof File) {
-                try {
-                  srcToShow = URL.createObjectURL(imgVal);
-                } catch (e) {
-                  srcToShow = undefined;
-                }
-              } else if (typeof imgVal === 'string' && imgVal?.trim()) {
-                const v = String(imgVal).trim();
-                if (v.startsWith('data:')) srcToShow = v;
-                else if (v.startsWith('http://') || v.startsWith('https://')) srcToShow = v;
-                else srcToShow = `${import.meta.env.VITE_DOMAIN}${v}`;
-              }
-
-              return (
-                <Box display="flex" alignItems="center" gap={1}>
-                  {srcToShow ? (
-                    <Box sx={{ width: 80, height: 50, overflow: 'hidden', borderRadius: 1 }}>
-                      <img src={srcToShow} alt="img" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </Box>
-                  ) : null}
-
-                  <input
-                    accept="image/*"
-                    capture="environment"
-                    id="repuesto-imagen-input-camera"
-                    ref={cameraInputRef}
-                    type="file"
-                    style={{ display: 'none' }}
-                    onChange={handleFileChange}
-                  />
-                  <input
-                    accept="image/*"
-                    id="repuesto-imagen-input-file"
-                    ref={fileInputRef}
-                    type="file"
-                    style={{ display: 'none' }}
-                    onChange={handleFileChange}
-                  />
-
-                  <Button startIcon={<CloudUploadIcon />} variant="outlined" onClick={(e) => setAnchorEl(e.currentTarget)}>
-                    Imagen
-                  </Button>
-
-                  <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
-                    <MenuItem
-                      onClick={() => {
-                        setAnchorEl(null);
-                        const isMobile = /Mobi|Android/i.test(navigator.userAgent || '');
-                        if (isMobile) {
-                          cameraInputRef.current?.click();
-                        } else {
-                          setCameraModalOpen(true);
-                        }
-                      }}
-                    >
-                      Tomar foto
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        setAnchorEl(null);
-                        fileInputRef.current?.click();
-                      }}
-                    >
-                      Elegir archivo
-                    </MenuItem>
-                  </Menu>
-                  {errors.imagen && (
-                    <Box component="span" color="error.main" fontSize={12}>
-                      {errors.imagen?.message}
-                    </Box>
-                  )}
-                </Box>
-              );
-            })()}
           </Grid>
 
           <Grid size={{ xs: 12, sm: 8 }}>
@@ -397,15 +300,6 @@ const RepuestosTable = ({ reparacionId, initial = [], editable = true }: Props) 
                         )}
                       </TableCell>
                       <TableCell>{it.cantidad}</TableCell>
-                      <TableCell>
-                        {it.imagen ? (
-                          <Box sx={{ width: 80, height: 50 }}>
-                            <img src={String(it.imagen).startsWith('data:') ? String(it.imagen) : `${import.meta.env.VITE_DOMAIN}${it.imagen}`} alt="img" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          </Box>
-                        ) : (
-                          '-'
-                        )}
-                      </TableCell>
                       <TableCell>
                         <Checkbox checked={!!it.checked} disabled color="primary" />
                       </TableCell>

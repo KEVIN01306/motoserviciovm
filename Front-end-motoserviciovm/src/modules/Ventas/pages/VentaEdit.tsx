@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import VentaForm from '../components/VentaForm';
 import { getVenta, putVenta } from '../../../services/ventas.services';
 import { useParams } from 'react-router-dom';

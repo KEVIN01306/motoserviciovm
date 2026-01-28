@@ -1,5 +1,5 @@
 
-export const formatDate = (dateString: string | undefined) => {
+export const formatDate = (dateString: string | undefined | Date) => {
     if (!dateString) return 'No disponible';
     // Avoid timezone shifts by extracting the YYYY-MM-DD part when available
     // and formatting it as DD/MM/YYYY

@@ -51,8 +51,7 @@ const SalidaForm = ({ control, register, errors, readOnlyValues }: Props) => {
           render={({ field }) => (
             <SignatureField
               onSaveSignature={field.onChange}
-              initialValue={field.value}
-              text="Agregar firma de salida"
+              initialValue={typeof field.value === 'string' ? field.value : ''} 
             />
           )}
         />

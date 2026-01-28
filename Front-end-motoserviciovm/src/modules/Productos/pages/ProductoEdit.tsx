@@ -8,7 +8,6 @@ import { ProductoInitialState, mergeProductoDataWithDefaults, type ProductoType 
 import { productoSchema } from "../../../zod/producto.schema";
 import { getProducto, putProducto } from "../../../services/producto.services";
 import { errorToast, successToast } from "../../../utils/toast";
-import { RiShoppingCartFill } from "react-icons/ri";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Loading from "../../../components/utils/Loading";

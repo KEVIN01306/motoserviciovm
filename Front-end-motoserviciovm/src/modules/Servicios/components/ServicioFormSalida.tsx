@@ -1,19 +1,17 @@
-﻿import React, { useEffect, useState } from 'react';
-import RepuestosReparacionForm from './RepuestosReparacionForm';
-import { Grid, TextField, Button, MenuItem, Box, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Paper, Checkbox, Autocomplete, Fab, FormControlLabel, Typography, Alert, FormControl, RadioGroup, Radio, Divider, Chip, Link } from '@mui/material';
+﻿import { useEffect, useState } from 'react';
+import { Grid, TextField, Button, Box, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Checkbox, Fab, FormControlLabel, Typography, Alert, FormControl, RadioGroup, Radio, Divider, Chip, Link } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useForm } from 'react-hook-form';
 import { useAuthStore } from '../../../store/useAuthStore';
 import FormEstructure from '../../../components/utils/FormEstructure';
-import { type ServicioType, ServicioInitialState, ServicioProductoClienteInitialState, type ServicioItemType, type ServicioGetType, type servicioProductoProximoType } from '../../../types/servicioType';
+import { type ServicioType, ServicioInitialState, type ServicioItemType, type ServicioGetType, type servicioProductoProximoType } from '../../../types/servicioType';
 import { ServicioProductoProximoInitialState } from '../../../types/servicioType';
 import { getInventarios } from '../../../services/inventario.services';
 import { getProductos } from '../../../services/producto.services';
 import { getMotos } from '../../../services/moto.services';
 import { getSucursales } from '../../../services/sucursal.services';
 import { getUsers, getUsersMecanicos } from '../../../services/users.services';
-import { errorToast } from '../../../utils/toast';
 import type { TipoServicioGetType } from '../../../types/tipoServicioType';
 import { getTipos } from '../../../services/tipoServicio.services';
 import type { SucursalType } from '../../../types/sucursalType';
@@ -23,7 +21,6 @@ import { estados } from '../../../utils/estados';
 import ProductsTable from '../../../components/Table/ProductsTable';
 import LinkStylesNavigate from '../../../components/utils/links';
 import { useGoTo } from '../../../hooks/useGoTo';
-import { de } from 'zod/v4/locales';
 import type { repuestoReparacionType } from '../../../types/repuestoReparacionType';
 const API_URL = import.meta.env.VITE_DOMAIN;
 
@@ -35,30 +32,22 @@ type Props = {
   changeSeHaranVentas?: (value: boolean) => void;
 };
 
-const LOCAL_KEY = 'servicio.create.draft';
-
-const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHaranVentas, changeSeHaranVentas }: Props) => {
-  const { register, handleSubmit, setValue, reset, formState: { isSubmitting }, watch } = useForm<ServicioType>({ defaultValues: { ...(initial ?? ServicioInitialState) } as any });
-  const [productosCliente, setProductosCliente] = useState<Array<{ nombre: string; cantidad: number }>>(initial?.productosCliente ?? []);
+const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
+  const { register, handleSubmit, setValue, formState: { isSubmitting }, watch } = useForm<ServicioType>({ defaultValues: { ...(initial ?? ServicioInitialState) } as any });
   // Estado para servicioProductoProximoType
   const [servicioProductoProximo, setServicioProductoProximo] = useState<servicioProductoProximoType[]>(initial?.proximoServicioItems ?? []);
   const [servicioProductoProximoTmp, setServicioProductoProximoTmp] = useState<{ nombre: string }>(ServicioProductoProximoInitialState);
-  const [productoTmp, setProductoTmp] = useState(ServicioProductoClienteInitialState);
-  const [productosList, setProductosList] = useState<any[]>([]);
-  const [imagenesFiles, setImagenesFiles] = useState<File[]>([]);
-  const [imagenesMeta, setImagenesMeta] = useState<Array<{ descripcion?: string; preview?: string }>>(initial?.imagenesMeta?.map((m: any) => ({ descripcion: m.descripcion ?? '', preview: undefined })) ?? []);
-  const [inventarioItems, setInventarioItems] = useState<any[]>([]);
-  const [motosList, setMotosList] = useState<any[]>([]);
-  const [motoSedected, setMotoSelected] = useState<any>(initial?.moto ?? null);
-  const [sucursalesList, setSucursalesList] = useState<any[]>([]);
-  const [sucursalSelected, setSucursalSelected] = useState<SucursalType | null>(initial?.sucursal ?? null);
+  const [, setProductosList] = useState<any[]>([]);
+  const [imagenesMeta,] = useState<Array<{ descripcion?: string; preview?: string }>>(initial?.imagenesMeta?.map((m: any) => ({ descripcion: m.descripcion ?? '', preview: undefined })) ?? []);
+  const [, setInventarioItems] = useState<any[]>([]);
+  const [, setMotosList] = useState<any[]>([]);
+  const [, setSucursalesList] = useState<any[]>([]);
+  const [, setSucursalSelected] = useState<SucursalType | null>(initial?.sucursal ?? null);
   const user = useAuthStore(state => state.user);
-  const [usersList, setUsersList] = useState<any[]>([]);
+  const [, setUsersList] = useState<any[]>([]);
   const [servicioItems, setServicioItems] = useState<ServicioItemType[]>(initial?.servicioItems ?? []);
-  const [tiposServicio, setTiposServicio] = useState<TipoServicioGetType[]>([]);
-  const [tipoServicioSelected, setTipoServicioSelected] = useState<TipoServicioGetType | null>(initial?.tipoServicio ? initial.tipoServicio : null);
-  const [mecanicos, setMecanicos] = useState<UserGetType[]>([])
-  const [mecanicoSelected, setMecanicoSelected] = useState<UserGetType | null>(initial?.mecanico ? initial.mecanico : null)
+  const [, setTiposServicio] = useState<TipoServicioGetType[]>([]);
+  const [, setMecanicos] = useState<UserGetType[]>([])
   // Puede ser File (nuevo) o string (url existente)
   const [imagenGuardada, setImagenGuardada] = useState<any>(initial?.firmaSalida ? initial.firmaSalida : null);
   const goTo = useGoTo();
@@ -156,11 +145,16 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
       } else if (typeof imagenGuardada === 'string' && imagenGuardada.startsWith('data:image')) {
         // Convertir base64 a File
         const arr = imagenGuardada.split(',');
-        const mime = arr[0].match(/:(.*?);/)[1];
+
+        // 1. Agregamos el operador '?' y un valor por defecto para evitar el error TS2531
+        const match = arr[0].match(/:(.*?);/);
+        const mime = match ? match[1] : 'image/jpeg';
+
         const bstr = atob(arr[1]);
         let n = bstr.length;
         const u8arr = new Uint8Array(n);
         while (n--) u8arr[n] = bstr.charCodeAt(n);
+
         const file = new File([u8arr], 'firma.jpg', { type: mime });
         firmaSalidaFile = file;
       }
@@ -187,8 +181,6 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
     ?.reduce((acc, venta) => {
       return acc + (venta.descuentoTotal || 0); // Suma el descuento acumulado
     }, 0) || 0;
-
-  const totalServicio = (initial?.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0) || 0) + (initial?.total || 0) - totalVentasDescuentos;
 
   const ventasValidas = initial?.ventas?.filter(v => v.estadoId == estados().confirmado) ?? [];
 
@@ -355,29 +347,29 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
                 <Chip label={initial.enReparaciones[0]?.estado.estado ?? ''} color={chipColorByEstado(initial.enReparaciones[0]?.estado.id)} sx={{ mb: 2 }} variant='outlined' />
                 <Grid spacing={2} display={'flex'} flexDirection={'row'} gap={2} size={{ xs: 12, md: 8 }}>
                   <Grid size={6}>
-                    <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={() => { goTo('/admin/enreparacion/' + initial.enReparaciones[0].id) }}>
+                    <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={() => { goTo('/admin/enreparacion/' + (initial ? initial.enReparaciones?.[0]?.id : '') ) }}>
                       Ver Detalle
                     </Button>
                   </Grid>
                   {
                     initial.enReparaciones[0]?.estado.id !== estados().entregado && (
                       <Grid size={6}>
-                        <Button variant="contained" color="success" sx={{ mt: 2 }} onClick={() => { goTo('/admin/enreparacion/' + initial.enReparaciones[0].id + '/salida') }}>
+                        <Button variant="contained" color="success" sx={{ mt: 2 }} onClick={() => { goTo('/admin/enreparacion/' + (initial ? initial.enReparaciones?.[0]?.id : '') + '/salida') }}>
                           Reparada
                         </Button>
                       </Grid>
                     )
-                    
+
                   }
-                                    {
+                  {
                     initial.enReparaciones[0]?.estado.id !== estados().entregado && (
                       <Grid size={6}>
-                        <Button variant="outlined" color="primary" sx={{ mt: 2 }} onClick={() => { goTo('/admin/enreparacion/' + initial.enReparaciones[0].id + '/edit') }}>
+                        <Button variant="outlined" color="primary" sx={{ mt: 2 }} onClick={() => { goTo('/admin/enreparacion/' + (initial ? initial.enReparaciones?.[0]?.id : '') + '/edit') }}>
                           Editar
                         </Button>
                       </Grid>
                     )
-                    
+
                   }
 
 
@@ -388,10 +380,10 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
                 initial.enReparaciones[0]?.repuestos && initial.enReparaciones[0].repuestos.length > 0 && (
                   <ProductsTable
                     columns={[
-                      { id: 'repuesto', label: 'Repuesto', minWidth: 120, format: (v: any, row: repuestoReparacionType) => row.nombre ?? '' },
-                      { id: 'descripcion', label: 'Descripción', minWidth: 180, format: (v: any, row: repuestoReparacionType) => row.descripcion ?? '' },
-                      { id: 'refencia', label: 'Referencia', minWidth: 100, format: (v: any, row: repuestoReparacionType) => row.refencia ? (<Link href={row.refencia} target="_blank" rel="noopener noreferrer" underline="hover" >Link</Link>) : 'No hay' },
-                      { id: 'checked', label: 'Entregado', minWidth: 100, format: (v: any, row: repuestoReparacionType) => <Checkbox color="primary" checked={!!row.checked} disabled /> },
+                      { id: 'repuesto', label: 'Repuesto', minWidth: 120, format: (_: any, row: repuestoReparacionType) => row.nombre ?? '' },
+                      { id: 'descripcion', label: 'Descripción', minWidth: 180, format: (_: any, row: repuestoReparacionType) => row.descripcion ?? '' },
+                      { id: 'refencia', label: 'Referencia', minWidth: 100, format: (_: any, row: repuestoReparacionType) => row.refencia ? (<Link href={row.refencia} target="_blank" rel="noopener noreferrer" underline="hover" >Link</Link>) : 'No hay' },
+                      { id: 'checked', label: 'Entregado', minWidth: 100, format: (_: any, row: repuestoReparacionType) => <Checkbox color="primary" checked={!!row.checked} disabled /> },
                       { id: 'cantidad', label: 'Cantidad', minWidth: 80, align: 'center', format: (v: any) => String(v) },
                     ] as any}
                     rows={initial.enReparaciones[0].repuestos ?? []}
@@ -409,43 +401,43 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar', seHara
           <>
             <Divider sx={{ width: '100%', my: 2 }} />
             <Grid size={{ xs: 12 }} textAlign="center" >
-            <Typography variant="h4" >
-              EN PARQUEO
-            </Typography>
-            <Typography variant="body1" >
-              {initial.enParqueos[0].descripcion}
-            </Typography>
-            <Typography variant="body2" >
-              Parqueo desde: {new Date(initial.enParqueos[0].createdAt ? initial.enParqueos[0].createdAt : '').toLocaleString()}
-            </Typography>
-            <Typography variant="body2" >
-              Dias en parqueo: {new Date().getDate() - new Date(initial.enParqueos[0].createdAt ? initial.enParqueos[0].createdAt : '').getDate()}
-            </Typography>
-            <Typography variant="h6" sx={{ mt: 2 }}>
-              {`Total Parqueo ${initial.enParqueos[0].total ? `Q ${initial.enParqueos[0].total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'Q 0.00'}`}
-            </Typography>
-            <Grid container justifyContent="center" sx={{ my: 2 }}>
-              <Chip label={initial.enParqueos[0]?.estado.estado ?? ''} color={chipColorByEstado(initial.enParqueos[0]?.estado.id)} sx={{ mb: 2 }} variant='outlined' />
-              <Grid spacing={2} display={'flex'} flexDirection={'row'} gap={2} size={{ xs: 12, md: 8 }}>
-                <Grid size={6}>
-                  <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={() => { goTo('/admin/enparqueo/' + initial.enParqueos[0].id) }}>
-                    Ver Detalle
-                  </Button>
+              <Typography variant="h4" >
+                EN PARQUEO
+              </Typography>
+              <Typography variant="body1" >
+                {initial.enParqueos[0].descripcion}
+              </Typography>
+              <Typography variant="body2" >
+                Parqueo desde: {new Date(initial.enParqueos[0].createdAt ? initial.enParqueos[0].createdAt : '').toLocaleString()}
+              </Typography>
+              <Typography variant="body2" >
+                Dias en parqueo: {new Date().getDate() - new Date(initial.enParqueos[0].createdAt ? initial.enParqueos[0].createdAt : '').getDate()}
+              </Typography>
+              <Typography variant="h6" sx={{ mt: 2 }}>
+                {`Total Parqueo ${initial.enParqueos[0].total ? `Q ${initial.enParqueos[0].total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'Q 0.00'}`}
+              </Typography>
+              <Grid container justifyContent="center" sx={{ my: 2 }}>
+                <Chip label={initial.enParqueos[0]?.estado.estado ?? ''} color={chipColorByEstado(initial.enParqueos[0]?.estado.id)} sx={{ mb: 2 }} variant='outlined' />
+                <Grid spacing={2} display={'flex'} flexDirection={'row'} gap={2} size={{ xs: 12, md: 8 }}>
+                  <Grid size={6}>
+                    <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={() => { goTo('/admin/enparqueo/' + ( initial ? initial?.enParqueos?.[0]?.id : '')) }}>
+                      Ver Detalle
+                    </Button>
+                  </Grid>
+                  {
+                    initial.enParqueos[0]?.estado.id !== estados().entregado && (
+                      <Grid size={6}>
+                        <Button variant="contained" color="success" sx={{ mt: 2 }} onClick={() => { goTo('/admin/enparqueo/' + ( initial ? initial?.enParqueos?.[0]?.id : '') + '/salida') }}>
+                          Parqueo Finalizado
+                        </Button>
+                      </Grid>
+                    )
+                  }
+
+
                 </Grid>
-                {
-                  initial.enParqueos[0]?.estado.id !== estados().entregado && (
-                    <Grid size={6}>
-                      <Button variant="contained" color="success" sx={{ mt: 2 }} onClick={() => { goTo('/admin/enparqueo/' + initial.enParqueos[0].id + '/salida') }}>
-                        Parqueo Finalizado
-                      </Button>
-                    </Grid>
-                  )
-                }
-
-
               </Grid>
             </Grid>
-          </Grid>
           </>
         )
       }

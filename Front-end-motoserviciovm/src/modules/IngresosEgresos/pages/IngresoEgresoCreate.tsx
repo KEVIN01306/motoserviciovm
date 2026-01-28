@@ -1,16 +1,12 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import IngresosEgresosForm from '../components/IngresosEgresosForm';
 import { postIngresoEgreso } from '../../../services/ingresosEgresos.services';
-import { useNavigate } from 'react-router-dom';
 import { successToast, errorToast } from '../../../utils/toast';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
-import { useAuthStore } from '../../../store/useAuthStore';
 import { RiMoneyDollarCircleLine } from 'react-icons/ri';
 import { tiposContabilidad } from '../../../utils/tiposContabilidad';
 
 const IngresoEgresoCreate = () => {
-  const navigate = useNavigate();
-  const auth = useAuthStore();
   const formRef = useRef<any>(null);
 
   const handleSubmit = async (payload: any) => {

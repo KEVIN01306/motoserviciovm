@@ -26,7 +26,7 @@ const getEnReparaciones = async (): Promise<EnReparacionGetType[]> => {
   }
 };
 
-const getEnReparacion = async (id: EnReparacionType["id"]): Promise<EnReparacionGetType> => {
+const getEnReparacion = async (id:number): Promise<EnReparacionGetType> => {
   try {
     const response = await api.get<apiResponse<EnReparacionGetType>>(`${API_ENREPARACION}/${id}`);
     const item = response.data.data;
@@ -61,7 +61,7 @@ const postEnReparacion = async (payload: EnReparacionType) => {
   }
 };
 
-const putEnReparacionSalida = async (id: EnReparacionType["id"], payload: Partial<EnReparacionType>) => {
+const putEnReparacionSalida = async (id: number, payload: Partial<EnReparacionType>) => {
   try {
     // Si hay firmaSalida (base64 o File), usar FormData
     let dataToSend: any = payload;
@@ -139,7 +139,7 @@ const putRepuestosReparacion = async (
 };
 
 
-const putEnReparacion = async (id: EnReparacionType["id"], payload: Partial<EnReparacionType>) => {
+const putEnReparacion = async (id: number, payload: Partial<EnReparacionType>) => {
   try {
     const response = await api.put<apiResponse<EnReparacionGetType>>(`${API_ENREPARACION}/${id}`, payload);
     if (!response.data.data) throw new Error("DATA_NOT_FOUND");

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { cancelarVenta, finalizarVenta, getVenta } from '../../../services/ventas.services';
 import { useParams } from 'react-router-dom';
-import { Box, Typography, Table, TableHead, TableRow, TableCell, TableBody, Divider, Button, Container, Card, CardContent, Grid, Chip } from '@mui/material';
+import { Box, Typography, Divider, Button, Container, Card, CardContent, Grid, Chip } from '@mui/material';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiProductHuntLine } from 'react-icons/ri';
 import { formatDate } from '../../../utils/formatDate';
@@ -35,19 +35,19 @@ const VentaDetail = () => {
     }
   };
 
-  
-    const chipColorByEstado = (id: number) => {
-        switch (id) {
-        case estados().enEspera:
-            return "warning";
-        case estados().confirmado:
-            return "success";
-        case estados().cancelado:
-            return "error";
-        default:
-            return "primary";
-        }
-    };
+
+  const chipColorByEstado = (id: number) => {
+    switch (id) {
+      case estados().enEspera:
+        return "warning";
+      case estados().confirmado:
+        return "success";
+      case estados().cancelado:
+        return "error";
+      default:
+        return "primary";
+    }
+  };
 
   useEffect(() => { getVentaOne(); }, [id]);
 
@@ -78,8 +78,15 @@ const VentaDetail = () => {
                 <Box>
                   <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 1 }}>
                     <Typography sx={{ minWidth: 120, color: '#6b7280', fontWeight: 600 }}>Vendedor</Typography>
-                    <LinkStylesNavigate label={data.usuario?.primerNombre + ' ' + (data.usuario?.primerApellido ?? '') ?? '-'} onClick={() => goTo(`/admin/users/${data.usuario?.id}`)} variant="body1" />
-                  </Box>
+                    <LinkStylesNavigate
+                      label={
+                        data.usuario
+                          ? `${data.usuario.primerNombre} ${data.usuario.primerApellido ?? ''}`.trim()
+                          : '-'
+                      }
+                      onClick={() => goTo(`/admin/users/${data.usuario?.id}`)}
+                      variant="body1"
+                    />                  </Box>
 
                   <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 1 }}>
                     <Typography sx={{ minWidth: 120, color: '#6b7280', fontWeight: 600 }}>Fecha</Typography>
@@ -107,7 +114,7 @@ const VentaDetail = () => {
 
                   <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
                     <Typography sx={{ minWidth: 120, color: '#6b7280', fontWeight: 600 }}>Servicio</Typography>
-                    <LinkStylesNavigate label={data.servicioId ?? '-'} onClick={() => goTo(`/admin/servicios/${data.servicioId}`)} variant="body1" />
+                    <LinkStylesNavigate label={String(data.servicioId) ?? '-'} onClick={() => goTo(`/admin/servicios/${data.servicioId}`)} variant="body1" />
                   </Box>
                 </Box>
               </Grid>
@@ -116,56 +123,56 @@ const VentaDetail = () => {
             <Divider sx={{ my: 2 }} />
 
             <Typography variant="h6" gutterBottom>Productos</Typography>
-             <ProductsTable
-               columns={[
-                 { id: 'producto', label: 'Producto', minWidth: 180, format: (v: any, row: VentaProductoGetType) => row.producto?.nombre ?? '' },
-                 { id: 'precio', label: 'Precio', minWidth: 100, align: 'right', format: (_v: any, row: VentaProductoGetType) => `Q ${Number(row.producto?.precio ?? 0).toFixed(2)}` },
-                 { id: 'cantidad', label: 'Cantidad', minWidth: 80, align: 'center', format: (v: any) => String(v) },
-                 { id: 'totalProducto', label: 'Total', minWidth: 100, align: 'right', format: (v: any) => `Q ${Number(v ?? 0).toFixed(2)}` },
-               ] as any}
-               rows={data.productos ?? []}
-               headerColor="#1565c0"
-             />
+            <ProductsTable
+              columns={[
+                { id: 'producto', label: 'Producto', minWidth: 180, format: (_: any, row: VentaProductoGetType) => row.producto?.nombre ?? '' },
+                { id: 'precio', label: 'Precio', minWidth: 100, align: 'right', format: (_v: any, row: VentaProductoGetType) => `Q ${Number(row.producto?.precio ?? 0).toFixed(2)}` },
+                { id: 'cantidad', label: 'Cantidad', minWidth: 80, align: 'center', format: (v: any) => String(v) },
+                { id: 'totalProducto', label: 'Total', minWidth: 100, align: 'right', format: (v: any) => `Q ${Number(v ?? 0).toFixed(2)}` },
+              ] as any}
+              rows={data.productos ?? []}
+              headerColor="#1565c0"
+            />
 
             <Divider sx={{ my: 3 }} />
             <Grid container spacing={2}>
-            {
-              userlogged?.permisos.includes('ventas:cancel') && data.estadoId === estados().enEspera && (
-                <Grid size={{xs: 5, md: 2}} textAlign="center">
-                  <Button variant="outlined" color="error" onClick={async () => {
-                    if (!window.confirm(`¿Cancelar la venta #${data.id}?`)) return;
-                    try {
-                      await cancelarVenta(data.id);
-                      alert('Venta cancelada');
-                      getVentaOne();
-                    } catch (err: any) {
-                      alert(err?.message ?? 'Error al cancelar');
-                    }
-                  }}>Cancelar</Button>
+              {
+                userlogged?.permisos.includes('ventas:cancel') && data.estadoId === estados().enEspera && (
+                  <Grid size={{ xs: 5, md: 2 }} textAlign="center">
+                    <Button variant="outlined" color="error" onClick={async () => {
+                      if (!window.confirm(`¿Cancelar la venta #${data.id}?`)) return;
+                      try {
+                        await cancelarVenta(data.id ? data.id : 0);
+                        alert('Venta cancelada');
+                        getVentaOne();
+                      } catch (err: any) {
+                        alert(err?.message ?? 'Error al cancelar');
+                      }
+                    }}>Cancelar</Button>
+                  </Grid>
+                )
+              }
+              {
+                userlogged?.permisos.includes('ventas:finalize') && data.estadoId === estados().enEspera && (
+                  <Grid size={{ xs: 5, md: 2 }} textAlign="center">
+                    <Button variant="outlined" color="success" onClick={async () => {
+                      if (!window.confirm(`¿Finalizar la venta #${data.id}?`)) return;
+                      try {
+                        await finalizarVenta(data.id ? data.id : 0);
+                        alert('Venta finalizada');
+                        getVentaOne();
+                      } catch (err: any) {
+                        alert(err?.message ?? 'Error al finalizar');
+                      }
+                    }}>Finalizar</Button>
+                  </Grid>
+                )
+              }
+              {userlogged?.permisos.includes('ventas:edit') && data.estadoId === estados().enEspera && (
+                <Grid size={{ xs: 5, md: 2 }} textAlign="center">
+                  <Button variant="contained" onClick={() => goTo(String('edit'))}>Editar</Button>
                 </Grid>
-              )
-            }
-            {
-              userlogged?.permisos.includes('ventas:finalize') && data.estadoId === estados().enEspera && (
-                <Grid size={{xs: 5, md: 2}} textAlign="center">
-                <Button variant="outlined" color="success" onClick={async () => {
-                  if (!window.confirm(`¿Finalizar la venta #${data.id}?`)) return;
-                  try {
-                    await finalizarVenta(data.id);
-                    alert('Venta finalizada');
-                    getVentaOne();
-                  } catch (err: any) {
-                    alert(err?.message ?? 'Error al finalizar');
-                  }
-                }}>Finalizar</Button>
-                </Grid>
-              )
-            }
-            {userlogged?.permisos.includes('ventas:edit') && data.estadoId === estados().enEspera && (
-                <Grid size={{xs: 5, md: 2}} textAlign="center">
-                <Button variant="contained" onClick={() => goTo(String('edit'))}>Editar</Button>
-                </Grid>
-            )}
+              )}
             </Grid>
           </CardContent>
         </Card>

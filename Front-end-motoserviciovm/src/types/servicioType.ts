@@ -51,6 +51,8 @@ export type ServicioGetType = ServicioType & {
   servicioOpcionesTipoServicio?: ProgresoItemType[];
   enReparaciones?: EnReparacionGetType[];
   enParqueos?: EnParqueoGetType[];
+  subtotal?: number;
+  imagen?: ImagenGetType[];
 };
 
 

@@ -7,6 +7,7 @@ import type { ServicioGetType } from "./servicioType";
 export type EnParqueoType = z.infer<typeof enParqueoSchema>;
 
 export type EnParqueoGetType = EnParqueoType & {
+    id: number;
     servicio: ServicioGetType;
     estado: EstadoType;
     fechaSalida: Date | null;

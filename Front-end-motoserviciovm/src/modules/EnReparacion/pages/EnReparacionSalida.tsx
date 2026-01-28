@@ -23,7 +23,7 @@ const EnReparacionSalida = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { control, handleSubmit, reset, formState, register, watch } = useForm<Partial<EnReparacionType>>({
+  const { control, handleSubmit, reset, formState, register } = useForm<Partial<EnReparacionType>>({
     resolver: zodResolver(enReparacionSchema) as any,
     defaultValues: {} as Partial<EnReparacionType>,
   });
@@ -86,7 +86,7 @@ const EnReparacionSalida = () => {
           }
         )}
       >
-        <SalidaForm control={control} errors={formState.errors} readOnlyValues={item ?? undefined} register={register} />
+        <SalidaForm control={control as any} errors={formState.errors} readOnlyValues={item ?? undefined} register={register as any} />
 
         <Grid size={12}>
           <Divider sx={{ my: 2 }} />

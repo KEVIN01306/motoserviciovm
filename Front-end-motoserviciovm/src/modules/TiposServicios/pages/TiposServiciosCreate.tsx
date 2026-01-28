@@ -9,7 +9,6 @@ import { TipoServicioInitialState, type TipoServicioType } from "../../../types/
 import { tipoServicioSchema } from "../../../zod/tipoServicio.schema";
 import { postTipo } from "../../../services/tipoServicio.services";
 import { successToast, errorToast } from "../../../utils/toast";
-import { useGoTo } from "../../../hooks/useGoTo";
 import { getOpciones } from "../../../services/opcionServicio.services";
 import type { OpcionServicioType } from "../../../types/opcionServicioType";
 import { PiDeviceTabletFill, PiPlus } from "react-icons/pi";
@@ -17,7 +16,6 @@ import { getTiposHorario } from "../../../services/tipoHorario.services";
 import type { TipoHorarioType } from "../../../types/tipoHorario";
 
 const TiposServiciosCreate = () => {
-  const goTo = useGoTo();
   const [opciones, setOpciones] = useState<OpcionServicioType[]>([]);
   const [tiposHorario, setTiposHorario] = useState<TipoHorarioType[]>([]);
 

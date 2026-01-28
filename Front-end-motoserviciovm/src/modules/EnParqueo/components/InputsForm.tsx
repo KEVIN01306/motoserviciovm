@@ -13,7 +13,7 @@ type Props = {
   watch?: any;
 };
 
-const InputsForm = ({ control, register, errors, setValue }: Props) => {
+const InputsForm = ({ control, register, errors }: Props) => {
   const [motos, setMotos] = useState<motoGetType[]>([]);
 
   useEffect(() => {

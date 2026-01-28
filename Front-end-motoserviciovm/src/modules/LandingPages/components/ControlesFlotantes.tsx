@@ -1,5 +1,5 @@
 import { useState } from "react";
-import WhatsAppIcon from "./WhatsAppIcon";
+import WhatsAppIcon from "./WhatsappIcon";
 import { Menu, X } from "lucide-react";
 
 type MenuLink = {

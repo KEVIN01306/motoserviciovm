@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container, Card, CardContent } from '@mui/material';
+import { Container } from '@mui/material';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiToolsLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';
@@ -8,10 +8,9 @@ import ErrorCard from '../../../components/utils/ErrorCard';
 import { getServicio, putFirmaSalida } from '../../../services/servicios.services';
 import { useGoTo } from '../../../hooks/useGoTo';
 import { successToast, errorToast } from '../../../utils/toast';
-import { mergeServicioDataWithDefaults, type ServicioGetType } from '../../../types/servicioType';
+import { type ServicioGetType } from '../../../types/servicioType';
 import ServicioFormSalida from '../components/ServicioFormSalida';
 import { estados } from '../../../utils/estados';
-import { da } from 'zod/v4/locales';
 
 const ServicioSalida = () => {
   const { id } = useParams();
@@ -23,7 +22,7 @@ const ServicioSalida = () => {
   const fetch = async () => {
     try {
       setLoading(true);
-      const res = await getServicio(id);
+      const res = await getServicio(id ?? '');
       setData(res);
     } catch (err: any) {
       setError(err?.message ?? 'Error cargando servicio');
@@ -53,7 +52,7 @@ const ServicioSalida = () => {
       if (accionSalida === "SOLOSALIDA" && data?.enParqueos?.length ? data?.enParqueos[0].estadoId == estados().activo : false) throw new Error('El servicio aun cuenta son parqueos pendientes, no se puede registrar solo salida.');
       const firmaSalida = firmaSalidaFile || (data?.firmaSalida ? null : undefined); // Si ya hay firma en data, enviar null
 
-      await putFirmaSalida(id, {
+      await putFirmaSalida(id ?? '', {
         total,
         observaciones,
         proximaFechaServicio: proximaFechaServicio || '',
@@ -65,8 +64,8 @@ const ServicioSalida = () => {
         descripcionAccion: descripcionAccion || '',
         totalSalidaAnticipado: totalSalidaAnticipado || 0
       });
-      console.log()
-      successToast('Firma de salida registrada');payload
+      console.log(payload);
+      successToast('Firma de salida registrada');
 
       if (accionSalida === "SOLOSALIDA") {
         successToast('Servicio dado de alta correctamente.');

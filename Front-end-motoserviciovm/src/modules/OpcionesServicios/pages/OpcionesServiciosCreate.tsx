@@ -1,7 +1,6 @@
 import { Grid, Divider, Button } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useGoTo } from "../../../hooks/useGoTo";
 import { OpcionServicioInitialState, type OpcionServicioType } from "../../../types/opcionServicioType";
 import { opcionesServicioSchema } from "../../../zod/opcionServicio.shema";
 import FormEstructure from "../../../components/utils/FormEstructure";
@@ -12,8 +11,6 @@ import BreadcrumbsRoutes from "../../../components/utils/Breadcrumbs";
 import { PiDeviceTabletFill, PiPlus } from "react-icons/pi";
 
 const OpcionesServiciosCreate = () => {
-  const goTo = useGoTo();
-
   const { register, handleSubmit, reset, formState } = useForm<OpcionServicioType>({
     resolver: zodResolver(opcionesServicioSchema) as any,
     defaultValues: OpcionServicioInitialState as any,

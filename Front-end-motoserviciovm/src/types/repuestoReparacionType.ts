@@ -7,7 +7,6 @@ export type repuestoReparacionType = z.infer<typeof repuestoReparacionSchema>;
 export const repuestoReparacionInitialState: repuestoReparacionType = {
     nombre:     "",
     descripcion: "",
-    imagen:      null,
     refencia:    null,
     cantidad:    0,
     checked:     false,
@@ -21,7 +20,6 @@ export const mergeRepuestoReparacionDataWithDefaults = (apiData: Partial<repuest
     return {
         nombre:      apiData.nombre ?? repuestoReparacionInitialState.nombre,
         descripcion: apiData.descripcion ?? repuestoReparacionInitialState.descripcion,
-        imagen:      apiData.imagen ?? repuestoReparacionInitialState.imagen,
         refencia:    apiData.refencia ?? repuestoReparacionInitialState.refencia,
         cantidad:    apiData.cantidad ?? repuestoReparacionInitialState.cantidad,
         checked:     apiData.checked ?? repuestoReparacionInitialState.checked,

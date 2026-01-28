@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { 
-  Container, 
   Grid, 
   Card, 
   CardMedia, 
@@ -8,14 +7,12 @@ import {
   Typography, 
   Button, 
   Fade,
-  Paper,
   Dialog,
   IconButton
 } from '@mui/material';
 import { 
   PhotoLibrary as PhotoIcon, 
   Close as CloseIcon,
-  Collections as CollectionsIcon,
   ZoomIn as ZoomInIcon
 } from '@mui/icons-material';
 import TextField from '@mui/material/TextField';
@@ -26,7 +23,16 @@ const API_URL = import.meta.env.VITE_DOMAIN;
  * Componente de Galería Adaptable
  * @param {Array} imagenes - Lista de objetos con id, imagen y descripcion
  */
-const ImageGallery = ({ imagenes = [] }) => {
+
+type ImageGalleryProps = {
+  imagenes: Array<{
+    id: number | string;
+    imagen: string;
+    descripcion?: string;
+  }>;
+};
+
+const ImageGallery = ({ imagenes = [] }: ImageGalleryProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
@@ -180,7 +186,7 @@ const ImageGallery = ({ imagenes = [] }) => {
                       alt={item.descripcion}
                       sx={{ objectFit: 'cover' }}
                       onError={(e) => {
-                        e.target.src = "https://via.placeholder.com/400x300?text=Imagen+no+disponible";
+                        (e.target as any).src= "https://via.placeholder.com/400x300?text=Imagen+no+disponible";
                       }}
                     />
                     <IconButton size="small" sx={{ position: 'absolute', top: 8, right: 8, bgcolor: 'rgba(0,0,0,0.4)', color: 'white', zIndex: 2 }}>

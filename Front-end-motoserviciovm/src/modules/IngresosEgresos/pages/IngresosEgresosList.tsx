@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import TableCustom from '../../../components/Table/Table';
-import { getIngresosEgresos, deleteIngresoEgreso, finalizarIngresoEgreso, cancelarIngresoEgreso } from '../../../services/ingresosEgresos.services';
-import { Box, Grid, Fab, Chip } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { getIngresosEgresos, finalizarIngresoEgreso, cancelarIngresoEgreso } from '../../../services/ingresosEgresos.services';
+import { Grid, Fab, Chip } from '@mui/material';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiMoneyDollarCircleLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';

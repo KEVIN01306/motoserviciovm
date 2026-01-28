@@ -8,12 +8,9 @@ import { CategoriaProductoInitialState, type CategoriaProductoType } from "../..
 import { categoriaProductoSchema } from "../../../zod/categoriaProducto.schema";
 import { postCategoria } from "../../../services/categoriaProducto.services";
 import { successToast, errorToast } from "../../../utils/toast";
-import { useGoTo } from "../../../hooks/useGoTo";
 import { TbCategory, TbCategoryPlus } from "react-icons/tb";
 
 const CategoriaProductoCreate = () => {
-  const goTo = useGoTo();
-
   const { register, handleSubmit, reset, formState } = useForm<CategoriaProductoType>({
     resolver: zodResolver(categoriaProductoSchema) as any,
     defaultValues: CategoriaProductoInitialState as any,

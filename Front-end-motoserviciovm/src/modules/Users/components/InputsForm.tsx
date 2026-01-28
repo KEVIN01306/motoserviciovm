@@ -2,7 +2,7 @@ import { Autocomplete, Checkbox, FormControl, FormControlLabel, Grid, InputLabel
 import { Controller, type Control, type FieldErrors, type UseFormRegister, type UseFormSetValue, type UseFormWatch } from "react-hook-form"
 import type { UserType } from "../../../types/userType";
 import { useEffect, useState } from "react";
-import type { RolGetType, RolType } from "../../../types/rolType";
+import type { RolGetType } from "../../../types/rolType";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import type { SucursalType } from "../../../types/sucursalType";

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Chip, Fab, Grid } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Chip, Fab, Grid } from '@mui/material';
 import TableCustom from '../../../components/Table/Table';
 import { getVentas } from '../../../services/ventas.services';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
@@ -106,7 +106,7 @@ const VentasList = () => {
           label: (<><PiUserCheckBold /><span className="ml-1.5">Finalizar</span></>), onClick: async (r) => {
             if (!window.confirm(`¿Finalizar la venta #${r.id}?`)) return;
             try {
-              await finalizarVenta(r.id);
+              await finalizarVenta(r.id ? r.id : 0);
               successToast('Venta finalizada');
               fetch();
             } catch (err: any) {
@@ -121,7 +121,7 @@ const VentasList = () => {
           label: (<><RiProductHuntLine /><span className="ml-1.5">Cancelar</span></>), onClick: async (r) => {
             if (!window.confirm(`¿Cancelar la venta #${r.id}?`)) return;
             try {
-              await cancelarVenta(r.id);
+              await cancelarVenta(r.id ? r.id : 0);
               successToast('Venta cancelada');
               fetch();
             } catch (err: any) {

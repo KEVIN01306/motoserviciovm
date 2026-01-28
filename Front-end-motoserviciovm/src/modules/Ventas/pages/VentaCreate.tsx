@@ -5,7 +5,6 @@ import { successToast, errorToast } from '../../../utils/toast';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiProductHuntLine } from 'react-icons/ri';
 import { useAuthStore } from '../../../store/useAuthStore';
-import { useEffect } from 'react';
 
 const VentaCreate = () => {
   const navigate = useNavigate();
@@ -18,7 +17,7 @@ const VentaCreate = () => {
       const productos = (payload.productos || []).map((p: any) => ({ productoId: p.productoId, cantidad: p.cantidad, totalProducto: p.totalProducto, descuento: p.descuento }));
       const finalPayload = { ...payload, usuarioId, productos };
       console.log('Submitting venta create with payload:', finalPayload);
-      const data = await postVenta(finalPayload);
+      await postVenta(finalPayload);
       successToast('Venta creada');
       navigate('..');
     } catch (err:any) {

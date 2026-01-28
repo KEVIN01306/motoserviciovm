@@ -4,7 +4,6 @@ import ErrorCard from "../../../components/utils/ErrorCard";
 import { RiBikeFill } from "react-icons/ri";
 import type { motoGetType } from "../../../types/motoType";
 import { useParams } from "react-router-dom";
-import { useGoTo } from "../../../hooks/useGoTo";
 import { getMoto } from "../../../services/moto.services";
 import BreadcrumbsRoutes from "../../../components/utils/Breadcrumbs";
 import { Box, Chip, Grid, Paper, Typography } from "@mui/material";
@@ -24,8 +23,6 @@ const HistorialServicio = () => {
 
 
     const { id } = useParams();
-    const goTo = useGoTo();
-
     const [moto, setMoto] = useState<motoGetType | undefined>();
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);

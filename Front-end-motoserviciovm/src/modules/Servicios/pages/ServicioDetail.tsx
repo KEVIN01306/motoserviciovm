@@ -1,26 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import Link from '@mui/material/Link';
-import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab, Avatar, Paper, Button } from '@mui/material';
+import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab, Avatar, Button } from '@mui/material';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiToolsLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';
 import ErrorCard from '../../../components/utils/ErrorCard';
 import { getServicio } from '../../../services/servicios.services';
-import type { ProgresoItemGetType, ProgresoItemType, ServicioGetType, ServicioItemType } from '../../../types/servicioType';
+import type { ProgresoItemGetType, ServicioGetType } from '../../../types/servicioType';
 import ProductsTable from '../../../components/Table/ProductsTable';
 import { formatDate } from '../../../utils/formatDate';
 import type { VentaProductoGetType } from '../../../types/ventaType';
 import { estados } from '../../../utils/estados';
 import { useGoTo } from '../../../hooks/useGoTo';
 import LinkStylesNavigate from '../../../components/utils/links';
-import { exportarAPDF } from '../../../utils/exportarPdf';
-import { ExposureTwoTone } from '@mui/icons-material';
 import Checkbox from '@mui/material/Checkbox';
 import { PiExportDuotone } from 'react-icons/pi';
 import ImageGallery from '../../../components/utils/GaleryImagenes';
 import { useAuthStore } from '../../../store/useAuthStore';
-import { da } from 'zod/v4/locales';
 import type { repuestoReparacionType } from '../../../types/repuestoReparacionType';
 
 const API_URL = import.meta.env.VITE_DOMAIN;
@@ -37,7 +34,7 @@ const ServicioDetail = () => {
   const fetch = async () => {
     try {
       setLoading(true);
-      const res = await getServicio(id);
+      const res = await getServicio(id ?? '');
       setData(res);
     } catch (err: any) {
       setError(err?.message ?? 'Error cargando servicio');
@@ -194,7 +191,7 @@ const ServicioDetail = () => {
                     <Chip label={venta.estado?.estado ?? ''} color={chipColorByEstado(venta.estado?.id)} sx={{ mb: 2 }} variant='outlined'/>
                     <ProductsTable
                     columns={[
-                      { id: 'producto', label: 'Producto', minWidth: 120, format: (v:any, row: VentaProductoGetType) => row.producto?.nombre ?? '' },
+                      { id: 'producto', label: 'Producto', minWidth: 120, format: (_:any, row: VentaProductoGetType) => row.producto?.nombre ?? '' },
                       { id: 'precio', label: 'Precio', minWidth: 100, align: 'right', format: (_v:any, row: VentaProductoGetType) => `Q ${Number(row.producto?.precio ?? 0).toFixed(2)}` },
                       { id: 'cantidad', label: 'Cantidad', minWidth: 80, align: 'center', format: (v:any) => String(v) },
                       { id: 'descuento', label: 'Descuento', minWidth: 80, align: 'center', format: (v:any) => v ? 'Sí' : 'No' },
@@ -214,8 +211,8 @@ const ServicioDetail = () => {
                     <Typography variant="h6" gutterBottom>{data.tipoServicio?.tipo}</Typography>
                     <ProductsTable
                     columns={[
-                      { id: 'opcion', label: 'Opcion', minWidth: 120, format: (v:any, row: ProgresoItemGetType) => row.opcionServicio.opcion ?? '' },
-                      { id: 'checked', label: 'Check', minWidth: 100, align: 'right', format: (_v: boolean, row: ProgresoItemGetType) => <Checkbox color="primary" checked={!!row.checked} disabled /> },
+                      { id: 'opcion', label: 'Opcion', minWidth: 120, format: (_:any, row: ProgresoItemGetType) => row.opcionServicio.opcion ?? '' },
+                      { id: 'checked', label: 'Check', minWidth: 100, align: 'right', format: (_: boolean, row: ProgresoItemGetType) => <Checkbox color="primary" checked={!!row.checked} disabled /> },
                       { id: 'observaciones', label: 'observaciones', minWidth: 80, align: 'center', format: (v: string) => v ?? '' },
                     ] as any}
                     rows={data.servicioOpcionesTipoServicio ?? []}
@@ -264,9 +261,9 @@ const ServicioDetail = () => {
 
                   <ProductsTable
                   columns={[
-                    { id: 'repuesto', label: 'Repuesto', minWidth: 120, format: (v:any, row: repuestoReparacionType) => row.nombre ?? '' },
-                    { id: 'descripcion', label: 'Descripción', minWidth: 180, format: (v:any, row: repuestoReparacionType) => row.descripcion ?? '' },
-                    { id: 'refencia', label: 'Referencia', minWidth: 100, format: (v:any, row: repuestoReparacionType) => row.refencia ? ( <Link href={row.refencia} target="_blank" rel="noopener noreferrer"  underline="hover" >Link</Link>) : 'No hay' },
+                    { id: 'repuesto', label: 'Repuesto', minWidth: 120, format: (_:any, row: repuestoReparacionType) => row.nombre ?? '' },
+                    { id: 'descripcion', label: 'Descripción', minWidth: 180, format: (_:any, row: repuestoReparacionType) => row.descripcion ?? '' },
+                    { id: 'refencia', label: 'Referencia', minWidth: 100, format: (_:any, row: repuestoReparacionType) => row.refencia ? ( <Link href={row.refencia} target="_blank" rel="noopener noreferrer"  underline="hover" >Link</Link>) : 'No hay' },
                     { id: 'cantidad', label: 'Cantidad', minWidth: 80, align: 'center', format: (v:any) => String(v) },
                   ] as any}
                   rows={data.enReparaciones[0].repuestos ?? []}

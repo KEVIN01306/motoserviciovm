@@ -11,7 +11,7 @@ import { estados } from '../../../utils/estados';
 import { getClienteByDocumento } from '../../../services/users.services';
 import { getMotoByPlaca } from '../../../services/moto.services';
 import { tipoServicioHorarioServices } from '../../../services/tipoServicioHorario.services';
-import type {  CitaGetType } from '../../../types/citaType';
+import type { CitaGetType } from '../../../types/citaType';
 import TimePicker from '../../../components/TimePicker';
 import { useAuthStore } from '../../../store/useAuthStore';
 
@@ -24,7 +24,7 @@ interface InputsFormProps {
   id?: number;
 }
 
-const InputsForm = ({ register, control, watch, setValue, errors,id  }: InputsFormProps) => {
+const InputsForm = ({ register, control, watch, setValue, errors, id }: InputsFormProps) => {
   const [tipos, setTipos] = useState<any[]>([]);
   const [horarios, setHorarios] = useState<any[]>([]);
   const [maxDate, setMaxDate] = useState<string | null>(null);
@@ -34,26 +34,26 @@ const InputsForm = ({ register, control, watch, setValue, errors,id  }: InputsFo
   const sucursalId = watch('sucursalId');
   const tipoServicioId = watch('tipoServicioId');
 
-  useEffect(() => { (async ()=>{ try{ const t = await getTipos(); setTipos(t); }catch(e){} })(); }, []);
+  useEffect(() => { (async () => { try { const t = await getTipos(); setTipos(t); } catch (e) { } })(); }, []);
 
   useEffect(() => {
     const fetchHorarios = async () => {
       if (!tipoServicioId || !sucursalId) { setHorarios([]); setMaxDate(null); return; }
       try {
-        const tipo = await getTipo(Number(tipoServicioId));
+        const tipo = await getTipo(String(tipoServicioId));
         if (!tipo?.tipoHorarioId) { setHorarios([]); setMaxDate(null); return; }
         const res = await tipoServicioHorarioServices.getTiposServicioHorario({ tipoHorarioId: Number(tipo.tipoHorarioId), sucursalId: Number(sucursalId) });
         setHorarios(res || []);
-        if (Array.isArray(res) && res.length>0) {
+        if (Array.isArray(res) && res.length > 0) {
           // elegir la fechaVijencia mínima entre los resultados
           try {
             const dates = res.map((r: any) => new Date(r.fechaVijencia + 'T00:00:00')).filter((d: Date) => !isNaN(d.getTime()));
-            if (dates.length>0) {
+            if (dates.length > 0) {
               const minDate = dates.reduce((a: Date, b: Date) => a.getTime() <= b.getTime() ? a : b);
-              const yyyy = minDate.toISOString().slice(0,10);
+              const yyyy = minDate.toISOString().slice(0, 10);
               setMaxDate(yyyy);
             } else setMaxDate(null);
-          } catch(e) { setMaxDate(null); }
+          } catch (e) { setMaxDate(null); }
         } else setMaxDate(null);
       } catch (e) { setHorarios([]); setMaxDate(null); }
     };
@@ -61,9 +61,6 @@ const InputsForm = ({ register, control, watch, setValue, errors,id  }: InputsFo
   }, [tipoServicioId, sucursalId]);
 
   const fechaCita = watch('fechaCita');
-
-  const currentCitaId = watch('id');
-
   const [citasFecha, setCitasFecha] = useState<CitaGetType[]>([]);
   const [horarioErrors, setHorarioErrors] = useState<string[]>([]);
 
@@ -72,7 +69,7 @@ const InputsForm = ({ register, control, watch, setValue, errors,id  }: InputsFo
 
   // calcular días de la semana (0-6) que están disponibles según filteredHorarios
   const availableWeekdays = (() => {
-    const diasEsOriginal = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    const diasEsOriginal = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     const diasEs = diasEsOriginal.map(d => d.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase());
     const set = new Set<number>();
     if (!Array.isArray(filteredHorarios)) return set;
@@ -94,7 +91,7 @@ const InputsForm = ({ register, control, watch, setValue, errors,id  }: InputsFo
 
     const date = new Date(fechaCita + 'T00:00:00');
     if (isNaN(date.getTime())) return;
-    const diasEs = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    const diasEs = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     const diaEs = diasEs[date.getDay()];
 
     // recolectar todas las horas de todos los horarios que aplican a la fecha
@@ -109,8 +106,8 @@ const InputsForm = ({ register, control, watch, setValue, errors,id  }: InputsFo
         continue;
       }
       for (const h of matched.horas) {
-        const start = typeof h.horaInicio === 'string' ? h.horaInicio.slice(0,5) : String(h.horaInicio).slice(0,5);
-        const end = typeof h.horaFin === 'string' ? h.horaFin.slice(0,5) : String(h.horaFin).slice(0,5);
+        const start = typeof h.horaInicio === 'string' ? h.horaInicio.slice(0, 5) : String(h.horaInicio).slice(0, 5);
+        const end = typeof h.horaFin === 'string' ? h.horaFin.slice(0, 5) : String(h.horaFin).slice(0, 5);
         // cantidadPersonal from matched may indicate capacity for this slot
         const capacity = (matched && (typeof matched.cantidadPersonal === 'number')) ? Number(matched.cantidadPersonal) : undefined;
         collected.push({ label: `${start} - ${end}`, start, end, capacity });
@@ -165,7 +162,7 @@ const InputsForm = ({ register, control, watch, setValue, errors,id  }: InputsFo
     return () => { mounted = false; };
   }, [fechaCita, sucursalId]);
 
-  
+
 
   // Si no hay horas disponibles, limpiar horaCita para que no quede valor inválido
   useEffect(() => {
@@ -181,7 +178,7 @@ const InputsForm = ({ register, control, watch, setValue, errors,id  }: InputsFo
     setFilteredHorarios(filtered);
   }, [horarios]);
 
-  
+
 
   const user = useAuthStore(s => s.user);
 
@@ -214,9 +211,9 @@ const InputsForm = ({ register, control, watch, setValue, errors,id  }: InputsFo
         <Controller name="tipoServicioId" control={control} render={({ field }) => (
           <Autocomplete
             options={tipos}
-            getOptionLabel={(opt:any) => opt?.tipo ?? ''}
-            value={tipos.find(t=>String(t.id)===String(field.value)) ?? null}
-            onChange={(_, v:any) => field.onChange(v ? v.id : undefined)}
+            getOptionLabel={(opt: any) => opt?.tipo ?? ''}
+            value={tipos.find(t => String(t.id) === String(field.value)) ?? null}
+            onChange={(_, v: any) => field.onChange(v ? v.id : undefined)}
             renderInput={(params) => <TextField {...params} label="Tipo de Servicio" variant="standard" fullWidth error={!!errors.tipoServicioId} helperText={errors.tipoServicioId?.message} />}
           />
         )} />
@@ -237,29 +234,30 @@ const InputsForm = ({ register, control, watch, setValue, errors,id  }: InputsFo
                   // disable if no available weekdays computed or day not in set
                   if (!(availableWeekdays instanceof Set) || availableWeekdays.size === 0) return true;
                   const today = new Date();
-                  today.setHours(0,0,0,0);
+                  today.setHours(0, 0, 0, 0);
                   const maxDateObj = maxDate ? new Date(maxDate + 'T00:00:00') : null;
                   // disable if before today or after maxDate
                   const d = new Date(day);
-                  d.setHours(0,0,0,0);
+                  d.setHours(0, 0, 0, 0);
                   if (d.getTime() < today.getTime()) return true;
                   if (maxDateObj && d.getTime() > maxDateObj.getTime()) return true;
                   return !availableWeekdays.has(day.getDay());
                 }}
-                renderDay={(day, _value, DayComponentProps) => {
-                  const isAvailable = availableWeekdays && availableWeekdays.has(day.getDay());
-                  return (
-                    <PickersDay
-                      {...DayComponentProps}
-                      sx={isAvailable ? { bgcolor: 'success.main', color: 'white', '&:hover': { bgcolor: 'success.dark' } } : undefined}
-                    />
-                  );
-                }}
-                inputFormat="yyyy-MM-dd"
+                {...({
+                  renderDay: (day: any, _value: any, DayComponentProps: any) => {
+                    const isAvailable = availableWeekdays && availableWeekdays.has(day.getDay());
+                    return (
+                      <PickersDay
+                        {...DayComponentProps}
+                        sx={isAvailable ? { bgcolor: 'success.main', color: 'white', '&:hover': { bgcolor: 'success.dark' } } : undefined}
+                      />
+                    );
+                  }
+                } as any)}
                 minDate={undefined}
                 maxDate={maxDate ? new Date(maxDate + 'T00:00:00') : undefined}
-                disabled={!(sucursalId && tipoServicioId && horarios.length>0)}
-                renderInput={(params) => <TextField {...params} fullWidth variant="standard" error={!!errors.fechaCita} helperText={errors.fechaCita?.message} />}
+                disabled={!(sucursalId && tipoServicioId && horarios.length > 0)}
+                renderInput={(params: any) => <TextField {...params} fullWidth variant="standard" error={!!errors.fechaCita} helperText={errors.fechaCita?.message} />}
               />
             </LocalizationProvider>
           );
@@ -269,7 +267,7 @@ const InputsForm = ({ register, control, watch, setValue, errors,id  }: InputsFo
       {maxDate && <Grid size={12}><Box mt={1}><Typography variant="caption">Fecha de vigencia máxima: {maxDate}</Typography></Box></Grid>}
 
       <Grid size={12} display={'flex'} justifyContent={'center'}>
-          {availableHours && availableHours.length > 0 ? (
+        {availableHours && availableHours.length > 0 ? (
           // Use TimePicker component to select from available hours and mark occupied ones
           <TimePicker
             dataHoras={availableHours.map(h => ({ id: h.start, horaInicio: h.start, horaFin: h.end, capacity: h.capacity }))}
@@ -322,7 +320,7 @@ const InputsForm = ({ register, control, watch, setValue, errors,id  }: InputsFo
               setClienteFound(null);
               const found = await getClienteByDocumento(doc);
               setClienteFound(found);
-              if (found && found.id) setValue('clienteId', found.id);
+              if (found && found.id) setValue('clienteId', Number(found.id));
             } catch (e) {
               setClienteFound(null);
             } finally { setBuscandoCliente(false); }
@@ -338,7 +336,7 @@ const InputsForm = ({ register, control, watch, setValue, errors,id  }: InputsFo
         </Box>
       </Grid>
 
-      
+
 
       <Grid size={12}>
         <TextField {...register('placa' as any)} label="Placa" fullWidth variant="standard" error={!!errors.placa} helperText={errors.placa?.message} />
@@ -354,11 +352,11 @@ const InputsForm = ({ register, control, watch, setValue, errors,id  }: InputsFo
               setMotoFound(null);
               const found = await getMotoByPlaca(placaVal);
               setMotoFound(found);
-              if (found && found.id) setValue('motoId', found.id);
+              if (found && found.id) setValue('motoId', Number(found.id));
               // if moto has users, optionally set cliente
-              if (found && Array.isArray(found.users) && found.users.length>0) {
+              if (found && Array.isArray(found.users) && found.users.length > 0) {
                 setClienteFound(found.users[0]);
-                if (found.users[0].id) setValue('clienteId', found.users[0].id);
+                if (found.users[0].id) setValue('clienteId', Number(found.users[0].id));
               }
             } catch (e) {
               setMotoFound(null);

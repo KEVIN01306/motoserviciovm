@@ -39,7 +39,7 @@ const LoginClientes = () => {
     } = useForm<AuthClienteType>({
         resolver: zodResolver(authClienteSchema),
         mode: 'onSubmit',
-        defaultValues: { ...authClienteInitialState, placa: 'M' },
+        defaultValues: { ...authClienteInitialState, placa: 'M' } as any,
     });
 
     const userType = watch('userType');

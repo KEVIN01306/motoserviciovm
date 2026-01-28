@@ -1,5 +1,5 @@
 
 
-export const exportarAPDF = (elementoId: string) => {
+export const exportarAPDF = () => {
 window.print();
 };

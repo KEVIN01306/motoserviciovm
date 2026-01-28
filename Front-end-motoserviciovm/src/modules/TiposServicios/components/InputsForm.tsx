@@ -1,11 +1,10 @@
-import { Autocomplete, Checkbox, FormControlLabel, FormLabel, Grid, TextField } from "@mui/material";
+import { Autocomplete, Checkbox, FormControlLabel, Grid, TextField } from "@mui/material";
 import { Controller, type Control, type FieldErrors, type UseFormRegister, type UseFormSetValue, type UseFormWatch } from "react-hook-form";
 import type { TipoServicioType } from "../../../types/tipoServicioType";
 import type { OpcionServicioType } from "../../../types/opcionServicioType";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import type { TipoHorarioType } from "../../../types/tipoHorario";
-import { useState } from "react";
 
 interface InputsFormProps {
     register: UseFormRegister<TipoServicioType>;
@@ -20,7 +19,7 @@ interface InputsFormProps {
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-const InputsForm = ({ register, errors, control, watch, setValue, opciones, tiposHorario }: InputsFormProps) => {
+const InputsForm = ({ register, errors, control, watch, opciones, tiposHorario }: InputsFormProps) => {
 
     return (
         <>
@@ -83,7 +82,7 @@ const InputsForm = ({ register, errors, control, watch, setValue, opciones, tipo
                                 disableCloseOnSelect
                                 getOptionLabel={(opt) => opt.opcion}
                                 value={selectedObjects}
-                                onChange={(event, newValue: OpcionServicioType[]) => {
+                                onChange={(_, newValue: OpcionServicioType[]) => {
                                     const ids = newValue.map(v => v.id);
                                     field.onChange(ids);
                                 }}

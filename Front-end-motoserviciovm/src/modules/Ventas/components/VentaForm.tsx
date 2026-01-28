@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Grid, TextField, Button, MenuItem, Box, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Autocomplete, FormControlLabel, Checkbox, TableContainer } from '@mui/material';
+import { useEffect, useMemo, useState } from 'react';
+import { Grid, TextField, Button, MenuItem, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Autocomplete, FormControlLabel, Checkbox, TableContainer } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import FormEstructure from '../../../components/utils/FormEstructure';
 import { errorToast } from '../../../utils/toast';
 import type { VentaType, VentaProductoType, VentaProductoGetType } from '../../../types/ventaType';
@@ -81,21 +81,21 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
       return;
     }
     // compute totalProducto from selected product precio * cantidad
-    const prod = productosList.find((p) => p.id === linea.productoId);
+    const prod = productosList.find((p) => Number(p.id) === linea.productoId);
     const precio = Number(prod?.precio ?? 0);
     const cantidad = Number(linea.cantidad ?? 0);
     const totalCalc = precio * cantidad;
     const lineaToAdd: VentaProductoGetType = { ...(linea as any), totalProducto: totalCalc, producto: prod, descuento: linea.descuento } as any;
     setItems((s) => [...s, lineaToAdd]);
-    setLinea(VentaProductoInitialState);
+    setLinea(VentaProductoInitialState as any);
   };
 
   const removeLinea = (idx: number) => {
     setItems((s) => s.filter((_, i) => i !== idx));
   };
 
-    const [searhParams]= useSearchParams();
-    const servicioId = searhParams.get('servicioId');
+    const [searchParams]= useSearchParams();
+    const servicioId = searchParams.get('servicioId');
 
     useEffect (() => {
       if (servicioId){
@@ -194,7 +194,7 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
               getOptionLabel={(o: any) => o?.nombre ?? ''}
               onChange={(_, val) => {
                 const prodId = val ? Number(val.id) : 0;
-                const prod = productosList.find(p => p.id === prodId);
+                const prod = productosList.find(p => Number(p.id) === prodId);
                 const precio = Number(prod?.precio ?? 0);
                 const cantidad = Number(linea.cantidad ?? 0);
                 setLinea({ ...linea, productoId: prodId, totalProducto: precio * cantidad });
@@ -205,13 +205,13 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
           </Grid>
 
           <Grid size={{ xs: 12, sm: 1 }}>
-            <TextField label="Stock" value={productosList.find(p => p.id === linea.productoId)?.cantidad ?? ''} fullWidth variant="standard" disabled />
+            <TextField label="Stock" value={productosList.find(p => Number(p.id) === linea.productoId)?.cantidad ?? ''} fullWidth variant="standard" disabled />
           </Grid>
 
           <Grid size={{ xs: 12, sm: 1 }}>
             <TextField label="Cantidad" type="number" variant="standard" value={linea.cantidad} onChange={(e) => {
               const cantidad = Number(e.target.value);
-              const prod = productosList.find(p => p.id === linea.productoId);
+              const prod = productosList.find(p => Number(p.id) === linea.productoId);
               const precio = Number(prod?.precio ?? 0);
               setLinea({ ...linea, cantidad, totalProducto: precio * cantidad });
             }} fullWidth />
@@ -254,13 +254,13 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
                 <TableCell>
                   <TextField select value={it.productoId} onChange={(e) => updateLinea(idx, { productoId: Number(e.target.value) })} variant="standard">
                     {productosList.map((p) => (
-                      <MenuItem key={p.id} value={p.id} disabled={items.some((it2, i2) => i2 !== idx && it2.productoId === p.id)}>{p.nombre}</MenuItem>
+                      <MenuItem key={p.id} value={p.id} disabled={items.some((it2, i2) => i2 !== idx && Number(it2.productoId) === Number(p.id))}>{p.nombre}</MenuItem>
                     ))}
                   </TextField>
                 </TableCell>
                 <TableCell>
                   {(() => {
-                    const prod = productosList.find(p => p.id === it.productoId);
+                    const prod = productosList.find(p => Number(p.id) === it.productoId);
                     return prod ? `Q ${Number(prod.precio ?? 0).toFixed(2)}` : '-';
                   })()}
                 </TableCell>

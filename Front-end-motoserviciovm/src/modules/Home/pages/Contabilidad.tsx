@@ -43,10 +43,15 @@ const Contabilidad: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
+      const sucursalIdsNumeros = sucursalIds
+        ? sucursalIds
+          .map((id: any) => Number(id))
+          .filter((id: number) => !isNaN(id))
+        : [];
       const data = await getContabilidad({
         fechaInicio,
         fechaFin,
-        sucursalIds,
+        sucursalIds: sucursalIdsNumeros,
       });
       setData(data);
     } catch (error: any) {
@@ -68,77 +73,79 @@ const Contabilidad: React.FC = () => {
     {
       id: 'id',
       label: 'Código',
-      format: (value, row) =>  <LinkStylesNavigate label={`Servicio #${row.id}`} onClick={() => goTo(`/admin/servicios/${row.id}`)} variant="body1" />
+      format: (_, row) => <LinkStylesNavigate label={`Servicio #${row ? row.id : ''}`} onClick={() => goTo(`/admin/servicios/${row ? row.id : ''}`)} variant="body1" />
     },
     {
       id: 'placa' as keyof ServicioGetType,
       label: 'Placa',
-      format: (value, row) => row?.moto?.placa || '',
+      format: (_, row) => row?.moto?.placa || '',
     },
-    { id: 'updatedAt', label: 'Fecha', format: (value, row) => formatDate(row.updatedAt) },
-    { id: 'descuentosServicio', label: 'Descuento', format: (value, row) => row?.descuentosServicio ? `Q ${row.descuentosServicio.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` : '' },
-    { id: 'Subtotal', label: 'Subtotal', format: (value,row) => `Q ${(row?.total || 0).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-    { id: 'total', label: 'Total', format: (value,row) => `Q ${((row?.total || 0) - (row?.descuentosServicio || 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+    { id: 'updatedAt', label: 'Fecha', format: (_, row) => row ? formatDate(row.updatedAt) : '' },
+    { id: 'descuentosServicio', label: 'Descuento', format: (_, row) => row?.descuentosServicio ? `Q ${row.descuentosServicio.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '' },
+    { id: 'subtotal', label: 'Subtotal', format: (_, row) => `Q ${(row?.total || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+    { id: 'total', label: 'Total', format: (_, row) => `Q ${((row?.total || 0) - (row?.descuentosServicio || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
   ];
-
+  
   const columnsVentas: Column<VentaGetType>[] = [
-    { id: 'id', label: 'Código', format: (value, row) =>  <LinkStylesNavigate label={`Venta #${row.id}`} onClick={() => goTo(`/admin/ventas/${row.id}`)} variant="body1" />},
-    { id: 'updatedAt', label: 'Fecha', format: (value, row) => formatDate(row.updatedAt) },
-    { id: 'costo', label: 'Costo', format: (value) => `Q ${(value).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-    { id: 'precioTotal', label: 'Precio', format: (value) => `Q ${(value).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-    { id: 'gananciaTotal', label: 'Ganancia', format: (value) => `Q ${(value).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-    { id: 'total', label: 'Monto Total', format: (value) => `Q ${(value).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+    { id: 'id', label: 'Código', format: (_, row) => <LinkStylesNavigate label={`Venta #${row ? row.id : ''}`} onClick={() => goTo(`/admin/ventas/${row ? row.id : ''}`)} variant="body1" /> },
+    { id: 'updatedAt', label: 'Fecha', format: (_, row) => row ? formatDate(row.updatedAt) : '' },
+    { id: 'costo', label: 'Costo', format: (value) => `Q ${(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+    { id: 'precioTotal', label: 'Precio', format: (value) => `Q ${(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+    { id: 'gananciaTotal', label: 'Ganancia', format: (value) => `Q ${(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+    { id: 'total', label: 'Monto Total', format: (value) => `Q ${(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
   ];
 
   const columnsIngresosEgresos: Column<IngresosEgresosGetType>[] = [
-    { id: 'descripcion', label: 'Descripción', format: (value, row) =>  <LinkStylesNavigate label={row.descripcion || ''} onClick={() => goTo(`/admin/ingresos-egresos/${row?.id}`)} variant="body1" />},
-    { id: 'updatedAt', label: 'Fecha', format: (value, row) => formatDate(row.updatedAt) },
-    { id: 'tipo', label: 'Tipo', format: (value, row) => row.tipo?.tipo || '' },
-    { id: 'monto', label: 'Monto', format(value, row) {
-        return row?.tipoId == tiposContabilidad().ingreso ? `+ Q ${row.monto.toFixed(2)}` : `- Q ${row.monto.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-    }, },
-  ];
- /*
-  const metrics = [
+    { id: 'descripcion', label: 'Descripción', format: (_, row) => <LinkStylesNavigate label={row ? row.descripcion || '' : ''} onClick={() => goTo(`/admin/ingresos-egresos/${row?.id}`)} variant="body1" /> },
+    { id: 'updatedAt', label: 'Fecha', format: (_, row) => row?.updatedAt ? formatDate(row.updatedAt.toDateString()) : '' },
+    { id: 'tipo', label: 'Tipo', format: (_, row) => row ? row.tipo?.tipo || '' : '' },
     {
-      title: 'Total Servicios',
-      value: "Q "+(data?.totalServicios || 0).toFixed(2),
-      //trend: 'up' as 'up',
-      //trendValue: 5.2,
-      icon: FaChartLine,
-      color: '#10b981',
-    },
-    {
-      title: 'Total Ventas',
-      value: "Q "+(data?.totalVentas || 0).toFixed(2),
-      //trend: 'down' as 'down',
-      //trendValue: 3.1,
-      icon: FaShoppingCart,
-      color: '#f59e0b',
-    },
-    {
-      title: 'Total Gastos',
-      value: "Q "+(data?.totalGastos || 0).toFixed(2),
-      //trend: 'down' as 'down',
-      //trendValue: 2.8,
-      icon: FaDollarSign,
-      color: '#ef4444',
-    },
-    {
-      title: 'Total Ingresos',
-      value: "Q "+(data?.totalIngresosGenerales || 0).toFixed(2),
-      //trend: 'up' as 'up',
-      //trendValue: 4.5,
-      icon: FaDollarSign,
-      color: '#3b82f6',
+      id: 'monto', label: 'Monto', format: (_, row) => {
+        return row?.tipoId == tiposContabilidad().ingreso ? `+ Q ${row.monto.toFixed(2)}` : `- Q ${row ? row.monto.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''}`;
+      },
     },
   ];
-  */
+  /*
+   const metrics = [
+     {
+       title: 'Total Servicios',
+       value: "Q "+(data?.totalServicios || 0).toFixed(2),
+       //trend: 'up' as 'up',
+       //trendValue: 5.2,
+       icon: FaChartLine,
+       color: '#10b981',
+     },
+     {
+       title: 'Total Ventas',
+       value: "Q "+(data?.totalVentas || 0).toFixed(2),
+       //trend: 'down' as 'down',
+       //trendValue: 3.1,
+       icon: FaShoppingCart,
+       color: '#f59e0b',
+     },
+     {
+       title: 'Total Gastos',
+       value: "Q "+(data?.totalGastos || 0).toFixed(2),
+       //trend: 'down' as 'down',
+       //trendValue: 2.8,
+       icon: FaDollarSign,
+       color: '#ef4444',
+     },
+     {
+       title: 'Total Ingresos',
+       value: "Q "+(data?.totalIngresosGenerales || 0).toFixed(2),
+       //trend: 'up' as 'up',
+       //trendValue: 4.5,
+       icon: FaDollarSign,
+       color: '#3b82f6',
+     },
+   ];
+   */
 
   const metricsRepuestos = [
     {
       title: 'Total Ventas',
-      value: "Q "+(data?.totalVentasRepuestos || 0).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
+      value: "Q " + (data?.totalVentasRepuestos || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       //trend: 'down' as 'down',
       //trendValue: 3.1,
       icon: FaShoppingCart,
@@ -146,7 +153,7 @@ const Contabilidad: React.FC = () => {
     },
     {
       title: 'Total Ganancias Ventas',
-      value: "Q "+(data?.totalGananciasVentas || 0).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
+      value: "Q " + (data?.totalGananciasVentas || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       //trend: 'up' as 'up',
       //trendValue: 5.2,
       icon: FaChartLine,
@@ -154,7 +161,7 @@ const Contabilidad: React.FC = () => {
     },
     {
       title: 'Total Gastos',
-      value: "Q "+(data?.totalGastosRepuestos || 0).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
+      value: "Q " + (data?.totalGastosRepuestos || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       //trend: 'down' as 'down',
       //trendValue: 2.8,
       icon: FaDollarSign,
@@ -162,7 +169,7 @@ const Contabilidad: React.FC = () => {
     },
     {
       title: 'Total Caja Repuestos',
-      value: "Q "+(data?.totalCajaRepuestos || 0).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
+      value: "Q " + (data?.totalCajaRepuestos || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       //trend: 'up' as 'up',
       //trendValue: 4.5,
       icon: FaDollarSign,
@@ -174,7 +181,7 @@ const Contabilidad: React.FC = () => {
   const metricsTaller = [
     {
       title: 'Total Servicios Taller',
-      value: "Q "+(data?.totalServiciosTaller || 0).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
+      value: "Q " + (data?.totalServiciosTaller || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       //trend: 'up' as 'up',
       //trendValue: 5.2,
       icon: FaChartLine,
@@ -182,7 +189,7 @@ const Contabilidad: React.FC = () => {
     },
     {
       title: 'Total Gastos Taller',
-      value: "Q "+(data?.totalGastosTaller || 0).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
+      value: "Q " + (data?.totalGastosTaller || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       //trend: 'down' as 'down',
       //trendValue: 3.1,
       icon: FaDollarSign,
@@ -190,7 +197,7 @@ const Contabilidad: React.FC = () => {
     },
     {
       title: 'Total Caja Taller',
-      value: "Q "+(data?.totalCajaTaller || 0).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
+      value: "Q " + (data?.totalCajaTaller || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       //trend: 'down' as 'down',
       //trendValue: 2.8,
       icon: FaDollarSign,
@@ -201,7 +208,7 @@ const Contabilidad: React.FC = () => {
   const mretricsGenerales = [
     {
       title: 'Total Ingresos',
-      value: "Q "+(data?.totalIngresos || 0).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
+      value: "Q " + (data?.totalIngresos || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       //trend: 'up' as 'up',
       //trendValue: 5.2,
       icon: FaChartLine,
@@ -209,7 +216,7 @@ const Contabilidad: React.FC = () => {
     },
     {
       title: 'Total Gastos',
-      value: "Q "+(data?.totalGastos || 0).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
+      value: "Q " + (data?.totalGastos || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       //trend: 'down' as 'down',
       //trendValue: 3.1,
       icon: FaDollarSign,
@@ -217,7 +224,7 @@ const Contabilidad: React.FC = () => {
     },
     {
       title: 'Total Caja General',
-      value: "Q "+ (data?.totalCajaGeneral || 0).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
+      value: "Q " + (data?.totalCajaGeneral || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       //trend: 'down' as 'down',
       //trendValue: 2.8,
       icon: FaDollarSign,
@@ -254,11 +261,11 @@ const Contabilidad: React.FC = () => {
           <Autocomplete
             multiple
             id="checkboxes-sucursales-tags"
-            options={user?.sucursales || []} 
+            options={user?.sucursales || []}
             disableCloseOnSelect
             getOptionLabel={(sucursal) => sucursal.nombre || ''}
             value={selectedSucursales}
-            onChange={(event, newValue) => setSelectedSucursales(newValue)}
+            onChange={(_, newValue) => setSelectedSucursales(newValue)}
             renderOption={(props, option, { selected }) => (
               <li {...props} key={option.id}>
                 <Checkbox
@@ -297,19 +304,19 @@ const Contabilidad: React.FC = () => {
       {!loading && !error && data && (
         <>
           <Typography variant='h4' textAlign={'center'} gutterBottom>
-              GENERAL
+            GENERAL
           </Typography>
-        
+
           <Grid container spacing={3} sx={{ mb: 4 }}>
             {mretricsGenerales.map((metric, index) => (
               <Grid size={{ md: 3, xs: 12 }} key={index}>
-                <KpiCard {...metric} />
+                <KpiCard {...metric} trendValue={0} />
               </Grid>
             ))}
           </Grid>
 
-          <Box mt={4} /> 
-            <Typography variant="h6" gutterBottom>
+          <Box mt={4} />
+          <Typography variant="h6" gutterBottom>
             Ingresos/Egresos Generales
           </Typography>
           <ProductsTable
@@ -317,7 +324,11 @@ const Contabilidad: React.FC = () => {
             columns={columnsIngresosEgresos}
             footerRow={{
               descripcion: 'Totales',
-              monto: "Q " + (data.ingresosEgresosDetalle.reduce((sum, row) => sum + (row.monto || 0), 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})
+              monto: ("Q " + (data.ingresosEgresosDetalle.reduce((sum, row) => sum + (row.monto || 0), 0))
+                .toLocaleString('en-US', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                })) as unknown as number,
             }}
             exportFileName="Ingresos_Egresos_Generales_Contabilidad"
             showExportButton={true}
@@ -325,13 +336,13 @@ const Contabilidad: React.FC = () => {
           />
 
           <Typography variant='h4' marginTop={10} textAlign={'center'} gutterBottom>
-              CONTROL TALLER
+            CONTROL TALLER
           </Typography>
 
           <Grid container spacing={3} sx={{ mb: 4 }}>
             {metricsTaller.map((metric, index) => (
               <Grid size={{ md: 3, xs: 12 }} key={index}>
-                <KpiCard {...metric} />
+                <KpiCard {...metric} trendValue={0} />
               </Grid>
             ))}
           </Grid>
@@ -344,28 +355,28 @@ const Contabilidad: React.FC = () => {
             rows={data.serviciosDetalle}
             columns={columnsServicios}
             footerRow={{
-              id: 'Totales',
-              descuentosServicio: "Q " + (data.serviciosDetalle.reduce((sum, row) =>  sum + (row.descuentosServicio || 0), 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
-              Subtotal: "Q " + (data.serviciosDetalle.reduce((sum, row) =>  sum + (row.total || 0), 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
-              total: "Q " + (data.serviciosDetalle.reduce((sum, row) =>  sum + ((row.total || 0) - (row.descuentosServicio || 0)), 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
+              id: ('Totales') as any,
+              descuentosServicio: ("Q " + (data.serviciosDetalle.reduce((sum, row) => sum + (row.descuentosServicio || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
+              subtotal: ("Q " + (data.serviciosDetalle.reduce((sum, row) => sum + (row.total || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
+              total: ("Q " + (data.serviciosDetalle.reduce((sum, row) => sum + ((row.total || 0) - (row.descuentosServicio || 0)), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
             }}
             exportFileName="Detalle_Servicios_Contabilidad"
             showExportButton={true}
           />
 
-          <Box mt={4} /> 
+          <Box mt={4} />
 
-          
-          <Box mt={4} /> 
-            <Typography variant="h6" gutterBottom>
+
+          <Box mt={4} />
+          <Typography variant="h6" gutterBottom>
             Ingresos/Egresos Taller
           </Typography>
           <ProductsTable
             rows={data.gastosTallerDetalle}
             columns={columnsIngresosEgresos}
             footerRow={{
-              descripcion: 'Totales',
-              monto: "Q " + (data.gastosTallerDetalle.reduce((sum, row) => sum + (row.monto || 0), 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
+              descripcion: ('Totales') as any,
+              monto: ("Q " + (data.gastosTallerDetalle.reduce((sum, row) => sum + (row.monto || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
             }}
             exportFileName="Ingresos_Egresos_Taller_Contabilidad"
             showExportButton={true}
@@ -373,37 +384,37 @@ const Contabilidad: React.FC = () => {
           />
 
           <Typography variant='h4' marginTop={10} textAlign={'center'} gutterBottom>
-              CONTROL REPUESTOS
+            CONTROL REPUESTOS
           </Typography>
 
-        <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid container spacing={3} sx={{ mb: 4 }}>
             {metricsRepuestos.map((metric, index) => (
               <Grid size={{ md: 3, xs: 12 }} key={index}>
-                <KpiCard {...metric} />
+                <KpiCard {...metric} trendValue={0} />
               </Grid>
             ))}
           </Grid>
 
-        
-        <Typography variant="h6" gutterBottom>
+
+          <Typography variant="h6" gutterBottom>
             Ventas
           </Typography>
           <ProductsTable
             rows={data.ventasDetalle}
             columns={columnsVentas}
             footerRow={{
-              id: 'Totales',
-                costo: "Q " + (data.ventasDetalle.reduce((sum, row) => sum + (row.costo || 0), 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                precioTotal: "Q " + (data.ventasDetalle.reduce((sum, row) => sum + (row.precioTotal || 0), 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
-                gananciaTotal: "Q " + (data.ventasDetalle.reduce((sum, row) => sum + (row.gananciaTotal || 0), 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
-              total: "Q " + (data.ventasDetalle.reduce((sum, row) => sum + (row.total || 0), 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}),
-            }}
+                id: ('Totales') as any,
+                costo: ("Q " + (data.ventasDetalle.reduce((sum, row) => sum + (row.costo || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
+                precioTotal: ("Q " + (data.ventasDetalle.reduce((sum, row) => sum + (row.precioTotal || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
+                gananciaTotal: ("Q " + (data.ventasDetalle.reduce((sum, row) => sum + (row.gananciaTotal || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
+                total: ("Q " + (data.ventasDetalle.reduce((sum, row) => sum + (row.total || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
+              }}
             exportFileName="Detalle_Ventas_Contabilidad"
             showExportButton={true}
           />
-          
-          <Box mt={4} /> 
-            <Typography variant="h6" gutterBottom>
+
+          <Box mt={4} />
+          <Typography variant="h6" gutterBottom>
             Ingresos/Egresos Repuestos
           </Typography>
           <ProductsTable
@@ -411,15 +422,15 @@ const Contabilidad: React.FC = () => {
             columns={columnsIngresosEgresos}
             footerRow={{
               descripcion: 'Totales',
-              monto: "Q " + (data.gastosRepuestosDetalle.reduce((sum, row) => sum + (row.monto || 0), 0)).toFixed(2),
+              monto: ("Q " + (data.gastosRepuestosDetalle.reduce((sum, row) => sum + (row.monto || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
             }}
             exportFileName="Ingresos_Egresos_Repuestos_Contabilidad"
             showExportButton={true}
           />
 
-          
+
         </>
-        
+
       )}
     </Box>
   );

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Grid, TextField, Button, Divider } from "@mui/material";
+import { Grid, Button, Divider } from "@mui/material";
 
 import BreadcrumbsRoutes from "../../../components/utils/Breadcrumbs";
 import { RiBikeFill } from "react-icons/ri";
@@ -8,10 +8,7 @@ import Loading from "../../../components/utils/Loading";
 import ErrorCard from "../../../components/utils/ErrorCard";
 
 import { EnReparacionInitialState, mergeEnReparacionDataForSubmissionEdit, type EnReparacionGetType, type EnReparacionType } from "../../../types/enReparacionType";
-import RepuestosTable from "../components/RepuestosTable";
-import { getEnReparacion as getEnReparacionService, putEnReparacion, putEnReparacionSalida } from "../../../services/enReparacion.services";
-import CardForm from "../../../components/utils/cards/CardForm";
-import { Padding } from "@mui/icons-material";
+import { getEnReparacion as getEnReparacionService, putEnReparacion } from "../../../services/enReparacion.services";
 import FormEstructure from "../../../components/utils/FormEstructure";
 import InputsForm from "../components/InputsForm";
 import { enReparacionSchema } from "../../../zod/enReparacion.schema";

@@ -5,10 +5,8 @@ import { Chip } from '@mui/material';
 import { estados } from '../../../utils/estados';
 import { formatDate } from '../../../utils/formatDate';
 import type { EstadoType } from '../../../types/estadoType';
-import { PiDeviceTabletFill, PiUserCheckBold } from 'react-icons/pi';
+import { PiDeviceTabletFill } from 'react-icons/pi';
 import { MdBikeScooter } from 'react-icons/md';
-import { FaBarsProgress } from "react-icons/fa6";
-import { RiMoneyDollarCircleLine } from 'react-icons/ri';
 import { useGoTo } from '../../../hooks/useGoTo';
 import { useAuthStore } from '../../../store/useAuthStore';
 
@@ -29,10 +27,8 @@ const getTableActions = () => {
     const user = useAuthStore.getState().user;
     const goTo = useGoTo();
     return (row: ServicioGetType) => {
-        const isEnEspera = row.estadoId === estados().enEspera;
         const actions: { label: any; onClick: (r: ServicioGetType) => void; permiso: string }[] = [];
 
-        
         if (user?.permisos.includes('servicios:salidaDetalle')) {
             actions.push({ label: (<><MdBikeScooter /><span className="ml-1.5">Detalle Salida</span></>), onClick: (r) => goTo(`/admin/servicios/${r.id}/salidaDetalle`), permiso: 'servicios:salidaDetalle' });
         }

@@ -26,7 +26,7 @@ const getEnParqueos = async (): Promise<EnParqueoGetType[]> => {
   }
 };
 
-const getEnParqueo = async (id: EnParqueoType["id"]): Promise<EnParqueoGetType> => {
+const getEnParqueo = async (id: number): Promise<EnParqueoGetType> => {
   try {
     const response = await api.get<apiResponse<EnParqueoGetType>>(`${API_ENPARQUEO}/${id}`);
     const item = response.data.data;
@@ -61,7 +61,7 @@ const postEnParqueo = async (payload: EnParqueoType) => {
   }
 };
 
-const putEnParqueoSalida = async (id: EnParqueoType["id"], payload: Partial<EnParqueoType>) => {
+const putEnParqueoSalida = async (id: number, payload: Partial<EnParqueoType>) => {
   try {
     let dataToSend: any = payload;
     console.log("Payload before submission:", payload);

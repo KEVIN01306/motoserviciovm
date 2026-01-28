@@ -2,6 +2,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import DownloadIcon from '@mui/icons-material/Download';
 import * as XLSX from 'xlsx';
 import type { Column } from './Table';
+import type { ReactNode } from 'react';
 
 type Props<T> = {
   columns: Column<T>[];
@@ -9,7 +10,7 @@ type Props<T> = {
   footerRow?: Partial<T>; // Optional footer row
   headerColor?: string;
   /** optional maximum height for scroll */
-  maxHeight?: number;
+  maxHeight?: number | string;
   colorHeader?: string;
   showExportButton?: boolean;
   exportFileName?: string;
@@ -121,8 +122,7 @@ export default function ProductsTable<T>({ columns, rows, footerRow, headerColor
               <TableRow>
                 {columns.map((column) => (
                   <TableCell key={column.id as string}>
-                    {footerRow[column.id] || ''}
-                  </TableCell>
+                    {footerRow ? (footerRow[column.id as keyof T] as ReactNode) || '' : ''}                  </TableCell>
                 ))}
               </TableRow>
             )}

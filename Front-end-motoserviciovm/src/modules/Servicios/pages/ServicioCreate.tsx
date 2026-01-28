@@ -1,17 +1,15 @@
-import { useEffect, useState } from 'react';
-import { Container, Card, CardContent } from '@mui/material';
+import { useState } from 'react';
+import { Container } from '@mui/material';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiToolsLine } from 'react-icons/ri';
 import ServicioForm from '../components/ServicioForm';
 import { postServicio } from '../../../services/servicios.services';
 import { useGoTo } from '../../../hooks/useGoTo';
-import { useAuthStore } from '../../../store/useAuthStore';
 import { successToast, errorToast } from '../../../utils/toast';
 
 const ServicioCreate = () => {
   const goTo = useGoTo();
-  const user = useAuthStore(s => s.user);
-  const [draft, setDraft] = useState<any | null>(null);
+  const [draft, ] = useState<any | null>(null);
   const [seHaranVentas,setSeHaranVentas]=useState<boolean>(false);
 
   const changeSeHaranVentas = (value: boolean) => {

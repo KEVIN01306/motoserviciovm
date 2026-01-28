@@ -52,16 +52,25 @@ const EnParqueoDetail = () => {
         ]}
       />
       {item ? (
-        <DetailData item={item}>
-          {/* show blue button linking to salida if user has permiso and registro not entregado */}
+        <>
+          {/* Cerramos el componente aquí mismo con /> */}
+          <DetailData item={item} />
+
+          {/* El botón ahora queda fuera de DetailData, pero dentro del condicional de item */}
           {!isEntregado(item) && user?.permisos?.includes("enparqueo:salida") && (
-            <Grid size={12}>
-              <Button variant="contained" color="primary" startIcon={<RiEdit2Line />} fullWidth onClick={() => goTo(`/admin/enparqueo/${id}/salida`)}>
+            <Grid size={12} sx={{ mt: 2 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<RiEdit2Line />}
+                fullWidth
+                onClick={() => goTo(`/admin/enparqueo/${id}/salida`)}
+              >
                 Registrar Salida
               </Button>
             </Grid>
           )}
-        </DetailData>
+        </>
       ) : null}
     </>
   );

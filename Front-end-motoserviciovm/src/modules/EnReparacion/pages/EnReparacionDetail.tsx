@@ -4,15 +4,13 @@ import Loading from "../../../components/utils/Loading";
 import ErrorCard from "../../../components/utils/ErrorCard";
 import { getEnReparacion } from "../../../services/enReparacion.services";
 import DetailData from "../components/DetailData";
-import RepuestosTable from "../components/RepuestosTable";
 import { useGoTo } from "../../../hooks/useGoTo";
 import BreadcrumbsRoutes from "../../../components/utils/Breadcrumbs";
 import { RiBikeFill, RiEdit2Line } from "react-icons/ri";
 import { useAuthStore } from "../../../store/useAuthStore";
-import { Grid, Button, Link, Checkbox, Box } from "@mui/material";
+import { Grid, Button, Link, Checkbox } from "@mui/material";
 import type { EnReparacionGetType } from "../../../types/enReparacionType";
 import ProductsTable from "../../../components/Table/ProductsTable";
-import type { repuestoReparacionType } from "../../../types/repuestoReparacionType";
 
 const EnReparacionDetail = () => {
   const { id } = useParams();
@@ -47,7 +45,7 @@ const EnReparacionDetail = () => {
     const estadoLabel = (row?.estado?.estado ?? "").toLowerCase();
     return estadoLabel.includes("entreg") || estadoLabel.includes("salid") || estadoLabel.includes("salida");
   };
-  
+
   return (
     <>
       <BreadcrumbsRoutes
@@ -59,34 +57,40 @@ const EnReparacionDetail = () => {
       <Grid container spacing={2} width={'100%'}>
         {item ? (
           <>
-
             <Grid size={12}>
-              <DetailData item={item}>
-                {!isEntregado(item) && user?.permisos?.includes("enreparacion:salida") && (
-                  <Grid size={12}>
-                    <Button variant="contained" color="primary" startIcon={<RiEdit2Line />} fullWidth onClick={() => goTo(`/admin/enreparacion/${id}/salida`)}>
-                      Registrar Salida
-                    </Button>
-                  </Grid>
-                )}
-              </DetailData>
+              {/* 1. Cerramos DetailData aquí (autocierre />) */}
+              <DetailData item={item} />
+
+              {/* 2. El botón ahora queda fuera de DetailData */}
+              {!isEntregado(item) && user?.permisos?.includes("enreparacion:salida") && (
+                <Grid size={12} sx={{ mt: 2 }}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<RiEdit2Line />}
+                    fullWidth
+                    onClick={() => goTo(`/admin/enreparacion/${id}/salida`)}
+                  >
+                    Registrar Salida
+                  </Button>
+                </Grid>
+              )}
             </Grid>
 
             <Grid size={12} sx={{ mt: 4 }}>
               <ProductsTable
                 columns={[
-                  { id: 'repuesto', label: 'Repuesto', minWidth: 120, format: (v: any, row: repuestoReparacionType) => row.nombre ?? '' },
-                  { id: 'descripcion', label: 'Descripción', minWidth: 180, format: (v: any, row: repuestoReparacionType) => row.descripcion ?? '' },
-                  { id: 'refencia', label: 'Referencia', minWidth: 100, format: (v: any, row: repuestoReparacionType) => row.refencia ? (<Link href={row.refencia} target="_blank" rel="noopener noreferrer" underline="hover" >Link</Link>) : 'No hay' },
-                  { id: 'checked', label: 'Entregado', minWidth: 100, format: (v: any, row: repuestoReparacionType) => <Checkbox color="primary" checked={!!row.checked} disabled /> },
-                  { id: 'cantidad', label: 'Cantidad', minWidth: 80, align: 'center', format: (v: any) => String(v) },
+                  { id: 'repuesto', label: 'Repuesto', minWidth: 120, format: (row: any) => row.nombre ?? '' },
+                  { id: 'descripcion', label: 'Descripción', minWidth: 180, format: (row: any) => row.descripcion ?? '' },
+                  { id: 'refencia', label: 'Referencia', minWidth: 100, format: (row: any) => row.refencia ? (<Link href={row.refencia} target="_blank" rel="noopener noreferrer" underline="hover" >Link</Link>) : 'No hay' },
+                  { id: 'checked', label: 'Entregado', minWidth: 100, format: (row: any) => <Checkbox color="primary" checked={!!row.checked} disabled /> },
+                  { id: 'cantidad', label: 'Cantidad', minWidth: 80, align: 'center', format: (row: any) => String(row.cantidad) },
                 ] as any}
                 rows={item.repuestos ?? []}
                 headerColor="#1565c0"
               />
             </Grid>
           </>
-
         ) : null}
 
       </Grid>

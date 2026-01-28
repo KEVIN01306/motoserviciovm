@@ -1,5 +1,5 @@
-import React, { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
-import { Grid, TextField, Button, MenuItem, Autocomplete, Menu } from '@mui/material';
+import { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
+import { Grid, TextField, Button, MenuItem, Autocomplete } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import FormEstructure from '../../../components/utils/FormEstructure';
 import { IngresosEgresosInitialState, type IngresosEgresosType } from '../../../types/ingresosEgresos.Type';
@@ -15,7 +15,7 @@ type Props = {
 
 const IngresosEgresosForm = forwardRef((props: Props, ref) => {
   const { initial, onSubmit, submitLabel = 'Guardar' } = props;
-  const { register, handleSubmit, setValue, formState: { isSubmitting }, reset, watch } = useForm<IngresosEgresosType>({ defaultValues: { ...(initial ?? IngresosEgresosInitialState) } as any });
+  const { register, handleSubmit, setValue, formState: { isSubmitting }, reset } = useForm<IngresosEgresosType>({ defaultValues: { ...(initial ?? IngresosEgresosInitialState) } as any });
   const [sucursales, setSucursales] = useState<any[]>([]);
   const [sucursalSelected, setSucursalSelected] = useState<any | null>(null);
   const user = useAuthStore(state => state.user);
@@ -50,14 +50,6 @@ const IngresosEgresosForm = forwardRef((props: Props, ref) => {
   const internalSubmit = async (data: IngresosEgresosType) => {
     await onSubmit({ ...data });
   };
-
-  const tiposMap = tiposContabilidad();
-  const tipos = [
-    { id: tiposMap.ingreso, tipo: 'Ingreso' },
-    { id: tiposMap.egreso, tipo: 'Egreso' },
-  ];
-
-
 
   return (
     <FormEstructure handleSubmit={handleSubmit(internalSubmit)} pGrid={2}>

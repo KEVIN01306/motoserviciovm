@@ -82,7 +82,7 @@ const EnParqueoSalida = () => {
           }
         )}
       >
-        <SalidaForm control={control} errors={formState.errors} readOnlyValues={item ?? undefined} register={register} />
+        <SalidaForm control={control as any} errors={formState.errors} readOnlyValues={item ?? undefined} register={register as any} />
 
         <Grid size={12}>
           <Divider sx={{ my: 2 }} />
