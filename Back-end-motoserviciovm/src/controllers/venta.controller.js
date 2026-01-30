@@ -33,6 +33,7 @@ const postVentaHandler = async (req, res) => {
         const data = req.body;
         if (typeof data.usuarioId !== 'undefined') data.usuarioId = parseInt(data.usuarioId);
         if (typeof data.servicioId !== 'undefined' && data.servicioId !== null) data.servicioId = parseInt(data.servicioId);
+        if (typeof data.reparacionId !== 'undefined' && data.reparacionId !== null) data.reparacionId = parseInt(data.reparacionId);
         if (typeof data.total !== 'undefined') data.total = parseFloat(data.total);
         if (typeof data.estadoId !== 'undefined') data.estadoId = parseInt(data.estadoId);
 
@@ -79,6 +80,7 @@ const putVentaHandler = async (req, res) => {
         const data = req.body;
         if (typeof data.usuarioId !== 'undefined') data.usuarioId = parseInt(data.usuarioId);
         if (typeof data.servicioId !== 'undefined' && data.servicioId !== null) data.servicioId = parseInt(data.servicioId);
+        if (typeof data.reparacionId !== 'undefined' && data.reparacionId !== null) data.reparacionId = parseInt(data.reparacionId);
         if (typeof data.total !== 'undefined') data.total = parseFloat(data.total);
         if (typeof data.estadoId !== 'undefined') data.estadoId = parseInt(data.estadoId);
 

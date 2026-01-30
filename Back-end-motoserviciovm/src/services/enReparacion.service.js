@@ -21,7 +21,7 @@ const getEnReparaciones = async () => {
 const getEnReparacion = async (id) => {
     const item = await prisma.enReparacion.findUnique({
         where: { id: id, estadoId: { not: estados().inactivo } },
-        include: { servicio: { include: { moto: { include: { modelo: true, users: true } } } }, estado: true, repuestos: true },
+        include: { servicio: { include: { moto: { include: { modelo: true, users: true } } } }, estado: true, repuestos: true, ventas: {include: {estado: true,productos:{include: {producto: true}}}}  },
     });
     if (!item) {
         const error = new Error('DATA_NOT_FOUND');

@@ -111,11 +111,22 @@ const VentaDetail = () => {
                     <Typography sx={{ minWidth: 120, color: '#6b7280', fontWeight: 600 }}>Estado</Typography>
                     <Typography><Chip variant='outlined' label={data.estado?.estado ?? ''} color={chipColorByEstado(data.estadoId ?? 0)} /></Typography>
                   </Box>
+                  {
+                    data.servicioId && (
+                      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                        <Typography sx={{ minWidth: 120, color: '#6b7280', fontWeight: 600 }}>Servicio</Typography>
+                        <LinkStylesNavigate label={String(data.servicioId) ?? '-'} onClick={() => goTo(`/admin/servicios/${data.servicioId}`)} variant="body1" />
+                      </Box>
+                    )
+                  }
+                  {data.reparacionId && (
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                      <Typography sx={{ minWidth: 120, color: '#6b7280', fontWeight: 600 }}>Reparación</Typography>
+                      <LinkStylesNavigate label={String(data.reparacionId) ?? '-'} onClick={() => goTo(`/admin/enreparacion/${data.reparacionId}`)} variant="body1" />
+                    </Box>
+                  )
+                  }
 
-                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                    <Typography sx={{ minWidth: 120, color: '#6b7280', fontWeight: 600 }}>Servicio</Typography>
-                    <LinkStylesNavigate label={String(data.servicioId) ?? '-'} onClick={() => goTo(`/admin/servicios/${data.servicioId}`)} variant="body1" />
-                  </Box>
                 </Box>
               </Grid>
             </Grid>

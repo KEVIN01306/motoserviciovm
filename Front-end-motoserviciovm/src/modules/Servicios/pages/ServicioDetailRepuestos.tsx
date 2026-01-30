@@ -110,9 +110,6 @@ const ServicioDetail = () => {
                     <Typography textAlign={'center'} variant="h6" gutterBottom>En Reparación</Typography>
                     <Typography textAlign={'center'} variant='body2' gutterBottom>{data.enReparaciones[0].descripcion}</Typography>
                     <Chip label={data.enReparaciones[0]?.estado.estado ?? ''} color={chipColorByEstado(data.enReparaciones[0]?.estado.id)} sx={{ mb: 2 }} variant='outlined'/>
-                    <Typography variant="h6" sx={{ mt: 2 }}>
-                        {`Total Reparacion ${data.enReparaciones[0].total ? `Q ${data.enReparaciones[0].total.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 'Q 0.00'}`}
-                    </Typography>
                   </Box>
 
                   <ProductsTable

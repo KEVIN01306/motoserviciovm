@@ -96,12 +96,19 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
 
     const [searchParams]= useSearchParams();
     const servicioId = searchParams.get('servicioId');
+    const reparacionId = searchParams.get('reparacionId');
 
     useEffect (() => {
       if (servicioId){
         setValue('servicioId' as any, Number(servicioId));
       }
     },[servicioId, setValue]);
+
+    useEffect (() => {
+      if (reparacionId){
+        setValue('reparacionId' as any, Number(reparacionId));
+      }
+    },[reparacionId, setValue]);
 
 
   const updateLinea = (idx: number, patch: Partial<VentaProductoType>) => {
@@ -169,6 +176,9 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
 
       <Grid size={{ xs: 12, sm: 6 }}>
         <TextField {...register('servicioId' as any)} label="Servicio (omitido)" fullWidth variant="standard" disabled />
+      </Grid>
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <TextField {...register('reparacionId' as any)} label="Reparación (omitido)" fullWidth variant="standard" disabled />
       </Grid>
 
       <Grid size={{ xs: 12, sm: 6 }}>

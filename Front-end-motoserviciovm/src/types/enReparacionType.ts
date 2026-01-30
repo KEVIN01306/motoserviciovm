@@ -4,6 +4,7 @@ import enReparacionSchema from "../zod/enReparacion.schema";
 import type { EstadoType } from "./estadoType";
 import type { repuestoReparacionType } from "./repuestoReparacionType";
 import type { ServicioGetType } from "./servicioType";
+import type { VentaGetType } from "./ventaType";
 
 
 export type EnReparacionType = z.infer<typeof enReparacionSchema> ;
@@ -15,6 +16,7 @@ export type EnReparacionGetType = EnReparacionType & {
     repuestos: repuestoReparacionType[];
     createdAt: string;
     updatedAt: string;
+    ventas?: VentaGetType[];
 };
 
 export const EnReparacionInitialState: EnReparacionType = {

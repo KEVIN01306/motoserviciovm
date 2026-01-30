@@ -1,18 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab, Avatar, Link } from '@mui/material';
+import { Container, Card, CardContent, Box, Typography, Divider, Grid, Chip, Fab, Avatar, Link, Checkbox } from '@mui/material';
 import BreadcrumbsRoutes from '../../../components/utils/Breadcrumbs';
 import { RiToolsLine } from 'react-icons/ri';
 import Loading from '../../../components/utils/Loading';
 import ErrorCard from '../../../components/utils/ErrorCard';
 import { getServicio } from '../../../services/servicios.services';
-import type { ServicioGetType } from '../../../types/servicioType';
+import type { ProgresoItemGetType, ServicioGetType } from '../../../types/servicioType';
 import ProductsTable from '../../../components/Table/ProductsTable';
 import { formatDate } from '../../../utils/formatDate';
 import type { VentaGetType, VentaProductoGetType } from '../../../types/ventaType';
 import { estados } from '../../../utils/estados';
 import { PiExportDuotone } from 'react-icons/pi';
-import type { OpcionServicioType } from '../../../types/opcionServicioType';
 import { useAuthStore } from '../../../store/useAuthStore';
 import type { repuestoReparacionType } from '../../../types/repuestoReparacionType';
 
@@ -227,23 +226,23 @@ const ServicioDetailSalida = () => {
                         
                         <Typography variant="h5" m={2} gutterBottom>{data.tipoServicio?.tipo ?? ''}</Typography>
                         {
-                            data.tipoServicio?.cantidadOpcionesServicio === 0 ? (
-                                <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
-                                    {data.tipoServicio?.opcionServicios?.map((item: OpcionServicioType) => (
-                                        <li key={item.id}>
-                                            <Typography variant="body1">{item.opcion}</Typography>
-                                        </li>
-                                    ))}
-                                </ul>
+                            data.servicioOpcionesTipoServicio?.length !== 0 ? (
+                            <>
+                                <Box sx={{ mb: 4 }} >
+                                    <ProductsTable
+                                        columns={[
+                                            { id: 'opcion', label: 'Opcion', minWidth: 120, format: (_: any, row: ProgresoItemGetType) => row.opcionServicio.opcion ?? '' },
+                                            { id: 'checked', label: 'Check', minWidth: 100, align: 'right', format: (_v: boolean, row: ProgresoItemGetType) => <Checkbox color="primary" checked={!!row.checked} disabled /> },
+                                            { id: 'observaciones', label: 'observaciones', minWidth: 80, align: 'center', format: (v: string) => v ?? '' },
+                                        ] as any}
+                                        rows={data.servicioOpcionesTipoServicio ?? []}
+                                        maxHeight={'none'}
+                                        headerColor="#1565c0"
+                                    />
+                                </Box>
+                            </>
                             ) : (
-                                <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
-                                    {data.servicioOpcionesTipoServicio?.map((item: any) => (
-                                        <li key={item.id}>
-                                            <Typography variant="body1">{item.opcionServicio?.opcion}</Typography>
-                                        </li>
-                                    ))}
-                                </ul>
-
+                                <Typography>No hay opciones de servicio asociadas a este servicio.</Typography>
                             )
 
                         }
@@ -330,7 +329,7 @@ const ServicioDetailSalida = () => {
                                     <Box sx={{ mb: 4, mt: 3 }} >
                                         <Typography variant="h6" gutterBottom>En Reparación</Typography>
                                         <Typography variant='body2' gutterBottom>{data.enReparaciones[0].descripcion}</Typography>
-                    <Typography variant='body2' >{data.enReparaciones[0].observaciones}</Typography>
+                                        <Typography variant='body2' >{data.enReparaciones[0].observaciones}</Typography>
 
                                         <Chip label={data.enReparaciones[0]?.estado.estado ?? ''} color={chipColorByEstado(data.enReparaciones[0]?.estado.id)} sx={{ mb: 2 }} variant='outlined' />
                                     </Box>

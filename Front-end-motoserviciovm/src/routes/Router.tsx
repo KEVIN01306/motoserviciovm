@@ -1,4 +1,4 @@
-import { lazy } from "react";
+import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import { UsersRoutes } from "../modules/Users/routes";
 import { authRoutes } from "../modules/Auth/routes";
@@ -24,18 +24,22 @@ import { ServiciosRoutes } from "../modules/Servicios/routes";
 import horariosRoutes from "../modules/Horarios/routes";
 import homeRoutes from "../modules/Home/routes";
 import CitasRoutes from "../modules/Citas/routes";
-import FullLayout from "../layouts/Full/FullLayout";
-import BlankLayout from "../layouts/Blanck/BlankLayout";
 
-const Index = lazy(() => import('../modules/LandingPages/Index'))
+
+const Index = lazy(() => import('../modules/LandingPages/index'))
 const NotFound = lazy(() => import('../components/PagesNotFound'))
 
+
+const FullLayout = lazy(() => import('../layouts/Full/FullLayout'));
+const BlankLayout = lazy(() => import('../layouts/Blanck/BlankLayout'));
+
+const LoadingComponente = lazy(() => import('../components/LoadingLogo'));
 
 const Router = [
     { index: true, element: <Index />},
     {
         path: "/public",
-        element: <BlankLayout />,
+        element: <Suspense fallback={<LoadingComponente />}><BlankLayout /></Suspense>,
         children: [
             ...authRoutes,
         ]
@@ -43,11 +47,11 @@ const Router = [
 
     {   
         path: "/admin",
-        element: <AuthRouteGuard />,
+        element: <Suspense fallback={<LoadingComponente />}><AuthRouteGuard /></Suspense>,
         children: [
             {
                 element: (
-                    <FullLayout />
+                    <Suspense fallback={<LoadingComponente />}><FullLayout /></Suspense>
                 ),
                 children: [
                     
@@ -81,7 +85,7 @@ const Router = [
     },
 
     { 
-        path: '*', element: <NotFound/>
+        path: '*', element: <Suspense fallback={<LoadingComponente />}><NotFound /></Suspense>
     }
 ]
 

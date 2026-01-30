@@ -7,6 +7,7 @@ import type { ProductoGetType } from "./productoType";
 import type { EstadoType } from "./estadoType";
 import type { SucursalType } from "./sucursalType";
 import type { ServicioGetType } from "./servicioType";
+import type { EnReparacionGetType } from "./enReparacionType";
 
 export type VentaType = z.infer<typeof ventaSchema>;
 
@@ -16,6 +17,7 @@ export type VentaGetType = VentaType & {
     sucursal: SucursalType;
     estado: EstadoType;
     servicio: ServicioGetType | null;
+    reparacion: EnReparacionGetType | null;
     costo: number;
     precioTotal: number;
     gananciaTotal: number;
@@ -36,6 +38,7 @@ export type VentaProductoGetType = VentaProductoType & {
 export const VentaInitialState: VentaType = {
     usuarioId: 0,
     servicioId: null,
+    reparacionId: null,
     total: 0,
     sucursalId: 0,
     estadoId: estados().enEspera,
@@ -56,6 +59,7 @@ export const mergeVentaDataWithDefaults = (apiData: Partial<VentaType>): Partial
         usuarioId: apiData.usuarioId ?? VentaInitialState.usuarioId,
         sucursalId: apiData.sucursalId ?? VentaInitialState.sucursalId,
         servicioId: apiData.servicioId ?? VentaInitialState.servicioId,
+        reparacionId: apiData.reparacionId ?? VentaInitialState.reparacionId,
         total: apiData.total ?? VentaInitialState.total,
         estadoId: apiData.estadoId ?? VentaInitialState.estadoId,
     };

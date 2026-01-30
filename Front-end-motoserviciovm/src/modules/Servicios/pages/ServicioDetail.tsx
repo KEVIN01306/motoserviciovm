@@ -59,6 +59,11 @@ const ServicioDetail = () => {
     }
   }, [loading, data, hash]);
 
+  const totalVentasReparacion = data?.enReparaciones?.reduce((acc, reparacion) => {
+    const ventasTotal = reparacion.ventas?.reduce((ventaAcc, venta) => ventaAcc + (venta.total || 0), 0) || 0;
+    return acc + ventasTotal;
+  }, 0) || 0;
+
   if (loading) return <Loading />;
   if (error) return <ErrorCard errorText={error} restart={fetch} />;
   if (!data) return <ErrorCard errorText={'Servicio no encontrado'} restart={fetch} />;
@@ -114,12 +119,13 @@ const ServicioDetail = () => {
               <Grid size={6}>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Mecánico</Typography><Typography> <LinkStylesNavigate label={`${data.mecanico.primerNombre} ${data.mecanico.primerApellido}` } onClick={() => goTo('/admin/users/'+data.mecanico.id)} variant='body2' /></Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Cliente</Typography><Typography> <LinkStylesNavigate label={`${data.cliente?.primerNombre} ${data.cliente?.primerApellido} - ${data.cliente?.dpi || data.cliente?.nit || ""}`} onClick={() => goTo('/admin/users/'+data.cliente?.id)} variant='body2' /></Typography></Box>
-                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Placa de la moto</Typography><Typography>{data.moto?.placa ?? '-'}</Typography></Box>
+                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Placa de la moto</Typography><Typography><LinkStylesNavigate label={data.moto?.placa ?? '-'} onClick={() => goTo('/admin/motos/'+data.moto?.id)} variant='body2' /></Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Kilometraje</Typography><Typography>{data.kilometraje ?? '-'}</Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Estado</Typography><Typography><Chip label={data.estado?.estado ?? '-'} color={chipColorByEstado(data.estado?.id)} variant='outlined' /></Typography></Box>
               </Grid>
               <Grid size={6}>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Descripción</Typography><Typography>{data.descripcion}</Typography></Box>
+                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Observaciones</Typography><Typography>{data.observaciones ?? '-'}</Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Tipo de servicio</Typography><Typography>{data.tipoServicio?.tipo ?? '-'}</Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Fecha Entrada</Typography><Typography>{formatDate(data.fechaEntrada as any)}</Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Fecha Salida</Typography><Typography>{data.fechaSalida ? formatDate(data.fechaSalida as any) : '-'}</Typography></Box>
@@ -176,9 +182,6 @@ const ServicioDetail = () => {
                 />
               </>
             }
-
-           
-            
 
             <Typography variant="h4" textAlign={'center'} mt={3} gutterBottom id="ventas">VENTAS</Typography>
             {
@@ -256,19 +259,56 @@ const ServicioDetail = () => {
                     <Typography variant="h6" sx={{ mt: 2 }}>
                         {`Total Reparacion ${data.enReparaciones[0].total ? `Q ${data.enReparaciones[0].total.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 'Q 0.00'}`}
                     </Typography> 
+                    <Typography variant='h6' gutterBottom>{`Total Ventas: Q ${totalVentasReparacion.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}`}</Typography>
+                    <Typography variant='h6' gutterBottom>{`Total: Q ${(totalVentasReparacion + (data.enReparaciones[0].total ?? 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}`}</Typography>
+                    <Typography variant='body2' gutterBottom>{`Desde: ${data.enReparaciones[0].fechaEntrada ? formatDate(data.enReparaciones[0].fechaEntrada as any) : '-'}`}</Typography>
+                    <Typography variant='body2' gutterBottom>{`Fecha Salida: ${data.enReparaciones[0].fechaSalida ? formatDate(data.enReparaciones[0].fechaSalida as any) : '-'}`}</Typography>
                     <Chip label={data.enReparaciones[0]?.estado.estado ?? ''} color={chipColorByEstado(data.enReparaciones[0]?.estado.id)} sx={{ mb: 2 }} variant='outlined'/>
                   </Box>
+
+                  {
+                    data.estadoId == estados().enReparacion && userlogged?.permisos.includes('enreparacion:create') && (
+                      <Box  textAlign="center" m={2} >
+                        <Button variant="contained" onClick={() => goTo(`/admin/ventas/create?reparacionId=${data.enReparaciones?.[0]?.id}`)}>Crear Venta Reparacion</Button>
+                      </Box>
+                    )
+                  }
 
                   <ProductsTable
                   columns={[
                     { id: 'repuesto', label: 'Repuesto', minWidth: 120, format: (_:any, row: repuestoReparacionType) => row.nombre ?? '' },
                     { id: 'descripcion', label: 'Descripción', minWidth: 180, format: (_:any, row: repuestoReparacionType) => row.descripcion ?? '' },
+                    { id: 'checked', label: 'Entregado', minWidth: 100, format: (_:any, row: repuestoReparacionType) => <Checkbox color="primary" checked={!!row.checked} disabled /> },
                     { id: 'refencia', label: 'Referencia', minWidth: 100, format: (_:any, row: repuestoReparacionType) => row.refencia ? ( <Link href={row.refencia} target="_blank" rel="noopener noreferrer"  underline="hover" >Link</Link>) : 'No hay' },
                     { id: 'cantidad', label: 'Cantidad', minWidth: 80, align: 'center', format: (v:any) => String(v) },
                   ] as any}
                   rows={data.enReparaciones[0].repuestos ?? []}
                   headerColor="#1565c0"
                     />
+
+                     {
+              data.enReparaciones[0].ventas?.length === 0 ? (
+                <Typography>No hay ventas asociadas a este servicio.</Typography>
+              ) : (
+                data.enReparaciones[0].ventas?.map((venta) => (
+                  <Box key={venta.id} sx={{ mb: 4 }} >
+                    <LinkStylesNavigate label={`Venta #${venta.id}`} onClick={() => goTo(`/admin/ventas/${venta.id}`)} variant="h6" />
+                    <Chip label={venta.estado?.estado ?? ''} color={chipColorByEstado(venta.estado?.id)} sx={{ mb: 2 }} variant='outlined'/>
+                    <ProductsTable
+                    columns={[
+                      { id: 'producto', label: 'Producto', minWidth: 120, format: (_:any, row: VentaProductoGetType) => row.producto?.nombre ?? '' },
+                      { id: 'precio', label: 'Precio', minWidth: 100, align: 'right', format: (_v:any, row: VentaProductoGetType) => `Q ${Number(row.producto?.precio ?? 0).toFixed(2)}` },
+                      { id: 'cantidad', label: 'Cantidad', minWidth: 80, align: 'center', format: (v:any) => String(v) },
+                      { id: 'descuento', label: 'Descuento', minWidth: 80, align: 'center', format: (v:any) => v ? 'Sí' : 'No' },
+                      { id: 'totalProducto', label: 'Total', minWidth: 100, align: 'right', format: (v:any) => `Q ${Number(v).toFixed(2)}` },
+                    ] as any}
+                    rows={venta.productos ?? []}
+                    headerColor="#1565c0"
+                      />
+                  </Box>
+                ))
+              )
+            }
               </>
               )
             }

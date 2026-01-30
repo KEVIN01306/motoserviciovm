@@ -36,11 +36,33 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
         _sum: { descuentosServicio: true },
     });
 
+    const totalReparaciones = await prisma.enReparacion.aggregate({
+        where: { estadoId: estados().entregado, sucursalId: { in: sucursalIds }, updatedAt: { gte: fechaInicio, lte: fechaFin } },
+        _sum: { total: true },
+    });
+
+    const totalParqueos = await prisma.enParqueo.aggregate({
+        where: { estadoId: estados().entregado, sucursalId: { in: sucursalIds }, updatedAt: { gte: fechaInicio, lte: fechaFin } },
+        _sum: { total: true },
+    });
+
     // SERVICIOS DETALLE
 
     const Servicios = await prisma.servicio.findMany({
         where: { estadoId: estados().entregado, sucursalId: { in: sucursalIds }, updatedAt: { gte: fechaInicio, lte: fechaFin } },
         include: { moto: true },
+        orderBy: { id: 'desc' },
+    });
+
+    const Reparaciones = await prisma.enReparacion.findMany({
+        where: { estadoId: estados().entregado, sucursalId: { in: sucursalIds }, updatedAt: { gte: fechaInicio, lte: fechaFin } },
+        include: { servicio: { include: { moto: true } } },
+        orderBy: { id: 'desc' },
+    });
+
+    const Parqueos = await prisma.enParqueo.findMany({
+        where: { estadoId: estados().entregado, sucursalId: { in: sucursalIds }, updatedAt: { gte: fechaInicio, lte: fechaFin } },
+        include: { servicio: { include: { moto: true } } },
         orderBy: { id: 'desc' },
     });
 
@@ -57,7 +79,7 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
 
     // TOTAL CAJA TALLER
 
-    const totalCajaTaller = (totalServicios._sum.total - (totalDescuentosServicios._sum.descuentosServicio || 0)) - (totalGastosTaller._sum.monto || 0);
+    const totalCajaTaller = (totalServicios._sum.total + totalReparaciones._sum.total + totalParqueos._sum.total - (totalDescuentosServicios._sum.descuentosServicio || 0)) - (totalGastosTaller._sum.monto || 0);
 
     // MODULO CONTROL REPUESTOS
 
@@ -93,11 +115,13 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
     // TOTAL CAJA REPUESTOS
     const totalCajaRepuestos = (totalVentas._sum.total || 0) - (totalGastosRepuestos._sum.monto || 0);
 
-    const totalIngresosGenerales = (totalServicios._sum.total - (totalDescuentosServicios._sum.descuentosServicio || 0)) + (totalVentas._sum.total || 0) + (totalIngresos._sum.monto || 0);
+    const totalIngresosGenerales = (totalServicios._sum.total + totalReparaciones._sum.total + totalParqueos._sum.total - (totalDescuentosServicios._sum.descuentosServicio || 0)) + (totalVentas._sum.total || 0) + (totalIngresos._sum.monto || 0);
     return {
 
         // TALLER 
         totalServiciosTaller: (totalServicios._sum.total - (totalDescuentosServicios._sum.descuentosServicio || 0)) || 0,
+        totalReparacionesTaller: totalReparaciones._sum.total || 0,
+        totalParqueosTaller: totalParqueos._sum.total || 0,
         totalGastosTaller: totalGastosTaller._sum.monto || 0,
         totalCajaTaller: totalCajaTaller,
 
