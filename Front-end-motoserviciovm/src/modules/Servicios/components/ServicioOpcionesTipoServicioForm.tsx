@@ -10,10 +10,26 @@ interface Props {
 }
 
 const ServicioOpcionesTipoServicioForm: React.FC<Props> = ({ initial, onSubmit, loading }) => {
-  const [rows, setRows] = useState<ProgresoItemGetType[]>(initial);
+  const [rows, setRows] = useState<ProgresoItemGetType[]>(() =>
+    initial.map(r => ({
+      ...r,
+      observaciones: (!r.observaciones && !r.checked) ? 'N/A' : (r.observaciones ?? ''),
+    }))
+  );
 
   const handleCheck = (idx: number, checked: boolean) => {
-    setRows(arr => arr.map((item, i) => i === idx ? { ...item, checked } : item));
+    setRows(arr => arr.map((item, i) => {
+      if (i !== idx) return item;
+      let observaciones = item.observaciones ?? '';
+      if (!checked) {
+        // when unchecking, if there is no observation set 'N/A'
+        observaciones = (!observaciones || observaciones === '') ? 'N/A' : observaciones;
+      } else {
+        // when checking, if it was 'N/A' clear it so user can type
+        observaciones = (observaciones === 'N/A') ? '' : observaciones;
+      }
+      return { ...item, checked, observaciones };
+    }));
   };
 
   const handleObs = (idx: number, observaciones: string) => {
@@ -58,6 +74,7 @@ const ServicioOpcionesTipoServicioForm: React.FC<Props> = ({ initial, onSubmit, 
                   fullWidth
                   variant="standard"
                   placeholder="Observaciones"
+                  inputProps={{ readOnly: !row.checked && row.observaciones === 'N/A' }}
                 />
               </TableCell>
             </TableRow>
