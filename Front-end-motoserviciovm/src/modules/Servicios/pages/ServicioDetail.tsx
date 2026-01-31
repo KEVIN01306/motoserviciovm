@@ -339,7 +339,7 @@ const ServicioDetail = () => {
             <Divider sx={{ my: 2 }} />
             <Grid container spacing={2} justifyContent="center" alignItems="center">
             {
-              userlogged?.permisos.includes('ventas:create') && (data.estadoId === estados().enServicio || data.estadoId === estados().enReparacion || data.estadoId === estados().enParqueo) && (
+              userlogged?.permisos.includes('ventas:create') && (data.estadoId === estados().enServicio || data.estadoId === estados().enParqueo || data.estadoId === estados().listoEntrega || data.estadoId === estados().pruebas) && (
                   <Grid size={{xs: 5, md: 3}} textAlign="center">
                   <Button variant="contained" onClick={() => goTo(`/admin/ventas/create?servicioId=${data.id}`)}>Crear Venta</Button>
                   </Grid>
@@ -347,7 +347,7 @@ const ServicioDetail = () => {
 
             }
             {
-              userlogged?.permisos.includes('servicios:salida') && (data.estadoId === estados().enServicio || data.estadoId === estados().enReparacion || data.estadoId === estados().enParqueo) && (
+              userlogged?.permisos.includes('servicios:salida') && (data.estadoId === estados().enServicio || data.estadoId === estados().enParqueo || data.estadoId === estados().listoEntrega || data.estadoId === estados().pruebas) && (
                   <Grid size={{xs: 5, md: 3}} textAlign="center">
                   <Button variant="outlined" color='success'  onClick={() => goTo(`/admin/servicios/${data.id}/salida`)}>Dar Salida</Button>
                   </Grid>
