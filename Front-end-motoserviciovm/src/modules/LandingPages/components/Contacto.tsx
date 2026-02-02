@@ -5,7 +5,7 @@ import type { ContactoType } from "../../../types/contactoType";
 
 
 
-const Contacto = ({ contacto, loading }: { contacto: ContactoType; loading: boolean }) => {
+const Contacto = ({ contacto, loading, loadingTextos, descripcion }: { contacto: ContactoType; loading: boolean; loadingTextos: boolean; descripcion?: string }) => {
     return (
         <>
             <section id="contacto" className="py-24 bg-white dark:bg-black">
@@ -27,7 +27,7 @@ const Contacto = ({ contacto, loading }: { contacto: ContactoType; loading: bool
                             viewport={{ once: true, margin: "-100px" }}
                             className="text-zinc-500 font-bold uppercase tracking-widest text-[10px]"
                         >
-                            Atención inmediata sin esperas
+                            {loadingTextos ? <Skeleton width="100%" /> : descripcion}
                         </motion.p>
                     </div>
 

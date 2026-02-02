@@ -14,6 +14,8 @@ import { getAboutImages } from '../../services/aboutImage.services';
 import { getValores } from '../../services/valor.services';
 import { getContactos } from '../../services/contacto.services';
 import type { ContactoType } from '../../types/contactoType';
+import { getTextos } from '../../services/texto.services';
+import type { TextoSchemaType } from '../../zod/texto.schema';
 
 const URL_DOMAIN = import.meta.env.VITE_DOMAIN;
 
@@ -50,6 +52,8 @@ const Index = () => {
     const [loadingValores, setLoadingValores] = useState(true);
     const [contacto, setContacto] = useState<ContactoType>({} as ContactoType);
     const [loadingContacto, setLoadingContacto] = useState(true);
+    const [textos, setTextos] = useState<TextoSchemaType>({});
+    const [loadingTextos, setLoadingTextos] = useState(true);
 
     useEffect(() => {
       const root = window.document.documentElement;
@@ -137,12 +141,25 @@ const Index = () => {
       }
     }
 
+    const fetchTextos = async () => {
+      try{
+        setLoadingTextos(true);
+        const textosResponse = await getTextos();
+        setTextos(textosResponse[0] || {});
+      } catch (error) {
+        console.error('Error fetching textos:', error);
+      } finally {
+        setLoadingTextos(false);
+      }
+    }
+
     useEffect ( () => {
         fecthServiciosTipos();
         fetchSlides();
         fetchAboutImages();
         fetchValores();
         fetchContacto();
+        fetchTextos();
     }, []);
 
     const menuLinks = [
@@ -162,18 +179,18 @@ const Index = () => {
     return (
         <div className="min-h-screen bg-white dark:bg-black text-zinc-900 dark:text-white transition-colors duration-500">
             
-            <Nav isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} menuLinks={menuLinks} />
+            <Nav isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} menuLinks={menuLinks} loading={loadingTextos} logoText={textos.logoTitle ? String(textos.logoTitle) : undefined} />
             
             <HeroSlider  slides={slides} currentSlide={currentSlide} setCurrentSlide={setCurrentSlide} loading={loadingSlides}/>
-            <Servicios services={serviciosTipos} loading={loadingServicios} />
+            <Servicios services={serviciosTipos} loading={loadingServicios} loadingTextos={loadingTextos} descripcion={textos.textoServicio ? String(textos.textoServicio) : undefined} />
 
-            <Nosotros values={loadingValores ? defaultValues : valores} aboutImages={aboutImages} loading={loadingAboutImages} loadingValores={loadingValores} />
+            <Nosotros loadingTextos={loadingTextos} descripcion={textos.textoAbout ? String(textos.textoAbout) : undefined} values={loadingValores ? defaultValues : valores} aboutImages={aboutImages} loading={loadingAboutImages} loadingValores={loadingValores} />
 
-            <DiagnosticAI />
+            <DiagnosticAI loading={loadingTextos} descripcion={textos.textoIA ? String(textos.textoIA) : undefined} />
 
-            <Contacto contacto={contacto} loading={loadingContacto} />
+            <Contacto contacto={contacto} loading={loadingContacto} loadingTextos={loadingContacto} descripcion={textos.textoCita ? String(textos.textoCita) : undefined} />
 
-            <Footer />
+            <Footer logoText={textos.logoTitle ? String(textos.logoTitle) : undefined} descripcion={textos.footerText ? String(textos.footerText) : undefined} loading={loadingTextos} />
             <ControlesFlotantes menuLinks={menuLinks} contacto={contacto} loading={loadingContacto} />
         </div>
     );

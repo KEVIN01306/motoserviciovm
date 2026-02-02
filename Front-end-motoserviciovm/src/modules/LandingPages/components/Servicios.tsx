@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 type ServiciosProps = {
     services: MotoServiceData[];
     loading?: boolean;
+    loadingTextos?: boolean;
+    descripcion?: string;
 };
 
 const ServiceCardSkeleton = () => (
@@ -42,7 +44,7 @@ const ServiceCardSkeleton = () => (
     </motion.div>
 );
 
-const Servicios = ({ services, loading }: ServiciosProps) => {
+const Servicios = ({ services, loading, loadingTextos, descripcion }: ServiciosProps) => {
     const isLoading = loading;
 
     return (
@@ -58,6 +60,16 @@ const Servicios = ({ services, loading }: ServiciosProps) => {
                     >
                         PLANES DE <span className="text-red-600">SERVICIO</span>
                     </motion.h2>
+
+                    <motion.p
+                            initial={{ opacity: 0, y: 10 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 0.1 }}
+                            viewport={{ once: true, margin: "-100px" }}
+                            className="text-zinc-500 font-bold uppercase tracking-widest text-[10px] text-start mb-12" 
+                        >
+                            {loadingTextos ? <Skeleton width="100%" /> : descripcion}
+                        </motion.p>
                     <div className="grid md:grid-cols-2 gap-8 place-items-center">
                         {isLoading ? (
                             <>

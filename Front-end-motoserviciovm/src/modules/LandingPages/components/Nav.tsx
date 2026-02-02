@@ -1,13 +1,18 @@
 import { LogIn, Moon, Sun } from "lucide-react";
+import DynamicLogo from "./DynamicLogo";
+import { CircularProgress } from "@mui/material";
 
 
 type NavProps = {
   isDarkMode: boolean;
   setIsDarkMode: (value: boolean) => void;
   menuLinks: { name: string; href: string }[];
+  logoText?: string;
+  loading: boolean;
 }
 
-const Nav = ({ isDarkMode, setIsDarkMode, menuLinks }: NavProps) => {
+const Nav = ({ isDarkMode, setIsDarkMode, menuLinks, logoText='', loading }: NavProps) => {
+
     return (
         <>
         <nav className="sticky top-0 z-50 bg-white/80 dark:bg-black/90 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 h-20 flex items-center">
@@ -15,7 +20,10 @@ const Nav = ({ isDarkMode, setIsDarkMode, menuLinks }: NavProps) => {
                 
                 {/* Logo */}
                 <a href="#" className="text-2xl font-black italic tracking-tighter group">
-                  MOTOSERVICIO<span className="text-red-600 transition-colors group-hover:text-zinc-900 dark:group-hover:text-white">VM</span>
+                  {
+                    loading ? <CircularProgress  /> :
+                    <DynamicLogo text={logoText} />
+                  }
                 </a>
 
                 {/* Desktop Menu */}

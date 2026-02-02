@@ -11,9 +11,11 @@ type NosotrosProp = {
     loading: boolean;
     aboutImages?: any[];
     loadingValores: boolean;
+    descripcion?: string;
+    loadingTextos: boolean;
 }
 
-const Nosotros = ({ values, aboutImages, loading,loadingValores }: NosotrosProp) => {
+const Nosotros = ({ values, aboutImages, loading,loadingValores, descripcion, loadingTextos }: NosotrosProp) => {
     return (
         <>
         {/* Nosotros + Valores */}
@@ -44,7 +46,7 @@ const Nosotros = ({ values, aboutImages, loading,loadingValores }: NosotrosProp)
                                 viewport={{ once: true, margin: "-100px" }}
                                 className="text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed italic border-l-4 border-yellow-500 pl-6"
                             >
-                                Líderes en mecánica preventiva y correctiva para todo tipo de motocicletas. Calidad garantizada en cada ajuste.
+                                {loadingTextos ? <Skeleton width="100%" /> : descripcion}
                             </motion.p>
                         </motion.div>
                         <div className="grid grid-cols-2 gap-4">

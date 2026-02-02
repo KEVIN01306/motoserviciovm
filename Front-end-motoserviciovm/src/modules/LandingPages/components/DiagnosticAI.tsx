@@ -2,16 +2,22 @@ import React, { useState } from 'react';
 import { Loader2, Send, Cpu } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { postAIDiagnostic } from '../../../services/ai.services';
+import { Skeleton } from '@mui/material';
 
-const DiagnosticAI: React.FC = () => {
+type DiagnosticAIProps = {
+  loading: boolean;
+  descripcion?: string;
+}
+
+const DiagnosticAI  = ({descripcion, loading}: DiagnosticAIProps) => {
   const [query, setQuery] = useState('');
   const [diagnosis, setDiagnosis] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loadingInternal, setLoadingInternal] = useState(false);
 
   const handleDiagnose = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!query.trim() || loading) return;
-    setLoading(true);
+    setLoadingInternal(true);
     setDiagnosis(null);
 
     let attempts = 0;
@@ -31,7 +37,7 @@ const DiagnosticAI: React.FC = () => {
       }
     }
 
-    setLoading(false);
+    setLoadingInternal(false);
   };
 
   return (
@@ -54,7 +60,7 @@ const DiagnosticAI: React.FC = () => {
             viewport={{ once: true, margin: "-100px" }}
             className="text-zinc-500 font-bold uppercase tracking-widest text-xs"
           >
-            Escaneo técnico asistido
+            {loading ? <Skeleton width="100%" /> : descripcion}
           </motion.p>
         </div>
 
@@ -74,11 +80,11 @@ const DiagnosticAI: React.FC = () => {
             />
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || loadingInternal}
               className="w-full bg-red-600 hover:bg-red-700 text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 uppercase italic text-xl"
             >
-              {loading ? <Loader2 className="animate-spin" /> : <Send size={20} />}
-              {loading ? 'Analizando...' : 'Diagnosticar'}
+              {loading || loadingInternal ? <Loader2 className="animate-spin" /> : <Send size={20} />}
+              {loading || loadingInternal ? 'Analizando...' : 'Diagnosticar'}
             </button>
           </form>
 

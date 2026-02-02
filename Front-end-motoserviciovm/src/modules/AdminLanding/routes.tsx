@@ -7,6 +7,7 @@ const SlidePages = lazy(() => import("./Slide/pages/SlidesPage"));
 const AboutImagesPage = lazy(() => import("./AboutImage/pages/AboutImagesPage"));
 const ValoresPage = lazy(() => import("./Valores/pages/ValoresPage"));
 const ContactoPage = lazy(() => import("./Contacto/pages/ContactoPage"));
+const TextosPage = lazy(() => import("./Textos/pages/TextosPage"));
 
 export const customizeLandingRoutes: RouteObject[] = [
   {
@@ -41,6 +42,14 @@ export const customizeLandingRoutes: RouteObject[] = [
         element: (
           <ProtectedRoute allowedPermisos={["customize-landing:contactoManagemente"]}>
             <ContactoPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'textos',
+        element: (
+          <ProtectedRoute allowedPermisos={["customize-landing:textoManagemente"]}>
+            <TextosPage />
           </ProtectedRoute>
         ),
       },

@@ -129,8 +129,8 @@ const PERMISOS_SEED = [
   { permiso: "customize-landing:aboutImageManagemente", modulo: "CUSTOMIZE_LANDING", estadoId: 1 },
   { permiso: "customize-landing:valorManagemente", modulo: "CUSTOMIZE_LANDING", estadoId: 1 },
   { permiso: "customize-landing:contactoManagemente", modulo: "CUSTOMIZE_LANDING", estadoId: 1 },
+  { permiso: "customize-landing:textoManagemente", modulo: "CUSTOMIZE_LANDING", estadoId: 1 },
 
-  
   { permiso: "contabilidad:view", modulo: "CONTABILIDAD", estadoId: 1 },
 
   { permiso: "home:view", modulo: "HOME", estadoId: 1 },

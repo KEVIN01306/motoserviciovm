@@ -66,6 +66,7 @@ const MenuItems = [
                 { name: "IMÁGENES NOSOTROS", link: "/admin/customize-landing/about-images", icon: StoreMallDirectoryOutlined, permiso: "customize-landing:aboutImageManagemente" },
                 { name: "VALORES", link: "/admin/customize-landing/valores", icon: StoreMallDirectoryOutlined, permiso: "customize-landing:valorManagemente" },
                 { name: "CONTACTO", link: "/admin/customize-landing/contacto", icon: StoreMallDirectoryOutlined, permiso: "customize-landing:contactoManagemente" },
+                { name: "TEXTOS", link: "/admin/customize-landing/textos", icon: StoreMallDirectoryOutlined, permiso: "customize-landing:textoManagemente" },
             ],
         },
     { name: "HOME", link: "/admin", icon: AiTwotoneHome, permiso: "home:view" },
