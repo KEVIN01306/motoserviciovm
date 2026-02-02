@@ -1,5 +1,6 @@
 import { ChevronRight, Tag } from "lucide-react";
 import { Skeleton } from "@mui/material";
+import { motion } from "framer-motion";
 import type{SlideType} from "../../../types/slideType";
 
 
@@ -35,10 +36,13 @@ const HeroSlider = ({ slides, currentSlide, setCurrentSlide, loading }: { slides
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent z-10"></div>
 
-                    <img 
-                        src={slide.image || ''} 
-                        className="absolute inset-0 w-full h-full object-cover opacity-60 scale-105" 
-                        alt="Hero background"
+                    <motion.img 
+                      initial={false}
+                      animate={index === currentSlide ? { scale: 1 } : { scale: 1.05 }}
+                      transition={{ duration: 1, ease: "easeInOut" }}
+                      src={slide.image || ''} 
+                      className="absolute inset-0 w-full h-full object-cover opacity-60" 
+                      alt="Hero background"
                     />
                     
                     <div className="relative z-20 max-w-7xl mx-auto px-4 h-full flex flex-col justify-center">

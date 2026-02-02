@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Loader2, Send, Cpu } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { postAIDiagnostic } from '../../../services/ai.services';
 
 const DiagnosticAI: React.FC = () => {
@@ -37,13 +38,33 @@ const DiagnosticAI: React.FC = () => {
     <section id="diagnostico" className="py-24 bg-zinc-50 dark:bg-[#0a0a0a] transition-colors duration-300">
       <div className="max-w-4xl mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter text-zinc-900 dark:text-white mb-4">
+          <motion.h2
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true, margin: "-100px" }}
+            className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter text-zinc-900 dark:text-white mb-4"
+          >
             DIAGNÓSTICO <span className="text-red-600 underline decoration-yellow-500">IA</span>
-          </h2>
-          <p className="text-zinc-500 font-bold uppercase tracking-widest text-xs">Escaneo técnico asistido</p>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            viewport={{ once: true, margin: "-100px" }}
+            className="text-zinc-500 font-bold uppercase tracking-widest text-xs"
+          >
+            Escaneo técnico asistido
+          </motion.p>
         </div>
 
-        <div className="bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 rounded-3xl p-8 shadow-2xl">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.15 }}
+          viewport={{ once: true, margin: "-100px" }}
+          className="bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 rounded-3xl p-8 shadow-2xl"
+        >
           <form onSubmit={handleDiagnose} className="space-y-6">
             <textarea
               value={query}
@@ -67,7 +88,7 @@ const DiagnosticAI: React.FC = () => {
               <div className="text-zinc-700 dark:text-zinc-300 italic border-l-4 border-red-600 pl-6 whitespace-pre-line">{diagnosis}</div>
             </div>
           )}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
