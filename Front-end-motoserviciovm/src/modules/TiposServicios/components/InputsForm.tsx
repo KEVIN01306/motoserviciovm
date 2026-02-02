@@ -136,6 +136,19 @@ const InputsForm = ({ register, errors, control, watch, opciones, tiposHorario }
                     </ol>
                 </div>
             </Grid>
+
+            <Grid>
+                <Controller name="activo" control={control} render={({field}) => (
+                    <FormControlLabel 
+                       label="¿Quieres mostrar este tipo de servicio en la apgina principal?"
+                        control={
+                            <Checkbox  {...field} checked={field.value} onChange={(e: any) => field.onChange(e.target.checked)} />
+                        }
+                    />
+                )}>
+
+                </Controller>
+            </Grid>
         </>
     );
 }

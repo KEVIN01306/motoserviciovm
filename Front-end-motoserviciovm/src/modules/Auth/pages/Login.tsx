@@ -20,9 +20,10 @@ import InputsForm from '../components/InputsForm';
 import { errorToast, successToast } from '../../../utils/toast';
 import { useGoTo } from '../../../hooks/useGoTo';
 import { useAuthStore } from '../../../store/useAuthStore';
+import { RiArrowGoBackLine } from 'react-icons/ri';
 
 const Login = () => {
-    const login = useAuthStore( state => state.login)
+    const login = useAuthStore(state => state.login)
     const goTo = useGoTo()
     const {
         register,
@@ -43,7 +44,7 @@ const Login = () => {
     const handleLogin = async (data: AuthType) => {
         try {
             await login(data)
-            const user =  useAuthStore.getState().user
+            const user = useAuthStore.getState().user
             successToast("Auth Succes: Hello " + user?.primerNombre)
             reset()
             goTo('/admin')
@@ -53,7 +54,11 @@ const Login = () => {
     };
 
     return (
-        <Container maxWidth="xs" sx={{ mt: 2, mb: 2, display: 'flex', justifyContent: 'center' }}>
+        <Container maxWidth="xs" sx={{ mt: 2, mb: 2, display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center' }}>
+            <Button onClick={() => goTo('/')} variant='contained'>
+                <RiArrowGoBackLine />
+                Volver a la pagina principal
+            </Button>
             <FormEstructure sx={{ padding: 0, margin: 0, border: "none", boxShadow: "none" }} pGrid={1} handleSubmit={handleSubmit(handleLogin)}>
                 <Card elevation={3} sx={{ borderRadius: 2 }}>
                     <CardContent sx={{ p: 4 }}>
@@ -73,7 +78,7 @@ const Login = () => {
                                     ¿Olvidaste tu contraseña?
                                 </Link>
                             </Box>*/}
-                             <Box>
+                            <Box>
                                 <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
                                     ¿Eres Cliente?{' '}
                                     <Button variant="text" onClick={() => goTo('/public/auth/login-clientes')}>

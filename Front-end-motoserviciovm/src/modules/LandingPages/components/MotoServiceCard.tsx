@@ -1,10 +1,12 @@
 import { ChevronRight, Wrench } from "lucide-react";
+import type { OpcionServicioType } from "../../../types/opcionServicioType";
+import { Fragment } from "react/jsx-runtime";
 
 export type MotoServiceData = {
-  name: string;
-  description: string;
-  isMajor: boolean;
-  items: string[];
+  tipo: string;
+  descripcion: string;
+  isMajor?: boolean;
+  opcionServicios: OpcionServicioType[];
 };
 
 export const MotoServiceCard = ({ data }: { data: MotoServiceData }) => {
@@ -29,19 +31,28 @@ export const MotoServiceCard = ({ data }: { data: MotoServiceData }) => {
         </div>
         <div className="space-y-3">
           <h3 className="text-3xl font-black text-zinc-900 dark:text-white uppercase italic tracking-tighter">
-            {data.name.split(' ')[0]} <span className="text-red-600">{data.name.split(' ')[1]}</span>
+            {(data.tipo || '').split(' ').filter(Boolean).map((word, i, arr) => (
+              <Fragment key={i}>
+                {i % 2 === 1 ? (
+                  <span className="text-red-600">{word}</span>
+                ) : (
+                  <span>{word}</span>
+                )}
+                {i < arr.length - 1 ? ' ' : ''}
+              </Fragment>
+            ))}
           </h3>
           <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed border-l-2 border-yellow-500 pl-4">
-            {data.description}
+            {data.descripcion}
           </p>
         </div>
-        <div className="mt-8 space-y-4">
+        <div className="mt-8 space-y-4 max-h-48 overflow-y-auto pr-2 opciones-scroll">
           <p className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Inspección técnica:</p>
           <ul className="space-y-3">
-            {data.items?.map((item, index) => (
+            {data.opcionServicios?.map((item, index) => (
               <li key={index} className="flex items-center space-x-3 group/item">
                 <div className="h-1.5 w-1.5 bg-red-600 rounded-full group-hover/item:w-4 transition-all shrink-0"></div>
-                <span className="text-sm text-zinc-700 dark:text-zinc-200 font-medium leading-tight">{item}</span>
+                <span className="text-sm text-zinc-700 dark:text-zinc-200 font-medium leading-tight">{item.opcion}</span>
               </li>
             ))}
           </ul>

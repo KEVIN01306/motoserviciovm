@@ -33,5 +33,10 @@ router.use('/tipoHorario', (await import('./tipoHorario.routes.js')).default);
 router.use('/tipoServicioHorario', (await import('./tipoServicioHorario.routes.js')).default);
 router.use('/diasDisponibles', (await import('./diasDisponibles.routes.js')).default);
 router.use('/citas', (await import('./cita.routes.js')).default);
+router.use('/slides', (await import('./slide.routes.js')).default);
+router.use('/aboutImage', (await import('./aboutImage.routes.js')).default);
+router.use('/valores', (await import('./valor.routes.js')).default);
+router.use('/textos', (await import('./texto.routes.js')).default);
+router.use('/contactos', (await import('./contacto.routes.js')).default);
 
 export default router;

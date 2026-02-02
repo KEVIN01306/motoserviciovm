@@ -25,6 +25,7 @@ import { useAuthStore } from '../../../store/useAuthStore';
 import FormEstructure from '../../../components/utils/FormEstructure';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import CallToActionOutlinedIcon from '@mui/icons-material/CallToActionOutlined';
+import { RiArrowGoBackLine } from 'react-icons/ri';
 
 const LoginClientes = () => {
     const loginCliente = useAuthStore(state => state.loginCliente);
@@ -66,8 +67,11 @@ const LoginClientes = () => {
     };
 
     return (
-        <Container maxWidth="xs" sx={{ mt: 2, mb: 2, display: 'flex', justifyContent: 'center' }}>
-
+        <Container maxWidth="xs" sx={{ mt: 2, mb: 2, display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center' }}>
+                <Button onClick={() => goTo('/')} variant='contained'>
+                    <RiArrowGoBackLine />
+                    Volver a la pagina principal
+                </Button>
             <FormEstructure sx={{ padding: 0, margin: 0, border: "none", boxShadow: "none" }} pGrid={1} handleSubmit={handleSubmit(handleLogin)}>
                 <Card elevation={3} sx={{ borderRadius: 2 }}>
                     <CardContent sx={{ p: 4 }}>
@@ -139,8 +143,8 @@ const LoginClientes = () => {
                         >
                             Ingresar
                         </Button>
-                    <Divider sx={{ my: 3 }} />
-                    </CardContent>   
+                        <Divider sx={{ my: 3 }} />
+                    </CardContent>
                 </Card>
             </FormEstructure>
         </Container>

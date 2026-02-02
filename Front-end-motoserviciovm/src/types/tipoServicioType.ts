@@ -19,6 +19,7 @@ export const TipoServicioInitialState = {
     servicioCompleto: false,
     estadoId: estados().activo,
     tipoHorarioId: undefined,
+    activo: false,
 };
 
 /** Normaliza los datos recibidos desde la API para que el formulario pueda usar `reset` sin fallas
@@ -33,5 +34,6 @@ export const mergeTipoServicioDataWithDefaults = (apiData: Partial<TipoServicioG
         estadoId: apiData.estadoId ?? TipoServicioInitialState.estadoId,
         servicioCompleto: apiData.servicioCompleto ?? TipoServicioInitialState.servicioCompleto,
         tipoHorarioId: apiData.tipoHorarioId ?? TipoServicioInitialState.tipoHorarioId,
+        activo: apiData.activo ?? TipoServicioInitialState.activo,
     };
 }

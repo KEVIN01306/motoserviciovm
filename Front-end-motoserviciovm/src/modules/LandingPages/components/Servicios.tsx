@@ -1,20 +1,60 @@
 import {MotoServiceCard} from "./MotoServiceCard";
 import type{ MotoServiceData } from "./MotoServiceCard";
+import { Skeleton } from "@mui/material";
 
 type ServiciosProps = {
     services: MotoServiceData[];
+    loading?: boolean;
 };
 
-const Servicios = ({ services }: ServiciosProps) => {
+const ServiceCardSkeleton = () => (
+    <div className="max-w-sm w-full bg-white dark:bg-[#0a0a0a] border-2 border-zinc-200 dark:border-zinc-800 rounded-tr-3xl rounded-bl-3xl overflow-hidden shadow-xl dark:shadow-[0_0_30px_rgba(220,38,38,0.15)] h-full flex flex-col">
+        <div className="w-full h-2.5 bg-gradient-to-r from-zinc-200 to-zinc-300 dark:from-zinc-700 dark:to-zinc-800" />
+        <div className="p-8 flex-grow">
+            <div className="flex justify-between items-center mb-8">
+                <Skeleton variant="circular" width={48} height={48} sx={{ backgroundColor: "red" }} />
+                <div className="text-right">
+                    <Skeleton variant="text" width={100} height={24} sx={{ backgroundColor: "red" }} />
+                </div>
+            </div>
+            <div className="space-y-3">
+                <Skeleton variant="text" width="100%" height={48} sx={{ backgroundColor: "white" }} />
+                <Skeleton variant="text" width="100%" height={60} sx={{ backgroundColor: "rgba(229, 231, 235, 0.7)" }} />
+            </div>
+            <div className="mt-8 space-y-4">
+                <Skeleton variant="text" width="80%" height={20} sx={{ backgroundColor: "rgba(229, 231, 235, 0.7)" }} />
+                <div className="space-y-3">
+                    {[1, 2, 3].map(i => (
+                        <Skeleton key={i} variant="text" width="100%" height={20} sx={{ backgroundColor: "rgba(229, 231, 235, 0.7)" }} />
+                    ))}
+                </div>
+            </div>
+        </div>
+        <div className="p-8 pt-0">
+            <Skeleton variant="rounded" width="100%" height={56} sx={{ backgroundColor: "rgba(229, 231, 235, 0.7)" }} />
+        </div>
+    </div>
+);
+
+const Servicios = ({ services, loading }: ServiciosProps) => {
+    const isLoading = loading;
+
     return (
         <>
-                    <section id="servicios" className="py-24 bg-white dark:bg-black">
+        <section id="servicios" className="py-24 bg-white dark:bg-black">
                 <div className="max-w-7xl mx-auto px-4">
                     <h2 className="text-5xl font-black italic uppercase tracking-tighter mb-12">
                         PLANES DE <span className="text-red-600">SERVICIO</span>
                     </h2>
-                    <div className="grid md:grid-cols-2 gap-8">
-                        {services.map((s, i) => <MotoServiceCard key={i} data={s} />)}
+                    <div className="grid md:grid-cols-2 gap-8 place-items-center">
+                        {isLoading ? (
+                            <>
+                                <ServiceCardSkeleton />
+                                <ServiceCardSkeleton />
+                            </>
+                        ) : (
+                            services.map((s, i) => <MotoServiceCard key={i} data={s} />)
+                        )}
                     </div>
                 </div>
             </section>

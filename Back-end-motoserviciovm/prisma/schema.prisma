@@ -199,6 +199,7 @@ model TipoServicio {
   tipo             String           @unique
   descripcion      String?
   estadoId         Int
+  activo            Boolean          @default(false)
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   servicioCompleto Boolean?         @default(false)
@@ -627,4 +628,45 @@ model IngresosEgresos {
   @@index([moduloTallerId], map: "IngresosEgresos_moduloTallerId_fkey")
   @@index([sucursalId], map: "IngresosEgresos_sucursalId_fkey")
   @@index([tipoId], map: "IngresosEgresos_tipoId_fkey")
+}
+
+
+model Slide {
+  id              Int      @id @default(autoincrement())
+  image           String?
+  tag             String?
+  promo           String?
+  subtitle        String?
+}
+
+model valor {
+  id              Int      @id @default(autoincrement())
+  title          String?
+  desc           String?
+  icon           String?
+  color          String?
+}
+
+model texto {
+  id              Int      @id @default(autoincrement())
+  logoTitle       String?
+  footerText        String?
+  textoServicio  String?
+  textoAbout       String?
+  textoIA      String?
+  textoCita      String?
+}
+
+model aboutImage {
+  id              Int      @id @default(autoincrement())
+  image           String?
+}
+
+model contacto {
+  id              Int      @id @default(autoincrement())
+  direccion      String?
+  telefono       String?
+  email          String?
+  textoWhatsapp   String?
+  telefonoWhatsapp String?
 }

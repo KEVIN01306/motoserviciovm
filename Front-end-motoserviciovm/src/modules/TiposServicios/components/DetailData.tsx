@@ -49,6 +49,10 @@ const DetailData = ({ item }: Props) => {
                             <Typography variant="subtitle2" color="textSecondary">¿Es un servicio completo?</Typography>
                             <Typography variant="body1">{item.servicioCompleto ? "Sí" : "No"}</Typography>
                         </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <Typography variant="subtitle2" color="textSecondary">¿Se vera en la pagina principal?</Typography>
+                            <Typography variant="body1">{item.activo ? "Sí" : "No"}</Typography>
+                        </Grid>
                     </Grid>
                 </CardContent>
             </Card>

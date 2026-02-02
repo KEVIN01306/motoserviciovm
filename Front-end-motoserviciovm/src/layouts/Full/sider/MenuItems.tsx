@@ -58,6 +58,16 @@ const MenuItems = [
             { name: "PERMISOS", link: "/admin/permisos", icon: AutoFixHighOutlined, permiso: "permisos:view" },
         ],
     },
+    {
+    module: "CUSTOM",
+            icon: MdOutlineAdminPanelSettings,
+            children: [
+                { name: "SLIDE", link: "/admin/customize-landing/slides", icon: StoreMallDirectoryOutlined, permiso: "customize-landing:slideManagemente" },
+                { name: "IMÁGENES NOSOTROS", link: "/admin/customize-landing/about-images", icon: StoreMallDirectoryOutlined, permiso: "customize-landing:aboutImageManagemente" },
+                { name: "VALORES", link: "/admin/customize-landing/valores", icon: StoreMallDirectoryOutlined, permiso: "customize-landing:valorManagemente" },
+                { name: "CONTACTO", link: "/admin/customize-landing/contacto", icon: StoreMallDirectoryOutlined, permiso: "customize-landing:contactoManagemente" },
+            ],
+        },
     { name: "HOME", link: "/admin", icon: AiTwotoneHome, permiso: "home:view" },
 ];
 

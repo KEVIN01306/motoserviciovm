@@ -24,6 +24,7 @@ import { ServiciosRoutes } from "../modules/Servicios/routes";
 import horariosRoutes from "../modules/Horarios/routes";
 import homeRoutes from "../modules/Home/routes";
 import CitasRoutes from "../modules/Citas/routes";
+import { customizeLandingRoutes } from "../modules/AdminLanding/routes";
 
 
 const Index = lazy(() => import('../modules/LandingPages/index'))
@@ -77,7 +78,8 @@ const Router = [
                     ...ServiciosRoutes,
                     ...homeRoutes,
                     ...horariosRoutes,
-                    ...CitasRoutes
+                    ...CitasRoutes,
+                    ...customizeLandingRoutes
                 ]
             },
 

@@ -124,6 +124,12 @@ const PERMISOS_SEED = [
   { permiso: "citas:detail", modulo: "CITAS", estadoId: 1 },
   { permiso: "citas:confirm", modulo: "CITAS", estadoId: 1 },
   { permiso: "citas:cancel", modulo: "CITAS", estadoId: 1 },
+
+  { permiso: "customize-landing:slideManagemente", modulo: "CUSTOMIZE_LANDING", estadoId: 1 },
+  { permiso: "customize-landing:aboutImageManagemente", modulo: "CUSTOMIZE_LANDING", estadoId: 1 },
+  { permiso: "customize-landing:valorManagemente", modulo: "CUSTOMIZE_LANDING", estadoId: 1 },
+  { permiso: "customize-landing:contactoManagemente", modulo: "CUSTOMIZE_LANDING", estadoId: 1 },
+
   
   { permiso: "contabilidad:view", modulo: "CONTABILIDAD", estadoId: 1 },
 
