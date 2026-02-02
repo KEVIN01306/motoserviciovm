@@ -15,13 +15,13 @@ const URL_DOMAIN = import.meta.env.VITE_DOMAIN;
 const SlideForm: React.FC<Props> = ({ open, initial, onClose, onSaved, saveFn }) => {
   const [slide, setSlide] = useState<SlideType>(initial ?? {} as SlideType);
   const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | undefined>(initial?.image);
+  const [preview, setPreview] = useState<string | undefined>(initial?.image ? `${URL_DOMAIN}${initial.image}` : undefined);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!open) return;
     setSlide(initial ?? {} as SlideType);
-    setPreview(initial?.image);
+    setPreview(initial?.image ? `${URL_DOMAIN}${initial.image}` : undefined);
     setFile(null);
   }, [open, initial]);
 
@@ -68,7 +68,7 @@ const SlideForm: React.FC<Props> = ({ open, initial, onClose, onSaved, saveFn })
         <h2>{initial?.id ? 'Editar Slide' : 'Nuevo Slide'}</h2>
         <Box component="form" onSubmit={handleSubmit}>
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2 }}>
-            <Avatar variant="rounded" src={initial?.image ? URL_DOMAIN + initial.image : preview} sx={{ width: 120, height: 70 }} />
+            <Avatar variant="rounded" src={preview} sx={{ width: 120, height: 70 }} />
             <Box sx={{ flex: 1 }}>
               <Button variant="outlined" component="label">
                 Cargar imagen
