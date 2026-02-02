@@ -238,6 +238,11 @@ const ServicioProgreso = () => {
                                 <Typography sx={{ color: '#05172b', fontWeight: 600 }}>PLACA:</Typography>
                                 <Typography>{data.moto?.placa ?? '-'}</Typography>
                             </Box>
+                            {/* Descripcion */}
+                            <Box sx={{ mb: 1, display: 'flex', gap: 1 }}>
+                                <Typography sx={{ color: '#05172b', fontWeight: 600 }}>DESCRIPCIÓN:</Typography>
+                                <Typography>{data.descripcion ?? '-'}</Typography>
+                            </Box>
                         </Grid>
 
                         <Divider sx={{ my: 2 }} />
