@@ -1,22 +1,21 @@
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export const formatDate = (dateString: string | undefined | Date) => {
     if (!dateString) return 'No disponible';
-    // Avoid timezone shifts by extracting the YYYY-MM-DD part when available
-    // and formatting it as DD/MM/YYYY
+
     try {
-        const datePart = String(dateString).includes('T') ? String(dateString).slice(0, 10) : String(dateString).slice(0, 10);
-        const [year, month, day] = datePart.split('-');
-        if (year && month && day) return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
+        // 1. Interpretamos la fecha de la DB como UTC
+        // 2. La convertimos a la zona horaria de Guatemala
+        // 3. Formateamos
+        return dayjs.utc(dateString)
+                    .tz('America/Guatemala')
+                    .format('DD/MM/YYYY');
     } catch (e) {
-        // fallback to original parsing
-    }
-    try {
-        return new Date(String(dateString)).toLocaleDateString('es-ES', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-        });
-    } catch (e) {
-        return String(dateString);
+        return 'Fecha inválida';
     }
 };
