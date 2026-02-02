@@ -1,6 +1,7 @@
 import { useState } from "react";
 import WhatsAppIcon from "./WhatsappIcon";
 import { Menu, X } from "lucide-react";
+import type { ContactoType } from "../../../types/contactoType";
 
 type MenuLink = {
     name: string;
@@ -8,7 +9,7 @@ type MenuLink = {
     icon: React.ReactNode;
 }
 
-const ControlesFlotantes = ({ menuLinks }: { menuLinks: MenuLink[] }) => {
+const ControlesFlotantes = ({ menuLinks, contacto, loading }: { menuLinks: MenuLink[]; contacto: ContactoType; loading: boolean }) => {
 
     const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
     return (
@@ -45,8 +46,10 @@ const ControlesFlotantes = ({ menuLinks }: { menuLinks: MenuLink[] }) => {
                 </div>
 
                 {/* Botón WhatsApp */}
-                <a
-                    href={`https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER}?text=Hola%2C%20quiero%20consultar%20sobre%20los%20servicios%20de%20mantenimiento%20para%20mi%20motocicleta.`}
+                {
+                    !loading && contacto && contacto.telefonoWhatsapp ? (
+                        <a
+                    href={`https://wa.me/${contacto.telefonoWhatsapp}?text=${encodeURIComponent(String(contacto.textoWhatsapp))}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-16 h-16 bg-[#25D366] rounded-full flex items-center justify-center text-white shadow-2xl hover:scale-110 active:scale-90 transition-all group relative border-4 border-white dark:border-black"
@@ -56,6 +59,9 @@ const ControlesFlotantes = ({ menuLinks }: { menuLinks: MenuLink[] }) => {
                         Chat Soporte Técnico
                     </span>
                 </a>
+                    ) : null
+                }
+                
             </div>
         </>
     );

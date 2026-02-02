@@ -1,8 +1,10 @@
-import { Bike, Calendar, Hash, MapPin, Send, Smartphone, User } from "lucide-react";
+import { Bike, Calendar, Hash, Mail, Map, MapPin, Send, Smartphone, User } from "lucide-react";
+import { Skeleton } from "@mui/material";
+import type { ContactoType } from "../../../types/contactoType";
 
 
 
-const Contacto = () => {
+const Contacto = ({ contacto, loading }: { contacto: ContactoType; loading: boolean }) => {
     return (
         <>
             <section id="contacto" className="py-24 bg-white dark:bg-black">
@@ -59,6 +61,54 @@ const Contacto = () => {
                             Confirmar Reserva <Send size={20} />
                         </button>
                     </form>
+                </div>
+                {/* --- Contacto personal CONTACTO --- */}
+
+                <div className="mt-16 pt-12 border-t-2 border-zinc-200 dark:border-zinc-800 grid md:grid-cols-3 gap-8">
+                    {loading ? (
+                        <>
+                            {[1, 2, 3].map((i) => (
+                                <div key={i} className="flex flex-col items-center text-center">
+                                    <Skeleton variant="circular" width={56} height={56} className="mb-4" sx={{ bgcolor: 'rgba(0,0,0,0.11)' }} />
+                                    <Skeleton variant="text" width={80} height={20} className="mb-1" sx={{ bgcolor: 'rgba(0,0,0,0.11)' }} />
+                                    <Skeleton variant="text" width={150} height={16} sx={{ bgcolor: 'rgba(0,0,0,0.11)' }} />
+                                </div>
+                            ))}
+                        </>
+                    ) : (
+                        <>
+                            <a
+                                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(contacto.direccion)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex flex-col items-center text-center group"
+                            >
+                                <div className="w-14 h-14 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-4 group-hover:bg-red-600 transition-colors">
+                                    <Map className="text-zinc-600 dark:text-zinc-400 group-hover:text-white" size={24} />
+                                </div>
+                                <h4 className="font-black italic uppercase text-sm mb-1">Ubicación</h4>
+                                <p className="text-zinc-500 font-bold text-xs whitespace-pre-line">
+                                    {contacto.direccion}
+                                </p>
+                            </a>
+
+                            <a href={`mailto:${contacto.email}`} className="flex flex-col items-center text-center group">
+                                <div className="w-14 h-14 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-4 group-hover:bg-red-600 transition-colors">
+                                    <Mail className="text-zinc-600 dark:text-zinc-400 group-hover:text-white" size={24} />
+                                </div>
+                                <h4 className="font-black italic uppercase text-sm mb-1">Email</h4>
+                                <p className="text-zinc-500 font-bold text-xs truncate w-full px-2">{contacto.email}</p>
+                            </a>
+
+                            <a href={`tel:${contacto.telefono}`} className="flex flex-col items-center text-center group">
+                                <div className="w-14 h-14 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-4 group-hover:bg-red-600 transition-colors">
+                                    <Smartphone className="text-zinc-600 dark:text-zinc-400 group-hover:text-white" size={24} />
+                                </div>
+                                <h4 className="font-black italic uppercase text-sm mb-1">Teléfono</h4>
+                                <p className="text-zinc-500 font-bold text-xs">{contacto.telefono}</p>
+                            </a>
+                        </>
+                    )}
                 </div>
             </section>
         </>

@@ -97,7 +97,7 @@ const Contabilidad: React.FC = () => {
 
   const columnsIngresosEgresos: Column<IngresosEgresosGetType>[] = [
     { id: 'descripcion', label: 'Descripción', format: (_, row) => <LinkStylesNavigate label={row ? row.descripcion || '' : ''} onClick={() => goTo(`/admin/ingresos-egresos/${row?.id}`)} variant="body1" /> },
-    { id: 'updatedAt', label: 'Fecha', format: (_, row) => row?.updatedAt ? formatDate(row.updatedAt.toDateString()) : '' },
+    { id: 'updatedAt', label: 'Fecha', format: (_, row) => row?.updatedAt ? formatDate(row.updatedAt) : '' },
     { id: 'tipo', label: 'Tipo', format: (_, row) => row ? row.tipo?.tipo || '' : '' },
     {
       id: 'monto', label: 'Monto', format: (_, row) => {

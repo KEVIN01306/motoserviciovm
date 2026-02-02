@@ -93,13 +93,13 @@ const ServicioDetail = () => {
     }, 0) || 0
   ).reduce((acc, curr) => acc + curr, 0) || 0;
 
-  const totalServicio =( data.ventas?.reduce((acc, venta) => acc + (venta.total || 0), 0) || 0) + (data.total || 0) + (data.enReparaciones?.[0]?.total || 0) + (data.enParqueos?.[0]?.total || 0) - totalVentasDescuentos;
+  const totalServicio =( data.ventas?.reduce((acc, venta) => acc + (venta.estadoId != estados().cancelado ? venta.total || 0 : 0), 0) || 0) + (data.total || 0) + (data.enReparaciones?.[0]?.total || 0) + (data.enParqueos?.[0]?.total || 0) - totalVentasDescuentos;
 
   const dataTableTotales = [
     { label: 'Total Reparacion', value: `Q ${data.enReparaciones?.[0]?.total ? data.enReparaciones[0].total.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00'}` },
     { label: 'Total Parqueo', value: `Q ${data.enParqueos?.[0]?.total ? data.enParqueos[0].total.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00'}` },
     { label: 'Total Servicio', value: `Q ${data.total?.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? '0.00'}` },
-    { label: 'Total Ventas', value: `Q ${(data.ventas?.reduce((acc, venta) => acc + (venta.total || 0) - totalVentasDescuentos, 0)).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? '0.00'}` },
+    { label: 'Total Ventas', value: `Q ${(data.ventas?.reduce((acc, venta) => acc + (venta.estadoId != estados().cancelado ? venta.total || 0 : 0), 0) - totalVentasDescuentos).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? '0.00'}` },
     { label: 'Gran Total', value: `Q ${totalServicio.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
   ]
   

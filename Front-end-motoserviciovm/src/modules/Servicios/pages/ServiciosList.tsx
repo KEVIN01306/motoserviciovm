@@ -72,7 +72,7 @@ const ServiciosList = () => {
   useEffect(() => {
     if (!term.trim()) { setFiltered(items); return; }
     const l = term.toLowerCase();
-    setFiltered(items.filter(i => String(i.id).toLowerCase().includes(l) || (i.descripcion ?? '').toLowerCase().includes(l) || (i.moto?.placa ?? '').toLowerCase().includes(l) || (i.mecanico?.primerNombre ?? '').toLowerCase().includes(l)));
+    setFiltered(items.filter(i => String(i.id).toLowerCase().includes(l) || (i.descripcion ?? '').toLowerCase().includes(l) || (i.moto?.placa ?? '').toLowerCase().includes(l) || (i.mecanico?.primerNombre ?? '').toLowerCase().includes(l) || (i.mecanico?.primerNombre ?? '').toLowerCase().includes(l) || (i.mecanico?.primerApellido ?? '').toLowerCase().includes(l) || (i.mecanico?.segundoApellido ?? '').toLowerCase().includes(l) || (i.moto?.modelo?.linea?.linea ?? '').toLowerCase().includes(l)));
   }, [term, items]);
 
     const chipColorByEstado = (id: number) => {

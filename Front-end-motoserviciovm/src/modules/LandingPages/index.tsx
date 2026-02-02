@@ -12,6 +12,8 @@ import { getTipos } from '../../services/tipoServicio.services';
 import { getSlides } from '../../services/slide.services';
 import { getAboutImages } from '../../services/aboutImage.services';
 import { getValores } from '../../services/valor.services';
+import { getContactos } from '../../services/contacto.services';
+import type { ContactoType } from '../../types/contactoType';
 
 const URL_DOMAIN = import.meta.env.VITE_DOMAIN;
 
@@ -46,6 +48,8 @@ const Index = () => {
     const [loadingAboutImages, setLoadingAboutImages] = useState(true);
     const [valores, setValores] = useState<any[]>([]);
     const [loadingValores, setLoadingValores] = useState(true);
+    const [contacto, setContacto] = useState<ContactoType>({} as ContactoType);
+    const [loadingContacto, setLoadingContacto] = useState(true);
 
     useEffect(() => {
       const root = window.document.documentElement;
@@ -121,11 +125,24 @@ const Index = () => {
       }
     }
 
+    const fetchContacto = async () => {
+      try{
+        setLoadingContacto(true);
+        const contactoResponse = await getContactos();
+        setContacto(contactoResponse[0] || null);
+      } catch (error) {
+        console.error('Error fetching contacto:', error);
+      } finally {
+        setLoadingContacto(false);
+      }
+    }
+
     useEffect ( () => {
         fecthServiciosTipos();
         fetchSlides();
         fetchAboutImages();
         fetchValores();
+        fetchContacto();
     }, []);
 
     const menuLinks = [
@@ -154,10 +171,10 @@ const Index = () => {
 
             <DiagnosticAI />
 
-            <Contacto />
+            <Contacto contacto={contacto} loading={loadingContacto} />
 
             <Footer />
-            <ControlesFlotantes menuLinks={menuLinks} />
+            <ControlesFlotantes menuLinks={menuLinks} contacto={contacto} loading={loadingContacto} />
         </div>
     );
 };
