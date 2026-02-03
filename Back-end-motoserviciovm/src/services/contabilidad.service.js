@@ -2,24 +2,13 @@ import prisma from "../configs/db.config.js";
 import { estados } from "../utils/estados.js";
 import { tiposModulos } from "../utils/modulosTaller.js";
 import { tiposContabilidad } from "../utils/tiposContabilidad.js";
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc.js';
-import timezone from 'dayjs/plugin/timezone.js';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
-
-    const tz = "America/Guatemala";
-
-    const inicioAjustado = dayjs.tz(fechaInicio, tz).startOf('day').toDate();
-    const finAjustado = dayjs.tz(fechaFin, tz).endOf('day').toDate();
 
     // Filtro base para no repetir código en cada consulta
     const whereBase = {
         sucursalId: { in: sucursalIds },
-        updatedAt: { gte: inicioAjustado, lte: finAjustado }
+        updatedAt: { gte: fechaInicio, lte: fechaFin }
     };
 
     const totalGastos = await prisma.ingresosEgresos.aggregate({
