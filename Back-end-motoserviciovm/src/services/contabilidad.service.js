@@ -16,18 +16,24 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
     const inicioAjustado = dayjs.tz(fechaInicio, tz).startOf('day').toDate();
     const finAjustado = dayjs.tz(fechaFin, tz).endOf('day').toDate();
 
+    // Filtro base para no repetir código en cada consulta
+    const whereBase = {
+        sucursalId: { in: sucursalIds },
+        updatedAt: { gte: inicioAjustado, lte: finAjustado }
+    };
+
     const totalGastos = await prisma.ingresosEgresos.aggregate({
-        where: { tipoId: tiposContabilidad().egreso, estadoId: estados().confirmado, sucursalId: { in: sucursalIds }, updatedAt: { gte: inicioAjustado, lte: finAjustado } },
+        where: { tipoId: tiposContabilidad().egreso, estadoId: estados().confirmado, ...whereBase },
         _sum: { monto: true },
     });
 
     const totalIngresos = await prisma.ingresosEgresos.aggregate({
-        where: { tipoId: tiposContabilidad().ingreso, estadoId: estados().confirmado, sucursalId: { in: sucursalIds }, updatedAt: { gte: inicioAjustado, lte: finAjustado } },
+        where: { tipoId: tiposContabilidad().ingreso, estadoId: estados().confirmado, ...whereBase },
         _sum: { monto: true },
     });
 
     const IngresosEgresos = await prisma.ingresosEgresos.findMany({
-        where: { estadoId: estados().confirmado, sucursalId: { in: sucursalIds }, updatedAt: { gte: inicioAjustado, lte: finAjustado } },
+        where: { estadoId: estados().confirmado, ...whereBase },
         include: { tipo: true },
     });
 
@@ -37,41 +43,41 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
     // TOTAL DE INGRESOS EN SERVICIOS
 
     const totalServicios = await prisma.servicio.aggregate({
-        where: { estadoId: estados().entregado, sucursalId: { in: sucursalIds }, updatedAt: { gte: inicioAjustado, lte: finAjustado } },
+        where: { estadoId: estados().entregado, ...whereBase },
         _sum: { total: true },
     });
 
     const totalDescuentosServicios = await prisma.servicio.aggregate({
-        where: { estadoId: estados().entregado, sucursalId: { in: sucursalIds }, updatedAt: { gte: inicioAjustado, lte: finAjustado } },
+        where: { estadoId: estados().entregado, ...whereBase },
         _sum: { descuentosServicio: true },
     });
 
     const totalReparaciones = await prisma.enReparacion.aggregate({
-        where: { estadoId: estados().entregado, sucursalId: { in: sucursalIds }, updatedAt: { gte: inicioAjustado, lte: finAjustado } },
+        where: { estadoId: estados().entregado, ...whereBase },
         _sum: { total: true },
     });
 
     const totalParqueos = await prisma.enParqueo.aggregate({
-        where: { estadoId: estados().entregado, sucursalId: { in: sucursalIds }, updatedAt: { gte: inicioAjustado, lte: finAjustado } },
+        where: { estadoId: estados().entregado, ...whereBase },
         _sum: { total: true },
     });
 
     // SERVICIOS DETALLE
 
     const Servicios = await prisma.servicio.findMany({
-        where: { estadoId: estados().entregado, sucursalId: { in: sucursalIds }, updatedAt: { gte: inicioAjustado, lte: finAjustado } },
+        where: { estadoId: estados().entregado, ...whereBase },
         include: { moto: true },
         orderBy: { id: 'desc' },
     });
 
     const Reparaciones = await prisma.enReparacion.findMany({
-        where: { estadoId: estados().entregado, sucursalId: { in: sucursalIds }, updatedAt: { gte: inicioAjustado, lte: finAjustado } },
+        where: { estadoId: estados().entregado, ...whereBase },
         include: { servicio: { include: { moto: true } } },
         orderBy: { id: 'desc' },
     });
 
     const Parqueos = await prisma.enParqueo.findMany({
-        where: { estadoId: estados().entregado, sucursalId: { in: sucursalIds }, updatedAt: { gte: inicioAjustado, lte: finAjustado } },
+        where: { estadoId: estados().entregado, ...whereBase },
         include: { servicio: { include: { moto: true } } },
         orderBy: { id: 'desc' },
     });
@@ -79,7 +85,7 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
     // GASTOS TALLER
 
     const totalGastosTaller = await prisma.ingresosEgresos.aggregate({
-        where: { tipoId: tiposContabilidad().egreso, estadoId: estados().confirmado, sucursalId: { in: sucursalIds }, moduloTallerId: tiposModulos().taller, updatedAt: { gte: inicioAjustado, lte: finAjustado } },
+        where: { tipoId: tiposContabilidad().egreso, estadoId: estados().confirmado, moduloTallerId: tiposModulos().taller, ...whereBase },
         _sum: { monto: true },
     });
 
@@ -96,26 +102,26 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
     // TOTAL DE INGRESOS EN VENTAS
 
     const totalVentas = await prisma.venta.aggregate({
-        where: { estadoId: estados().confirmado, sucursalId: { in: sucursalIds }, updatedAt: { gte: inicioAjustado, lte: finAjustado } },
+        where: { estadoId: estados().confirmado, ...whereBase },
         _sum: { total: true },
     });
     
     // TOTAL GANANCIAS EN VENTAS
     const totalGananciasVentas = await prisma.ventaProducto.aggregate({
-        where: { venta: { estadoId: estados().confirmado, sucursalId: { in: sucursalIds }, updatedAt: { gte: inicioAjustado, lte: finAjustado } } },
+        where: { venta: { estadoId: estados().confirmado, ...whereBase } },
         _sum: { ganacia: true },
     });
 
     // DETALLE DE VENTAS
 
     const Ventas = await prisma.venta.findMany({
-        where: { estadoId: estados().confirmado, sucursalId: { in: sucursalIds }, updatedAt: { gte: inicioAjustado, lte: finAjustado } },
+        where: { estadoId: estados().confirmado, ...whereBase },
         include: { servicio: true },
     });
 
     // GASTOS REPUESTOS
     const totalGastosRepuestos = await prisma.ingresosEgresos.aggregate({
-        where: { tipoId: tiposContabilidad().egreso, estadoId: estados().confirmado, sucursalId: { in: sucursalIds }, moduloTallerId: tiposModulos().repuestos, updatedAt: { gte: fechaInicio, lte: fechaFin } },
+        where: { tipoId: tiposContabilidad().egreso, estadoId: estados().confirmado,...whereBase, moduloTallerId: tiposModulos().repuestos },
         _sum: { monto: true },
     });
 
