@@ -36,9 +36,61 @@ const SlideForm: React.FC<Props> = ({ open, initial, onClose, onSaved, saveFn })
     setSlide(s => ({ ...s, [k]: e.target.value }));
   };
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const compressImage = (file: File): Promise<File> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          let quality = 0.8;
+
+          // Reducir dimensiones si es muy grande
+          if (width > 2000 || height > 2000) {
+            const ratio = Math.min(2000 / width, 2000 / height);
+            width *= ratio;
+            height *= ratio;
+          }
+
+          const ctx = canvas.getContext('2d')!;
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Reducir calidad hasta obtener < 300KB
+          const compressToSize = (targetSize: number): void => {
+            canvas.toBlob(
+              (blob) => {
+                if (blob && blob.size > targetSize && quality > 0.1) {
+                  quality -= 0.1;
+                  compressToSize(targetSize);
+                } else if (blob) {
+                  resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+                }
+              },
+              'image/jpeg',
+              quality
+            );
+          };
+
+          compressToSize(300 * 1024); // 300 KB
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0] ?? null;
-    setFile(f);
+    if (f) {
+      const compressed = await compressImage(f);
+      setFile(compressed);
+    } else {
+      setFile(null);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

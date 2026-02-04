@@ -27,12 +27,60 @@ const AboutImagesPage: React.FC = () => {
     }
   };
 
+  const compressImage = (file: File): Promise<File> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          let quality = 0.8;
+
+          // Reducir dimensiones si es muy grande
+          if (width > 2000 || height > 2000) {
+            const ratio = Math.min(2000 / width, 2000 / height);
+            width *= ratio;
+            height *= ratio;
+          }
+
+          const ctx = canvas.getContext('2d')!;
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Reducir calidad hasta obtener < 300KB
+          const compressToSize = (targetSize: number): void => {
+            canvas.toBlob(
+              (blob) => {
+                if (blob && blob.size > targetSize && quality > 0.1) {
+                  quality -= 0.1;
+                  compressToSize(targetSize);
+                } else if (blob) {
+                  resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+                }
+              },
+              'image/jpeg',
+              quality
+            );
+          };
+
+          compressToSize(300 * 1024); // 300 KB
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, imageId?: number) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const compressed = await compressImage(file);
     const fd = new FormData();
-    fd.append('image', file);
+    fd.append('image', compressed);
 
     try {
       setUploading(imageId ?? -1);
