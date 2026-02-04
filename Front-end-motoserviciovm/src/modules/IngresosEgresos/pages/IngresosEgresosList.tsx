@@ -104,13 +104,12 @@ const IngresosEgresosList = () => {
 
   const getTableColumns = (): Column<IngresosEgresosGetType>[] => {
     const base: Column<IngresosEgresosGetType>[] = [
-      { id: 'id', label: 'Codigo', minWidth: 50 },
+      { id: 'createdAt', label: 'Creado', minWidth: 120, format: (v) => formatDate(v as any) },
+      { id: 'tipo', label: 'Tipo', minWidth: 100, format: (v) => v?.tipo ?? '' },
       { id: 'descripcion', label: 'Descripción', minWidth: 150 },
       { id: 'monto', label: 'Monto', minWidth: 100 },
-      { id: 'tipo', label: 'Tipo', minWidth: 100, format: (v) => v?.tipo ?? '' },
-      { id: 'sucursal', label: 'Sucursal', minWidth: 150, format: (v) => v?.nombre ?? '' },
-      { id: 'createdAt', label: 'Creado', minWidth: 120, format: (v) => formatDate(v as any) },
       { id: 'estado', label: 'Estado', minWidth: 120, format: (v:any) => <Chip variant='outlined' label={v?.estado ?? ''} color={chipColorByEstado(v?.id ?? 0)} /> },
+      { id: 'sucursal', label: 'Sucursal', minWidth: 150, format: (v) => v?.nombre ?? '' },
     ];
 
     const actions = getTableActions();

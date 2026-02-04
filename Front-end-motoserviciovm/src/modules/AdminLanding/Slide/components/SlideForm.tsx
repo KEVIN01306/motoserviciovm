@@ -47,9 +47,9 @@ const SlideForm: React.FC<Props> = ({ open, initial, onClose, onSaved, saveFn })
     try {
       const fd = new FormData();
       if (file) fd.append('image', file);
-      if (slide.tag) fd.append('tag', slide.tag);
-      if (slide.promo) fd.append('promo', slide.promo);
-      if (slide.subtitle) fd.append('subtitle', slide.subtitle);
+      fd.append('tag', slide.tag ?? '');
+      fd.append('promo', slide.promo ?? '');
+      fd.append('subtitle', slide.subtitle ?? '');
       const res = await saveFn(slide.id as number | undefined, fd);
       onSaved?.(res);
       handleClose();
