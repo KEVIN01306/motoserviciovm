@@ -5,8 +5,8 @@ import type { EnReparacionGetType, EnReparacionType } from "../../../types/enRep
 
 type Props = {
   control: Control<EnReparacionType>;
-  register?: UseFormRegister<EnReparacionType>;
-  errors?: FieldErrors<EnReparacionType>;
+  register: UseFormRegister<EnReparacionType>;
+  errors: FieldErrors<EnReparacionType>;
   readOnlyValues?: Partial<EnReparacionGetType>;
 };
 
@@ -17,8 +17,8 @@ const SalidaForm = ({ control, register, errors, readOnlyValues }: Props) => {
         <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>{readOnlyValues?.servicio?.moto?.placa}</Typography>
       </Grid>
 
-      <Grid size={{ xs: 12 }}>
-        <TextField variant="standard" fullWidth label="Descripción" value={readOnlyValues?.descripcion ?? ""} InputProps={{ readOnly: true }} />
+      <Grid size={12}>
+        <TextField variant="standard" fullWidth label="Descripción" {...register("descripcion")} error={!!errors.descripcion} helperText={errors.descripcion?.message} />
       </Grid>
 
       <Grid size={{ xs: 12 }}>
@@ -34,14 +34,8 @@ const SalidaForm = ({ control, register, errors, readOnlyValues }: Props) => {
         />
       </Grid>
 
-      <Grid size={{ xs: 12 }}>
-        <Controller
-          control={control}
-          name="observaciones"
-          render={({ field }) => (
-            <TextField variant="standard" {...field} fullWidth value={""} label="Observaciones" multiline rows={3} error={!!errors?.observaciones} helperText={errors?.observaciones?.message} />
-          )}
-        />
+      <Grid size={12}>
+        <TextField variant="standard" fullWidth label="observaciones" {...register("observaciones")} error={!!errors.observaciones} helperText={errors.observaciones?.message} />
       </Grid>
 
       <Grid size={{ xs: 12 }}>

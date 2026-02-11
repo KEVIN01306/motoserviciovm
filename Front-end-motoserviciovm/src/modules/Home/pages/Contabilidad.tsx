@@ -83,7 +83,9 @@ const Contabilidad: React.FC = () => {
     { id: 'updatedAt', label: 'Fecha', format: (_, row) => row ? formatDate(row.updatedAt) : '' },
     { id: 'descuentosServicio', label: 'Descuento', format: (_, row) => row?.descuentosServicio ? `Q ${row.descuentosServicio.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '' },
     { id: 'subtotal', label: 'Subtotal', format: (_, row) => `Q ${(row?.total || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
-    { id: 'total', label: 'Total', format: (_, row) => `Q ${((row?.total || 0) - (row?.descuentosServicio || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+    { id: 'enReparaciones', label: 'Reparacion', format: (_,row) =>  `Q ${(row?.enReparaciones?.[0]?.total || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+    { id: 'enParqueos', label: 'Parqueo', format: (_,row) =>  `Q ${(row?.enParqueos?.[0]?.total || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+    { id: 'total', label: 'Total', format: (_, row) => `Q ${((row?.total || 0) - (row?.descuentosServicio || 0) + (row?.enReparaciones?.[0]?.total || 0) + (row?.enParqueos?.[0]?.total || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
   ];
   
   const columnsVentas: Column<VentaGetType>[] = [
@@ -182,6 +184,22 @@ const Contabilidad: React.FC = () => {
     {
       title: 'Total Servicios Taller',
       value: "Q " + (data?.totalServiciosTaller || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      //trend: 'up' as 'up',
+      //trendValue: 5.2,
+      icon: FaChartLine,
+      color: '#10b981',
+    },
+    {
+      title: 'Total Reparaciones',
+      value: "Q " + (data?.totalReparacionesTaller || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      //trend: 'up' as 'up',
+      //trendValue: 5.2,
+      icon: FaChartLine,
+      color: '#10b981',
+    },
+    {
+      title: 'Total Parqueos',
+      value: "Q " + (data?.totalParqueosTaller || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       //trend: 'up' as 'up',
       //trendValue: 5.2,
       icon: FaChartLine,
@@ -358,7 +376,9 @@ const Contabilidad: React.FC = () => {
               id: ('Totales') as any,
               descuentosServicio: ("Q " + (data.serviciosDetalle.reduce((sum, row) => sum + (row.descuentosServicio || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
               subtotal: ("Q " + (data.serviciosDetalle.reduce((sum, row) => sum + (row.total || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
-              total: ("Q " + (data.serviciosDetalle.reduce((sum, row) => sum + ((row.total || 0) - (row.descuentosServicio || 0)), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
+              enReparaciones: ("Q " + (data.serviciosDetalle.reduce((sum, row) => sum + (row?.enReparaciones?.[0]?.total || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
+              enParqueos: ("Q " + (data.serviciosDetalle.reduce((sum, row) => sum + (row?.enParqueos?.[0]?.total || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
+              total: ("Q " + (data.serviciosDetalle.reduce((sum, row) => sum + ((row.total || 0) - (row.descuentosServicio || 0) + (row?.enReparaciones?.[0]?.total || 0) + (row?.enParqueos?.[0]?.total || 0)), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
             }}
             exportFileName="Detalle_Servicios_Contabilidad"
             showExportButton={true}

@@ -248,6 +248,10 @@ const salidaServicioHandler = async (req, res) => {
             body.kilometrajeProximoServicio = parseInt(body.kilometrajeProximoServicio);
         }
 
+        if (body.sucursalId !== undefined) {
+            body.sucursalId = parseInt(body.sucursalId);
+        }
+
         // Parse date fields
         if (typeof body.proximaFechaServicio === 'string' && body.proximaFechaServicio) {
             body.proximaFechaServicio = new Date(body.proximaFechaServicio);
@@ -292,6 +296,7 @@ const salidaServicioHandler = async (req, res) => {
             accionSalida: body.accionSalida,
             descripcionAccion: body.descripcionAccion,
             totalSalidaAnticipado: body.totalSalidaAnticipado,
+            sucursalId: body.sucursalId
         };
 
         const updated = await salidaServicio(parseInt(id), dataToSend);

@@ -54,6 +54,7 @@ const ServicioDetailSalida = () => {
         }
     }, [loading, data, hash]);
 
+    const [dataTableCambiosReparacion, setDataTableCambiosReparacion] = useState<any[]>([]);
     const [dataTableCambiosServicio, setDataTableCambiosServicio] = useState<any[]>([]);
 
     useEffect(() => {
@@ -83,7 +84,33 @@ const ServicioDetailSalida = () => {
         ) || [];
 
         setDataTableCambiosServicio(dataTableCambiosServicioList);
-    }, [data, setDataTableCambiosServicio]);
+        const repuestosCambiados = data.enReparaciones?.[0]?.repuestos?.filter((repuesto) => repuesto.checked) ?? []
+        const dataTableCambiosReparacionList = Array.from(
+            [
+                ...(data.enReparaciones?.[0]?.ventas?.flatMap((venta: VentaGetType) =>
+                    venta.productos?.map((producto: VentaProductoGetType) => ({
+                        id: producto.producto?.id,
+                        nombre: producto.producto?.nombre,
+                    })) || []
+                ) || []),
+
+                 ...(repuestosCambiados.map((repuesto: any) => ({
+                    id: repuesto.id,
+                    nombre: repuesto.nombre,
+                })) || [])
+            ].reduce((map, obj) => {
+                // El Map se encarga de que si el ID ya existe, no se duplique
+                if (obj.id && !map.has(obj.id)) {
+                    map.set(obj.id, obj);
+                }
+                return map;
+            }, new Map<string | number, any>()).values()
+        ) || [];
+        
+
+        setDataTableCambiosReparacion(dataTableCambiosReparacionList)
+    }, [data, setDataTableCambiosServicio, setDataTableCambiosReparacion]);
+    
 
 
     if (loading) return <Loading />;
@@ -340,10 +367,31 @@ const ServicioDetailSalida = () => {
                                             { id: 'descripcion', label: 'Descripción', minWidth: 180, format: (_: any, row: repuestoReparacionType) => row.descripcion ?? '' },
                                             { id: 'refencia', label: 'Referencia', minWidth: 100, format: (_: any, row: repuestoReparacionType) => row.refencia ? (<Link href={row.refencia} target="_blank" rel="noopener noreferrer" underline="hover" >Link</Link>) : 'No hay' },
                                             { id: 'cantidad', label: 'Cantidad', minWidth: 80, align: 'center', format: (v: any) => String(v) },
+                                            { id: 'cchecked', Label: 'Check', minWidth: 80, align: 'center', format: (_: any, row: repuestoReparacionType) =>  <Checkbox color="primary" checked={!!row.checked} disabled /> }
                                         ] as any}
                                         rows={data.enReparaciones[0].repuestos ?? []}
                                         headerColor="#1565c0"
                                     />
+                                    <Box width={'100%'} display={'flex'} flexDirection={{ xs: 'column', md: 'row' }} justifyContent={'space-between'} mb={4}>
+                                    <Box width={{ xs: '100%', md: '40%' }} mx="auto" m={2}>
+                                        {
+                                            dataTableCambiosReparacion.length === 0 ? (
+                                                null
+                                            ) : (
+                                                <>
+                                                    <ProductsTable
+                                                        maxHeight={'none'}
+                                                        columns={[
+                                                            { id: 'nombre', label: 'CAMBIOS REALIZADOS DURANTE LA REPARACION', minWidth: 180, format: (v: any) => v ?? '', align: 'center' },
+                                                        ] as any}
+                                                        rows={dataTableCambiosReparacion ?? []}
+                                                        headerColor="#1565c0"
+                                                    />
+                                                </>
+                                            )
+                                        }
+                                    </Box>
+                                    </Box>
                                 </>
                             )
                         }

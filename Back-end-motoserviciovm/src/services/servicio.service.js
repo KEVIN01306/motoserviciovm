@@ -21,7 +21,7 @@ const getServicios = async (filters = {}) => {
     const items = await prisma.servicio.findMany({
         where: whereClause,
         orderBy: { createdAt: 'desc' },
-        include: { moto: {include: { modelo: {include: { linea: true }} }}, sucursal: true, cliente: true, mecanico: true, estado: true, enReparaciones: true, enParqueos: true},
+        include: { moto: {include: { modelo: {include: { linea: true }} }}, sucursal: true, cliente: true, mecanico: true, estado: true, enReparaciones: {include: {ventas: {include: {productos: true}}}}, enParqueos: true},
     });
 
     /*if (!items || items.length === 0) {
@@ -313,6 +313,7 @@ const salidaServicio = async (id, data) => {
                         estadoId: estados().activo,
                         descripcion: base.descripcionAccion,
                         total: base.totalSalidaAnticipado || 0,
+                        sucursalId: base.sucursalId,
                     },
                 });
             }

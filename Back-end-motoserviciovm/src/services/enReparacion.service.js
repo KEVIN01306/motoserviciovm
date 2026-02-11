@@ -100,14 +100,15 @@ const putEnReparacionSalida = async (id, data, firmaSalidaFile) => {
                 throw error;
             }
 
-            const isTermino = servicio.enParqueos.every(parqueo => parqueo.estadoId === estados().activo);
+            const isTermino = servicio.enParqueos.length > 0 && 
+                 servicio.enParqueos.every(parqueo => parqueo.estadoId === estados().activo);
 
             const motoId = servicio.motoId;
 
             // Update servicio state
             await tx.servicio.update({
                 where: { id: existing.servicioId },
-                data: { estadoId: isTermino ? estados().enParqueo : estados().enServicio },
+                data: { estadoId: isTermino ? estados().enParqueo : estados().entregado },
             });
 
             // Update moto state

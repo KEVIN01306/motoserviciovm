@@ -55,8 +55,8 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
 
     const Servicios = await prisma.servicio.findMany({
         where: { estadoId: estados().entregado, ...whereBase },
-        include: { moto: true },
-        orderBy: { id: 'desc' },
+        include: { moto: true, enReparaciones: {where: { estadoId: estados().entregado}}, enParqueos:{where: { estadoId: estados().entregado}}},
+        orderBy: { fechaSalida: 'desc' },
     });
 
     const Reparaciones = await prisma.enReparacion.findMany({

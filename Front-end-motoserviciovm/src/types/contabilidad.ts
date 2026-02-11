@@ -7,6 +7,8 @@ export type contabilidadTotalesType = {
         totalServiciosTaller: number,
         totalGastosTaller: number,
         totalCajaTaller: number,
+        totalReparacionesTaller: number,
+        totalParqueosTaller: number,
 
         // TALLER DETALLE
         serviciosDetalle: ServicioGetType[],
