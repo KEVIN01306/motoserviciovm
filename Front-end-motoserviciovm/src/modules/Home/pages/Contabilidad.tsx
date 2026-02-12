@@ -166,8 +166,8 @@ const Contabilidad: React.FC = () => {
       value: "Q " + (data?.totalIngresosRepuestos || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       //trend: 'down' as 'down',
       //trendValue: 3.1,
-      icon: FaDollarSign,
-      color: '#ef4444',
+      icon: FaChartLine,
+      color: '#10b981',
     },
     {
       title: 'Total Gastos',

@@ -81,7 +81,7 @@ const IngresosEgresosForm = forwardRef((props: Props, ref) => {
       <Grid size={{ xs: 12, sm: 6 }}>
         <Controller
           name="moduloTallerId"
-          control={control} // Viene de useForm()
+          control={control}
           defaultValue={initial?.moduloTallerId || 1}
           render={({ field }) => (
             <TextField
@@ -90,7 +90,6 @@ const IngresosEgresosForm = forwardRef((props: Props, ref) => {
               fullWidth
               label="Módulo"
               variant="standard"
-              // Esto fuerza a que el componente se redibuje cuando el valor cambie
               value={field.value ?? ""} 
             >
               <MenuItem value={1}>Taller</MenuItem>

@@ -90,7 +90,7 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
 
     // TOTAL CAJA TALLER
 
-    const totalCajaTaller = (totalServicios._sum.total + totalReparaciones._sum.total + totalParqueos._sum.total - (totalDescuentosServicios._sum.descuentosServicio || 0)) - (totalGastosTaller._sum.monto || 0);
+    const totalCajaTaller = (totalServicios._sum.total + totalReparaciones._sum.total + totalParqueos._sum.total + (totalIngresosTaller._sum.monto || 0) - (totalDescuentosServicios._sum.descuentosServicio || 0)) - (totalGastosTaller._sum.monto || 0);
 
     // MODULO CONTROL REPUESTOS
 
@@ -122,7 +122,7 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
 
     // INGRESOS
     const totalIngresosRepuestos = await prisma.ingresosEgresos.aggregate({
-        where: { tipoId: tiposContabilidad().ingreso, moduloTallerId: tiposModulos().taller , estadoId: estados().confirmado, ...whereBase },
+        where: { tipoId: tiposContabilidad().ingreso, moduloTallerId: tiposModulos().repuestos , estadoId: estados().confirmado, ...whereBase },
         _sum: { monto: true },
     });
 
@@ -130,7 +130,7 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
 
 
     // TOTAL CAJA REPUESTOS
-    const totalCajaRepuestos = (totalVentas._sum.total || 0) - (totalGastosRepuestos._sum.monto || 0);
+    const totalCajaRepuestos = (totalVentas._sum.total || 0) - (totalGastosRepuestos._sum.monto || 0 ) + totalIngresosRepuestos._sum.monto || 0;
 
     const totalIngresosGenerales = (totalServicios._sum.total + totalReparaciones._sum.total + totalParqueos._sum.total - (totalDescuentosServicios._sum.descuentosServicio || 0)) + (totalVentas._sum.total || 0) + (totalIngresos._sum.monto || 0);
     return {
