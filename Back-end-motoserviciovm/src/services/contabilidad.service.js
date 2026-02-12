@@ -51,6 +51,7 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
         _sum: { total: true },
     });
 
+
     // SERVICIOS DETALLE
 
     const Servicios = await prisma.servicio.findMany({
@@ -75,6 +76,11 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
 
     const totalGastosTaller = await prisma.ingresosEgresos.aggregate({
         where: { tipoId: tiposContabilidad().egreso, estadoId: estados().confirmado, moduloTallerId: tiposModulos().taller, ...whereBase },
+        _sum: { monto: true },
+    });
+    // INGRESOS
+    const totalIngresosTaller = await prisma.ingresosEgresos.aggregate({
+        where: { tipoId: tiposContabilidad().ingreso, moduloTallerId: tiposModulos().taller , estadoId: estados().confirmado, ...whereBase },
         _sum: { monto: true },
     });
 
@@ -114,6 +120,12 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
         _sum: { monto: true },
     });
 
+    // INGRESOS
+    const totalIngresosRepuestos = await prisma.ingresosEgresos.aggregate({
+        where: { tipoId: tiposContabilidad().ingreso, moduloTallerId: tiposModulos().taller , estadoId: estados().confirmado, ...whereBase },
+        _sum: { monto: true },
+    });
+
     // DETALLE DE GASTOS REPUESTOS
 
 
@@ -128,21 +140,26 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
         totalReparacionesTaller: totalReparaciones._sum.total || 0,
         totalParqueosTaller: totalParqueos._sum.total || 0,
         totalGastosTaller: totalGastosTaller._sum.monto || 0,
+        totalIngresosTaller: totalIngresosTaller._sum.monto || 0,
         totalCajaTaller: totalCajaTaller,
 
         // TALLER DETALLE
         serviciosDetalle: Servicios,
         gastosTallerDetalle: IngresosEgresos.filter(ie => ie.moduloTallerId === tiposModulos().taller && ie.tipoId === tiposContabilidad().egreso),
+        ingresosTallerDetalle: IngresosEgresos.filter(ie => ie.moduloTallerId === tiposModulos().taller && ie.tipoId === tiposContabilidad().ingreso),
 
         // REPUESTOS
         totalVentasRepuestos: totalVentas._sum.total || 0,
         totalGananciasVentas: totalGananciasVentas._sum.ganacia || 0,
         totalGastosRepuestos: totalGastosRepuestos._sum.monto || 0,
+        totalIngresosRepuestos: totalIngresosRepuestos._sum.monto || 0,
         totalCajaRepuestos: totalCajaRepuestos,
 
         // REPUESTOS DETALLE
         ventasDetalle: Ventas,
         gastosRepuestosDetalle: IngresosEgresos.filter(ie => ie.moduloTallerId === tiposModulos().repuestos && ie.tipoId === tiposContabilidad().egreso),
+        ingresosRepuestosDetalle: IngresosEgresos.filter(ie => ie.moduloTallerId === tiposModulos().repuestos && ie.tipoId === tiposContabilidad().ingreso),
+
 
         // GENERALES
         totalIngresos: totalIngresosGenerales || 0,

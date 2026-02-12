@@ -161,6 +161,14 @@ const Contabilidad: React.FC = () => {
       icon: FaChartLine,
       color: '#10b981',
     },
+      {
+      title: 'Total Ingresos Repuestos',
+      value: "Q " + (data?.totalIngresosRepuestos || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      //trend: 'down' as 'down',
+      //trendValue: 3.1,
+      icon: FaDollarSign,
+      color: '#ef4444',
+    },
     {
       title: 'Total Gastos',
       value: "Q " + (data?.totalGastosRepuestos || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
@@ -202,6 +210,14 @@ const Contabilidad: React.FC = () => {
       value: "Q " + (data?.totalParqueosTaller || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       //trend: 'up' as 'up',
       //trendValue: 5.2,
+      icon: FaChartLine,
+      color: '#10b981',
+    },
+    {
+      title: 'Total Ingresos Taller',
+      value: "Q " + (data?.totalIngresosTaller || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      //trend: 'down' as 'down',
+      //trendValue: 3.1,
       icon: FaChartLine,
       color: '#10b981',
     },
@@ -403,6 +419,17 @@ const Contabilidad: React.FC = () => {
 
           />
 
+          <ProductsTable
+            rows={data.ingresosTallerDetalle}
+            columns={columnsIngresosEgresos}
+            footerRow={{
+              descripcion: ('Totales') as any,
+              monto: ("Q " + (data.ingresosTallerDetalle.reduce((sum, row) => sum + (row.monto || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
+            }}
+            exportFileName="Ingresos_Taller_Contabilidad"
+            showExportButton={true}
+          />
+
           <Typography variant='h4' marginTop={10} textAlign={'center'} gutterBottom>
             CONTROL REPUESTOS
           </Typography>
@@ -445,6 +472,17 @@ const Contabilidad: React.FC = () => {
               monto: ("Q " + (data.gastosRepuestosDetalle.reduce((sum, row) => sum + (row.monto || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
             }}
             exportFileName="Ingresos_Egresos_Repuestos_Contabilidad"
+            showExportButton={true}
+          />
+
+          <ProductsTable
+            rows={data.ingresosRepuestosDetalle}
+            columns={columnsIngresosEgresos}
+            footerRow={{
+              descripcion: 'Totales',
+              monto: ("Q " + (data.ingresosRepuestosDetalle.reduce((sum, row) => sum + (row.monto || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
+            }}
+            exportFileName="Ingresos_Repuestos_Contabilidad"
             showExportButton={true}
           />
 

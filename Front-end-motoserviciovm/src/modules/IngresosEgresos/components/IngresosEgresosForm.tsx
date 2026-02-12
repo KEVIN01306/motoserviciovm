@@ -1,6 +1,6 @@
 import { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { Grid, TextField, Button, MenuItem, Autocomplete } from '@mui/material';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import FormEstructure from '../../../components/utils/FormEstructure';
 import { IngresosEgresosInitialState, type IngresosEgresosType } from '../../../types/ingresosEgresos.Type';
 import { getSucursales } from '../../../services/sucursal.services';
@@ -15,7 +15,7 @@ type Props = {
 
 const IngresosEgresosForm = forwardRef((props: Props, ref) => {
   const { initial, onSubmit, submitLabel = 'Guardar' } = props;
-  const { register, handleSubmit, setValue, formState: { isSubmitting }, reset } = useForm<IngresosEgresosType>({ defaultValues: { ...(initial ?? IngresosEgresosInitialState) } as any });
+  const { register, handleSubmit, setValue, formState: { isSubmitting }, reset,control } = useForm<IngresosEgresosType>({ defaultValues: { ...(initial ?? IngresosEgresosInitialState) } as any });
   const [sucursales, setSucursales] = useState<any[]>([]);
   const [sucursalSelected, setSucursalSelected] = useState<any | null>(null);
   const user = useAuthStore(state => state.user);
@@ -78,15 +78,27 @@ const IngresosEgresosForm = forwardRef((props: Props, ref) => {
           renderInput={(params) => <TextField {...params} label="Sucursal" variant="standard" fullWidth />}
         />
       </Grid>
-      {
-        
-      }
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField select {...register('moduloTallerId' as any, { valueAsNumber: true })} defaultValue={initial?.moduloTallerId} fullWidth label="Módulo" variant="standard" >
-             <MenuItem selected value={1}>Taller</MenuItem>
-             <MenuItem value={2}>Repuestos</MenuItem>
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <Controller
+          name="moduloTallerId"
+          control={control} // Viene de useForm()
+          defaultValue={initial?.moduloTallerId || 1}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              select
+              fullWidth
+              label="Módulo"
+              variant="standard"
+              // Esto fuerza a que el componente se redibuje cuando el valor cambie
+              value={field.value ?? ""} 
+            >
+              <MenuItem value={1}>Taller</MenuItem>
+              <MenuItem value={2}>Repuestos</MenuItem>
             </TextField>
-          </Grid>
+          )}
+        />
+      </Grid>
 
       <Grid size={{ xs: 12 }}>
         <Button type="submit" variant="contained" fullWidth disabled={isSubmitting}>{submitLabel}</Button>
