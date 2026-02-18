@@ -11,7 +11,7 @@ import { useAuthStore } from '../../../store/useAuthStore';
 import { useGoTo } from '../../../hooks/useGoTo';
 import AddIcon from '@mui/icons-material/Add';
 import type { Column } from '../../../components/Table/Table';
-import type { IngresosEgresosGetType, moduloTallerType } from '../../../types/ingresosEgresos.Type';
+import type { IngresosEgresosGetType } from '../../../types/ingresosEgresos.Type';
 import { formatDate } from '../../../utils/formatDate';
 import { successToast, errorToast } from '../../../utils/toast';
 import { estados } from '../../../utils/estados';
