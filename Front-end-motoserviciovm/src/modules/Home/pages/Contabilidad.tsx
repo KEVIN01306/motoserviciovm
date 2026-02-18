@@ -80,6 +80,7 @@ const Contabilidad: React.FC = () => {
       label: 'Placa',
       format: (_, row) => row?.moto?.placa || '',
     },
+    { id: 'mecanico', label: 'Mecanico', format: (_, row) => row ? row.mecanico.primerNombre :  '' },
     { id: 'updatedAt', label: 'Fecha', format: (_, row) => row ? formatDate(row.updatedAt) : '' },
     { id: 'descuentosServicio', label: 'Descuento', format: (_, row) => row?.descuentosServicio ? `Q ${row.descuentosServicio.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '' },
     { id: 'subtotal', label: 'Subtotal', format: (_, row) => `Q ${(row?.total || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },

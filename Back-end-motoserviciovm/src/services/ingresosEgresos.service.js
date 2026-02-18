@@ -14,7 +14,7 @@ const getIngresosEgresos = async () => {
         },
             
         orderBy: { createdAt: 'desc' },
-        include: { tipo: true, sucursal: true,estado: true },
+        include: { tipo: true, sucursal: true,estado: true, moduloTaller: true },
     });
 
     if (!ingresosEgresos) {

@@ -11,7 +11,7 @@ import { useAuthStore } from '../../../store/useAuthStore';
 import { useGoTo } from '../../../hooks/useGoTo';
 import AddIcon from '@mui/icons-material/Add';
 import type { Column } from '../../../components/Table/Table';
-import type { IngresosEgresosGetType } from '../../../types/ingresosEgresos.Type';
+import type { IngresosEgresosGetType, moduloTallerType } from '../../../types/ingresosEgresos.Type';
 import { formatDate } from '../../../utils/formatDate';
 import { successToast, errorToast } from '../../../utils/toast';
 import { estados } from '../../../utils/estados';
@@ -49,7 +49,9 @@ const IngresosEgresosList = () => {
     setFilteredItems(items.filter(i =>
       String(i.id).toLowerCase().includes(term) ||
       (i.descripcion ?? '').toLowerCase().includes(term) ||
-      (i.sucursal?.nombre ?? '').toLowerCase().includes(term)
+      (i.sucursal?.nombre ?? '').toLowerCase().includes(term) ||
+      (i.moduloTaller?.modulo ?? '').toLowerCase().includes(term)
+
     ));
   }, [searchTerm, searchCodigo, items]);
 
@@ -106,6 +108,7 @@ const IngresosEgresosList = () => {
     const base: Column<IngresosEgresosGetType>[] = [
       { id: 'createdAt', label: 'Creado', minWidth: 120, format: (v) => formatDate(v as any) },
       { id: 'tipo', label: 'Tipo', minWidth: 100, format: (v) => v?.tipo ?? '' },
+      { id: 'moduloTaller', label: 'Modulo', minWidth: 100, format: (_,row) => row ? row.moduloTaller?.modulo : '' },
       { id: 'descripcion', label: 'Descripción', minWidth: 150 },
       { id: 'monto', label: 'Monto', minWidth: 100 },
       { id: 'estado', label: 'Estado', minWidth: 120, format: (v:any) => <Chip variant='outlined' label={v?.estado ?? ''} color={chipColorByEstado(v?.id ?? 0)} /> },

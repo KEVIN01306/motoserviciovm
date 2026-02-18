@@ -24,6 +24,7 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
     const IngresosEgresos = await prisma.ingresosEgresos.findMany({
         where: { estadoId: estados().confirmado, ...whereBase },
         include: { tipo: true },
+        orderBy: {updatedAt: 'desc'}
     });
 
 
@@ -56,8 +57,8 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
 
     const Servicios = await prisma.servicio.findMany({
         where: { estadoId: estados().entregado, ...whereBase },
-        include: { moto: true, enReparaciones: {where: { estadoId: estados().entregado}}, enParqueos:{where: { estadoId: estados().entregado}}},
-        orderBy: { fechaSalida: 'desc' },
+        include: { moto: true,mecanico: true, enReparaciones: {where: { estadoId: estados().entregado}}, enParqueos:{where: { estadoId: estados().entregado}}},
+        orderBy: { updatedAt: 'desc' },
     });
 
     const Reparaciones = await prisma.enReparacion.findMany({
@@ -112,6 +113,7 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
     const Ventas = await prisma.venta.findMany({
         where: { estadoId: estados().confirmado, ...whereBase },
         include: { servicio: true },
+        orderBy: { updatedAt: 'desc'}
     });
 
     // GASTOS REPUESTOS
