@@ -4,6 +4,7 @@ import { Celebration, DateRangeOutlined, DateRangeTwoTone, MailOutline, PersonOu
 import type { UserGetType } from "../../../types/userType";
 import { PiTarget } from "react-icons/pi";
 import { useGoTo } from "../../../hooks/useGoTo";
+import { formatDateNotFormat } from "../../../utils/formatDate";
 
 interface DataDetail {
     user: UserGetType;
@@ -72,7 +73,7 @@ const DataDetail = ({ user }: DataDetail) => {
                     }
                     <DetailItem
                         label="Fecha de Nacimiento"
-                        value={fechaNac ? new Date(fechaNac).toLocaleDateString() : 'N/A'}
+                        value={fechaNac ? formatDateNotFormat(fechaNac) : 'N/A'}
                         icon={<Celebration fontSize="small" />}
                     />
                     <DetailItem
