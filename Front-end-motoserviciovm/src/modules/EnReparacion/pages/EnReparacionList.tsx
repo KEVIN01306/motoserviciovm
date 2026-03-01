@@ -132,6 +132,7 @@ const EnReparacionList = () => {
     const base: Column<EnReparacionGetType>[] = [
       { id: "descripcion", label: "Descripción", minWidth: 200 },
       { id: "fechaEntrada", label: "Entrada", minWidth: 150, format: (v) => (v ? new Date(v).toLocaleString() : "-") },
+      { id: "fechaSalida", label: "Salida", minWidth: 150, format: (v) => (v ? new Date(v).toLocaleString() : "-") },
       { id: "servicio", label: "Moto", minWidth: 120, format: (v) => (v ? (v as any).moto?.placa : "-") },
       { id: "estado", label: "Estado", minWidth: 100, format: (v) => (v ? <Chip label={(v as any).estado} color={chipColorByEstado((v as any).estado)} variant="outlined" /> : "-") },
     ];

@@ -132,13 +132,9 @@ const DataDetail = ({ user }: DataDetail) => {
                         icon={<StoreMallDirectoryRounded fontSize="small" />}
                     />
                 </Grid>
-
-
             </Grid>
             
             <Divider sx={{ my: 1 }} />
-
-
             <Box sx={{ mt: 3 }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
                     Usuarios asignados

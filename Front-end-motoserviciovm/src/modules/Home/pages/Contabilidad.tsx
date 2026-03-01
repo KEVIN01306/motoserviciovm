@@ -28,9 +28,27 @@ const Contabilidad: React.FC = () => {
   const defaultFechaInicio = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')} 00:00:00`;
   const defaultFechaFin = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')} 23:59:59`;
 
-  const [fechaInicio, setFechaInicio] = useState<string>(defaultFechaInicio);
-  const [fechaFin, setFechaFin] = useState<string>(defaultFechaFin);
+  // Retrieve initial values from localStorage or use defaults
+  const storedFechaInicio = localStorage.getItem('contabilidadFechaInicio') || defaultFechaInicio;
+  const storedFechaFin = localStorage.getItem('contabilidadFechaFin') || defaultFechaFin;
+  const storedSucursalId = localStorage.getItem('contabilidadSucursalId');
+
+  const [fechaInicio, setFechaInicio] = useState<string>(storedFechaInicio);
+  const [fechaFin, setFechaFin] = useState<string>(storedFechaFin);
   const [selectedSucursales, setSelectedSucursales] = useState<SucursalType[]>([]);
+
+  useEffect(() => {
+    // Validate storedSucursalId and set default if invalid
+    if (user?.sucursales?.length) {
+      const validSucursal = user.sucursales.find((sucursal: any) => sucursal.id === Number(storedSucursalId));
+      if (validSucursal) {
+        setSelectedSucursales([validSucursal]);
+      } else {
+        setSelectedSucursales([user.sucursales[0]]);
+        localStorage.setItem('contabilidadSucursalId', user.sucursales[0].id.toString());
+      }
+    }
+  }, [user]);
 
   const fetchContabilidad = async () => {
     if (!user || !user.sucursales || user.sucursales.length === 0) return;
@@ -68,6 +86,14 @@ const Contabilidad: React.FC = () => {
 
     console.log('Initial fetchContabilidad called: ', data);
   }, []);
+
+  useEffect(() => {
+    // Automatically fetch data only on initial load if all fields have valid data
+    if (fechaInicio && fechaFin && selectedSucursales.length > 0) {
+      fetchContabilidad();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fechaInicio, fechaFin, selectedSucursales]);
 
   const columnsServicios: Column<ServicioGetType>[] = [
     {
@@ -267,6 +293,23 @@ const Contabilidad: React.FC = () => {
     },
   ]
 
+  const handleFechaInicioChange = (value: string) => {
+    setFechaInicio(value);
+    localStorage.setItem('contabilidadFechaInicio', value);
+  };
+
+  const handleFechaFinChange = (value: string) => {
+    setFechaFin(value);
+    localStorage.setItem('contabilidadFechaFin', value);
+  };
+
+  const handleSucursalChange = (newValue: SucursalType[]) => {
+    setSelectedSucursales(newValue);
+    if (newValue.length > 0) {
+      localStorage.setItem('contabilidadSucursalId', newValue[0]?.id?.toString() || "");
+    }
+  };
+
   return (
     <Box p={3} width={'100%'}>
       <Grid container spacing={2} mb={2}>
@@ -276,7 +319,7 @@ const Contabilidad: React.FC = () => {
             type="datetime-local"
             variant='standard'
             value={fechaInicio}
-            onChange={(e) => setFechaInicio(e.target.value)}
+            onChange={(e) => handleFechaInicioChange(e.target.value)}
             InputLabelProps={{ shrink: true }}
             fullWidth
           />
@@ -287,7 +330,7 @@ const Contabilidad: React.FC = () => {
             type="datetime-local"
             variant='standard'
             value={fechaFin}
-            onChange={(e) => setFechaFin(e.target.value)}
+            onChange={(e) => handleFechaFinChange(e.target.value)}
             InputLabelProps={{ shrink: true }}
             fullWidth
           />
@@ -300,7 +343,7 @@ const Contabilidad: React.FC = () => {
             disableCloseOnSelect
             getOptionLabel={(sucursal) => sucursal.nombre || ''}
             value={selectedSucursales}
-            onChange={(_, newValue) => setSelectedSucursales(newValue)}
+            onChange={(_, newValue) => handleSucursalChange(newValue)}
             renderOption={(props, option, { selected }) => (
               <li {...props} key={option.id}>
                 <Checkbox

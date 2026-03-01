@@ -353,6 +353,14 @@ const ServicioDetail = () => {
                   </Grid>
             )
             }
+
+            {
+              userlogged?.permisos.includes('enreparacion:salida') && (data.estadoId === estados().enReparacion) &&(
+                  <Grid size={{xs: 5, md: 3}} textAlign="center">
+                  <Button variant="contained" color='success'  onClick={() => goTo(`/admin/enreparacion/${data?.enReparaciones?.[0]?.id }/salida`)}>Dar Salida Reparacion</Button>
+                  </Grid>
+            )
+            }
             </Grid>
 
           </CardContent>

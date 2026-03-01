@@ -18,9 +18,15 @@ const getServicios = async (filters = {}) => {
         ...(mecanicoId && { mecanicoId: mecanicoId }),
     };
 
+    const order = { query: {createdAt: 'desc'} }
+
+    if (estadoId == estados().entregado) {
+        order.query = { fechaSalida: 'desc' }
+    }
+
     const items = await prisma.servicio.findMany({
         where: whereClause,
-        orderBy: { createdAt: 'desc' },
+        orderBy: order.query,
         include: { moto: {include: { modelo: {include: { linea: true }} }}, sucursal: true, cliente: true, mecanico: true, estado: true, enReparaciones: {include: {ventas: {include: {productos: true}}}}, enParqueos: true},
     });
 

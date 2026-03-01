@@ -11,6 +11,7 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
         updatedAt: { gte: fechaInicio, lte: fechaFin }
     };
 
+
     const totalGastos = await prisma.ingresosEgresos.aggregate({
         where: { tipoId: tiposContabilidad().egreso, estadoId: estados().confirmado, ...whereBase },
         _sum: { monto: true },

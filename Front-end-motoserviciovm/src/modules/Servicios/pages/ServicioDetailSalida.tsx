@@ -361,6 +361,9 @@ const ServicioDetailSalida = () => {
                                         <Chip label={data.enReparaciones[0]?.estado.estado ?? ''} color={chipColorByEstado(data.enReparaciones[0]?.estado.id)} sx={{ mb: 2 }} variant='outlined' />
                                     </Box>
 
+                                    <Typography variant="h6" display={'flex'} justifyContent={'center'} gutterBottom>REPUESTOS SOLICITADOS</Typography>
+
+
                                     <ProductsTable
                                         columns={[
                                             { id: 'repuesto', label: 'Repuesto', minWidth: 120, format: (_: any, row: repuestoReparacionType) => row.nombre ?? '' },
