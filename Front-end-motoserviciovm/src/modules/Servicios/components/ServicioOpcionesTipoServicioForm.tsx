@@ -39,8 +39,8 @@ const ServicioOpcionesTipoServicioForm: React.FC<Props> = ({ initial, onSubmit, 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Only send the required fields for update
-    onSubmit(rows.map(({ servicioId, opcionServicioId, checked, observaciones }) => ({
-      servicioId, opcionServicioId, checked, observaciones
+    onSubmit(rows.map(({ servicioId, opcionServicioId, checked, observaciones, extra }) => ({
+      servicioId, opcionServicioId, checked, observaciones, extra,
     })));
   };
 
