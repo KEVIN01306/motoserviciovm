@@ -233,7 +233,7 @@ const ServicioDetail = () => {
               {servicioOpcionesTipoServicioExtras && servicioOpcionesTipoServicioExtras.length > 0 && (
 
                   <Box  sx={{ mb: 4 }} >
-                    <Typography variant="h6" gutterBottom>SERVICIOS EXTRAS</Typography>
+                    <Typography variant="h6" gutterBottom>SERVICIOS ADICIONALES</Typography>
                     <ProductsTable
                     columns={[
                       { id: 'opcion', label: 'Opcion', minWidth: 120, format: (_:any, row: ProgresoItemGetType) => row.opcionServicio.opcion ?? '' },
