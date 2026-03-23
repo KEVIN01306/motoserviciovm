@@ -10,7 +10,7 @@ const getTiposServicio = async () => {
                 select: { opcionServicios: true },
             },
             tipoHorario: true,
-            opcionServicios: { select: { opcion: true}},
+            opcionServicios: { select: { id: true,opcion: true}},
         },
     });
 

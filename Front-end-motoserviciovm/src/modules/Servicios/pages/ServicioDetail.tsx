@@ -30,17 +30,22 @@ const ServicioDetail = () => {
   const goTo = useGoTo();
   const { hash } = useLocation();
   const userlogged = useAuthStore(state => state.user);
+  const [servicioOpcionesTipoServicio, setServicioOpcionesTipoServicio] = useState<ServicioGetType['servicioOpcionesTipoServicio']>([])
+  const [servicioOpcionesTipoServicioExtras, setServicioOpcionesTipoServicioExtras] = useState<ServicioGetType['servicioOpcionesTipoServicio']>([])
 
   const fetch = async () => {
     try {
       setLoading(true);
       const res = await getServicio(id ?? '');
       setData(res);
+      console.log(res)
+      setServicioOpcionesTipoServicio(res.servicioOpcionesTipoServicio?.filter( op => op.extra == false))
+      setServicioOpcionesTipoServicioExtras(res.servicioOpcionesTipoServicio?.filter( op => op.extra == true))
     } catch (err: any) {
       setError(err?.message ?? 'Error cargando servicio');
     } finally { setLoading(false); }
   };
-
+  
   useEffect(() => { fetch(); }, [id]);
 
   
@@ -208,7 +213,7 @@ const ServicioDetail = () => {
               )
             }
 
-             {data.servicioOpcionesTipoServicio && data.servicioOpcionesTipoServicio.length > 0 && (
+             {servicioOpcionesTipoServicio && servicioOpcionesTipoServicio.length > 0 && (
 
                   <Box  sx={{ mb: 4 }} >
                     <Typography variant="h6" gutterBottom>{data.tipoServicio?.tipo}</Typography>
@@ -218,7 +223,24 @@ const ServicioDetail = () => {
                       { id: 'checked', label: 'Check', minWidth: 100, align: 'right', format: (_: boolean, row: ProgresoItemGetType) => <Checkbox color="primary" checked={!!row.checked} disabled /> },
                       { id: 'observaciones', label: 'observaciones', minWidth: 80, align: 'center', format: (v: string) => v ?? '' },
                     ] as any}
-                    rows={data.servicioOpcionesTipoServicio ?? []}
+                    rows={servicioOpcionesTipoServicio ?? []}
+                    headerColor="#1565c0"
+                      />
+                  </Box>
+                )}
+
+
+              {servicioOpcionesTipoServicioExtras && servicioOpcionesTipoServicioExtras.length > 0 && (
+
+                  <Box  sx={{ mb: 4 }} >
+                    <Typography variant="h6" gutterBottom>SERVICIOS EXTRAS</Typography>
+                    <ProductsTable
+                    columns={[
+                      { id: 'opcion', label: 'Opcion', minWidth: 120, format: (_:any, row: ProgresoItemGetType) => row.opcionServicio.opcion ?? '' },
+                      { id: 'checked', label: 'Check', minWidth: 100, align: 'right', format: (_: boolean, row: ProgresoItemGetType) => <Checkbox color="primary" checked={!!row.checked} disabled /> },
+                      { id: 'observaciones', label: 'observaciones', minWidth: 80, align: 'center', format: (v: string) => v ?? '' },
+                    ] as any}
+                    rows={servicioOpcionesTipoServicioExtras ?? []}
                     headerColor="#1565c0"
                       />
                   </Box>

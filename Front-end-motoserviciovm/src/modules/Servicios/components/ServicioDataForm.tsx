@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getOpciones } from '../../../services/opcionServicio.services';
+import { getOpciones, postOpcion } from '../../../services/opcionServicio.services';
 import { Grid, TextField, Autocomplete, Paper, Button, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Checkbox, FormControlLabel, Typography, Box } from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -7,6 +7,8 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ImagenesEditorInput from '../../../components/utils/ImagenesEditorInput';
 import SignatureField from '../../../components/utils/SignatureField';
+import type { TipoServicioGetType } from '../../../types/tipoServicioType';
+import { estados } from '../../../utils/estados';
 
 const API_URL = import.meta.env.VITE_DOMAIN;
 
@@ -45,11 +47,19 @@ const ServicioDataForm = ({
   setImagenGuardada,
 }: any) => {
   const [opcionesServicio, setOpcionesServicio] = useState<any[]>([]);
+  const [opcionesServicioExtras, setOpcionesServicioExtras] = useState<any[]>([]);
   const [opcionesSeleccionadas, setOpcionesSeleccionadas] = useState<number[]>([]);
+  const [opcionesSeleccionadasExtras, setOpcionesSeleccionadasExtras] = useState<number[]>([]);
+  const [opcionInput, setOpcionInput] = useState<string>('');
+  const [opcionExtrasInput, setOpcionExtrasInput] = useState<string>('');
+  const [isCreatingOpcion, setIsCreatingOpcion] = useState<boolean>(false);
+  const [opcionError, setOpcionError] = useState<string>('');
+  const [opcionExtrasError, setOpcionExtrasError] = useState<string>('');
 
   useEffect(() => {
-    if (tipoServicioSelected && tipoServicioSelected.cantidadOpcionesServicio === 0) {
+    if (tipoServicioSelected ) {
       getOpciones().then(setOpcionesServicio).catch(() => setOpcionesServicio([]));
+      console.log(tipoServicioSelected)
     } else {
       setOpcionesServicio([]);
       setOpcionesSeleccionadas([]);
@@ -57,9 +67,119 @@ const ServicioDataForm = ({
   }, [tipoServicioSelected]);
 
   useEffect(() => {
+    if (tipoServicioSelected ) {
+      getOpciones()
+      .then((data) => {
+        const idsEnTipo = tipoServicioSelected.opcionServicios.map((os: TipoServicioGetType) => os.id );        
+        const opcionesExtras = data.filter((opcion) => !idsEnTipo.includes(opcion.id));
+
+        setOpcionesServicioExtras(opcionesExtras);
+      })
+      .catch(() => setOpcionesServicioExtras([]));
+    } else {
+      setOpcionesSeleccionadas([]);
+      setOpcionesSeleccionadasExtras([]);
+    }
+  }, [tipoServicioSelected]);
+
+
+  useEffect(() => {
     setValue('opcionesServicioManual', opcionesSeleccionadas);
   }, [opcionesSeleccionadas, setValue]);
 
+  useEffect(() => {
+    setValue('opcionesServicioExtras', opcionesSeleccionadasExtras);
+  }, [opcionesSeleccionadasExtras, setValue]);
+
+  const crearOpcionDesdeInput = async () => {
+    const opcionTexto = opcionInput?.trim();
+    if (!opcionTexto) {
+      setOpcionError('El texto no puede estar vacío');
+      return;
+    }
+
+    if (opcionesServicio.some((o) => o.opcion?.toLowerCase() === opcionTexto.toLowerCase())) {
+      setOpcionError('La opción ya existe');
+      return;
+    }
+
+    setOpcionError('');
+    setIsCreatingOpcion(true);
+
+    try {
+      const created = await postOpcion({ opcion: opcionTexto, estadoId: estados().activo } as any);
+      const allOpciones = await getOpciones();
+      setOpcionesServicio(allOpciones);
+
+      if (tipoServicioSelected) {
+        const tipoIds = tipoServicioSelected.opcionServicios?.map((os: any) => os.id) ?? [];
+        setOpcionesServicioExtras(allOpciones.filter((opcion) => !tipoIds.includes(opcion.id)));
+      }
+
+      if (created?.id != null) {
+        const createdId = Number(created.id);
+        if (!Number.isNaN(createdId)) {
+          setOpcionesSeleccionadas((prev) => Array.from(new Set([...prev, createdId])));
+        }
+      }
+
+      setOpcionInput('');
+    } catch (error: any) {
+      setOpcionError(error?.message ?? 'Error creando opción');
+    } finally {
+      setIsCreatingOpcion(false);
+    }
+  };
+
+  const crearOpcionExtrasDesdeInput = async () => {
+    const opcionTexto = opcionExtrasInput?.trim();
+    if (!opcionTexto) {
+      setOpcionExtrasError('El texto no puede estar vacío');
+      return;
+    }
+
+    if (opcionesServicio.some((o) => o.opcion?.toLowerCase() === opcionTexto.toLowerCase())) {
+      setOpcionExtrasError('La opción ya existe');
+      return;
+    }
+
+    setOpcionExtrasError('');
+    setIsCreatingOpcion(true);
+
+    try {
+      const created = await postOpcion({ opcion: opcionTexto, estadoId: estados().activo } as any);
+      const allOpciones = await getOpciones();
+      setOpcionesServicio(allOpciones);
+
+      if (tipoServicioSelected) {
+        const tipoIds = tipoServicioSelected.opcionServicios?.map((os: any) => os.id) ?? [];
+        setOpcionesServicioExtras(allOpciones.filter((opcion) => !tipoIds.includes(opcion.id)));
+      }
+
+      if (created?.id != null) {
+        const createdId = Number(created.id);
+        if (!Number.isNaN(createdId)) {
+          setOpcionesSeleccionadasExtras((prev) => Array.from(new Set([...prev, createdId])));
+        }
+      }
+
+      setOpcionExtrasInput('');
+    } catch (error: any) {
+      setOpcionExtrasError(error?.message ?? 'Error creando opcion extra');
+    } finally {
+      setIsCreatingOpcion(false);
+    }
+  };
+
+  const canCrearOpcion = Boolean(
+    opcionInput.trim() &&
+      !opcionesServicio.some((o) => o.opcion?.toLowerCase() === opcionInput.trim().toLowerCase())
+  );
+
+  const canCrearOpcionExtras = Boolean(
+    opcionExtrasInput.trim() &&
+      !opcionesServicio.some((o) => o.opcion?.toLowerCase() === opcionExtrasInput.trim().toLowerCase())
+  );
 
   return (
     <Grid container spacing={2}>
@@ -127,16 +247,23 @@ const ServicioDataForm = ({
         />
       </Grid>
       {/* Opciones de servicio manual: Autocomplete múltiple con checkboxes */}
-      {tipoServicioSelected?.cantidadOpcionesServicio === 0 && opcionesServicio.length > 0 && (
+      {tipoServicioSelected?.cantidadOpcionesServicio === 0 && (
         <Grid size={12}>
           <Paper sx={{ p: 2, mb: 2 }}>
             <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Opciones de Servicio</Typography>
             <Autocomplete
               multiple
-              options={opcionesServicio}
+              freeSolo
               disableCloseOnSelect
+              openOnFocus
+              options={opcionesServicio}
               getOptionLabel={(opt: any) => opt?.opcion ?? ''}
               value={opcionesSeleccionadas.map(id => opcionesServicio.find(o => o.id === id)).filter(Boolean) as any}
+              inputValue={opcionInput}
+              onInputChange={(_event, newInputValue) => {
+                setOpcionInput(newInputValue);
+                setOpcionError('');
+              }}
               onChange={(_e, newValue: any[]) => {
                 const ids = newValue.map(v => v.id);
                 setOpcionesSeleccionadas(ids);
@@ -161,6 +288,77 @@ const ServicioDataForm = ({
                 />
               )}
             />
+            {canCrearOpcion && (
+              <Box display="flex" gap={1} alignItems="center" mt={1}>
+                <Typography variant="body2">No existe '{opcionInput}' en la lista.</Typography>
+                <Button size="small" variant="contained" onClick={crearOpcionDesdeInput} disabled={isCreatingOpcion}>
+                  {isCreatingOpcion ? 'Creando...' : `Crear "${opcionInput}"`}
+                </Button>
+              </Box>
+            )}
+            {opcionError && (
+              <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                {opcionError}
+              </Typography>
+            )}
+          </Paper>
+        </Grid>
+      )}
+      {/* Opciones de servicio Extras: Autocomplete múltiple con checkboxes */}
+      {Number(tipoServicioSelected?.cantidadOpcionesServicio) > 0 && (
+        <Grid size={12}>
+          <Paper sx={{ p: 2, mb: 2 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Opciones de Servicio Extras</Typography>
+            <Autocomplete
+              multiple
+              freeSolo
+              disableCloseOnSelect
+              openOnFocus
+              options={opcionesServicioExtras}
+              getOptionLabel={(opt: any) => opt?.opcion ?? ''}
+              value={opcionesSeleccionadasExtras.map(id => opcionesServicio.find(o => o.id === id)).filter(Boolean) as any}
+              inputValue={opcionExtrasInput}
+              onInputChange={(_event, newInputValue) => {
+                setOpcionExtrasInput(newInputValue);
+                setOpcionExtrasError('');
+              }}
+              onChange={(_e, newValue: any[]) => {
+                const ids = newValue.map(v => v.id);
+                setOpcionesSeleccionadasExtras(ids);
+              }}
+              renderOption={(props, option, { selected }) => (
+                <li {...props}>
+                  <Checkbox
+                    icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                    checkedIcon={<CheckBoxIcon fontSize="small" />}
+                    style={{ marginRight: 8 }}
+                    checked={selected}
+                  />
+                  {option.opcion}
+                </li>
+              )}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant="standard"
+                  label="Opciones de servicio"
+                  placeholder="Seleccionar opciones"
+                />
+              )}
+            />
+            {canCrearOpcionExtras && (
+              <Box display="flex" gap={1} alignItems="center" mt={1}>
+                <Typography variant="body2">No existe '{opcionExtrasInput}' en la lista.</Typography>
+                <Button size="small" variant="contained" onClick={crearOpcionExtrasDesdeInput} disabled={isCreatingOpcion}>
+                  {isCreatingOpcion ? 'Creando...' : `Crear "${opcionExtrasInput}"`}
+                </Button>
+              </Box>
+            )}
+            {opcionExtrasError && (
+              <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                {opcionExtrasError}
+              </Typography>
+            )}
           </Paper>
         </Grid>
       )}

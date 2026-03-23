@@ -24,13 +24,17 @@ const ServicioDetailSalida = () => {
     const [error, setError] = useState<string | null>(null);
     const { hash } = useLocation();
     const userlogged = useAuthStore(state => state.user);
+    const [servicioOpcionesTipoServicio, setServicioOpcionesTipoServicio] = useState<ServicioGetType['servicioOpcionesTipoServicio']>([])
+    const [servicioOpcionesTipoServicioExtras, setServicioOpcionesTipoServicioExtras] = useState<ServicioGetType['servicioOpcionesTipoServicio']>([])
+
 
     const fetch = async () => {
         try {
             setLoading(true);
             const res = await getServicio(id ?? '');
             setData(res);
-            console.log(res);
+            setServicioOpcionesTipoServicio(res.servicioOpcionesTipoServicio?.filter( op => op.extra == false))
+            setServicioOpcionesTipoServicioExtras(res.servicioOpcionesTipoServicio?.filter( op => op.extra == true))
         } catch (err: any) {
             setError(err?.message ?? 'Error cargando servicio');
         } finally { setLoading(false); }
@@ -253,7 +257,7 @@ const ServicioDetailSalida = () => {
                         
                         <Typography variant="h5" m={2} gutterBottom>{data.tipoServicio?.tipo ?? ''}</Typography>
                         {
-                            data.servicioOpcionesTipoServicio?.length !== 0 ? (
+                            servicioOpcionesTipoServicio?.length !== 0 ? (
                             <>
                                 <Box sx={{ mb: 4 }} >
                                     <ProductsTable
@@ -262,7 +266,7 @@ const ServicioDetailSalida = () => {
                                             { id: 'checked', label: 'Check', minWidth: 100, align: 'right', format: (_v: boolean, row: ProgresoItemGetType) => <Checkbox color="primary" checked={!!row.checked} disabled /> },
                                             { id: 'observaciones', label: 'observaciones', minWidth: 80, align: 'center', format: (v: string) => v ?? '' },
                                         ] as any}
-                                        rows={data.servicioOpcionesTipoServicio ?? []}
+                                        rows={servicioOpcionesTipoServicio ?? []}
                                         maxHeight={'none'}
                                         headerColor="#1565c0"
                                     />
@@ -274,6 +278,28 @@ const ServicioDetailSalida = () => {
 
                         }
 
+                      <Typography variant="h5" m={2} gutterBottom>SERVICIOS ADICIONALES</Typography>
+                        {
+                            servicioOpcionesTipoServicioExtras?.length !== 0 ? (
+                            <>
+                                <Box sx={{ mb: 4 }} >
+                                    <ProductsTable
+                                        columns={[
+                                            { id: 'opcion', label: 'Opcion', minWidth: 120, format: (_: any, row: ProgresoItemGetType) => row.opcionServicio.opcion ?? '' },
+                                            { id: 'checked', label: 'Check', minWidth: 100, align: 'right', format: (_v: boolean, row: ProgresoItemGetType) => <Checkbox color="primary" checked={!!row.checked} disabled /> },
+                                            { id: 'observaciones', label: 'observaciones', minWidth: 80, align: 'center', format: (v: string) => v ?? '' },
+                                        ] as any}
+                                        rows={servicioOpcionesTipoServicioExtras ?? []}
+                                        maxHeight={'none'}
+                                        headerColor="#1565c0"
+                                    />
+                                </Box>
+                            </>
+                            ) : (
+                                <Typography>No hay opciones de servicio asociadas a este servicio.</Typography>
+                            )
+
+                        }
 
                         <Divider sx={{ my: 2 }} />
                         <Box width={'100%'} display={'flex'} flexDirection={{ xs: 'column', md: 'row' }} justifyContent={'space-between'} mb={4}>

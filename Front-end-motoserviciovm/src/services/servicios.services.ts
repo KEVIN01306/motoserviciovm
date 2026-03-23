@@ -144,6 +144,9 @@ const postServicio = async (payload: Partial<ServicioType> & { imagenesFiles?: F
     if (payload.opcionesServicioManual && Array.isArray(payload.opcionesServicioManual)) {
       form.append('opcionesServicioManual', JSON.stringify(payload.opcionesServicioManual));
     }
+    if (payload.opcionesServicioExtras && Array.isArray(payload.opcionesServicioExtras)) {
+      form.append('opcionesServicioExtras', JSON.stringify(payload.opcionesServicioExtras));
+    }
     const response = await api.post<apiResponse<ServicioGetType>>(API_SERVICIOS, form, {
       headers: { 'Content-Type': 'multipart/form-data' },
 

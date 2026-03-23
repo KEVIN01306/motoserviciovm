@@ -122,7 +122,7 @@ const EnReparacionDetail = () => {
               )
             }
               {
-                user?.permisos?.includes("ventas:create")  && (
+                user?.permisos?.includes("ventas:create")  && item.estadoId != estados().entregado && (
                   <Button variant="contained" color="secondary" sx={{ mt: 2, mr: 2 }} onClick={() => goTo('/admin/ventas/create?reparacionId=' + item.id)}>
                     Crear Venta
                   </Button>

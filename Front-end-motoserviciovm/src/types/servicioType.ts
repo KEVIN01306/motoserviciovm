@@ -66,6 +66,7 @@ export const ProgresoItemInitialState: ProgresoItemType = {
   servicioId: 0,
   opcionServicioId: 0,
   checked: false,
+  extra: false,
   observaciones: '',
 };
 
@@ -75,6 +76,7 @@ export const mergeProgresoItemType = (apiData: Partial<ProgresoItemType>): Parti
     servicioId: apiData.servicioId ?? ProgresoItemInitialState.servicioId,
     opcionServicioId: apiData.opcionServicioId ?? ProgresoItemInitialState.opcionServicioId,
     checked: apiData.checked ?? ProgresoItemInitialState.checked,
+    extra: apiData.extra ?? ProgresoItemInitialState.extra,
     observaciones: apiData.observaciones ?? ProgresoItemInitialState.observaciones,
   };
 };
@@ -118,6 +120,7 @@ export const ServicioInitialState: ServicioType = {
   estadoId: estados().enServicio,
   kilometrajeProximoServicio: 0,
   opcionesServicioManual: [],
+  opcionesServicioExtras: [],
   dpiClienteMoto: null,
   nombreClienteMoto: null,
 };
@@ -157,6 +160,7 @@ export const mergeServicioDataWithDefaults = (apiData: Partial<ServicioType>): P
     imagenesMeta: apiData.imagenesMeta ?? ServicioInitialState.imagenesMeta,
     kilometraje: apiData.kilometraje ?? ServicioInitialState.kilometraje,
     opcionesServicioManual: apiData.opcionesServicioManual ?? ServicioInitialState.opcionesServicioManual,
+    opcionesServicioExtras: apiData.opcionesServicioExtras ?? ServicioInitialState.opcionesServicioExtras,
     nombreClienteMoto: apiData.nombreClienteMoto ?? ServicioInitialState.nombreClienteMoto,
     dpiClienteMoto: apiData.dpiClienteMoto ?? ServicioInitialState.dpiClienteMoto,
   };

@@ -1,4 +1,4 @@
-import z from "zod";
+import z, { boolean } from "zod";
 
 export const servicioItemSchema = z.object({
     inventarioId: z.number(),
@@ -29,6 +29,7 @@ export const servicioOpcionesTipoServicio = z.object({
     servicioId: z.number(),
     opcionServicioId: z.number(),
     checked: z.boolean(),
+    extra:  z.boolean(),
     observaciones: z.string().optional(),
 })
 
@@ -55,6 +56,7 @@ export const servicioSchema = z.object({
     createdAt: z.date().optional(),
     updatedAt: z.date().optional(),
     opcionesServicioManual: z.array(z.number()).optional(),
+    opcionesServicioExtras: z.array(z.number()).optional(),
     nombreClienteMoto: z.string().optional().nullable(),
     dpiClienteMoto: z.string().optional().nullable(),
 });

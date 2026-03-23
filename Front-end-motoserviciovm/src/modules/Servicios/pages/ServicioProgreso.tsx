@@ -24,6 +24,9 @@ import { PiExportDuotone } from 'react-icons/pi';
 const ServicioProgreso = () => {
 
     const [savingImagenes, setSavingImagenes] = useState(false);
+    const [servicioOpcionesTipoServicio, setServicioOpcionesTipoServicio] = useState<ServicioGetType['servicioOpcionesTipoServicio']>([])
+    const [servicioOpcionesTipoServicioExtras, setServicioOpcionesTipoServicioExtras] = useState<ServicioGetType['servicioOpcionesTipoServicio']>([])
+
 
     const [savingEstadoPruebas, setSavingEstadoPruebas] = useState(false);
     const handleSaveImagenes = async ({ files, metas }: { files: File[]; metas: { descripcion?: string }[] }) => {
@@ -82,7 +85,8 @@ const ServicioProgreso = () => {
             setLoading(true);
             const res = await getServicio(id ?? '');
             setData(res);
-            console.log(res);
+            setServicioOpcionesTipoServicio(res.servicioOpcionesTipoServicio?.filter( op => op.extra == false))
+            setServicioOpcionesTipoServicioExtras(res.servicioOpcionesTipoServicio?.filter( op => op.extra == true))
         } catch (err: any) {
             setError(err?.message ?? 'Error cargando servicio');
         } finally { setLoading(false); }
@@ -286,9 +290,9 @@ const ServicioProgreso = () => {
                         <Typography variant="h5" textAlign={'center'} m={2} gutterBottom>{data.tipoServicio?.tipo ?? ''}</Typography>
 
                         {/* Tabla editable de opcionesTipoServicio para mecánico (solo editable si tiene permiso) */}
-                        {editable && data.servicioOpcionesTipoServicio && data.servicioOpcionesTipoServicio.length > 0 ? (
+                        {editable && servicioOpcionesTipoServicio && servicioOpcionesTipoServicio.length > 0 ? (
                             <ServicioOpcionesTipoServicioForm
-                                initial={data.servicioOpcionesTipoServicio as any}
+                                initial={ servicioOpcionesTipoServicio as any}
                                 onSubmit={handleSaveOpcionesTipoServicio}
                                 loading={savingOpciones}
                             />
@@ -302,7 +306,30 @@ const ServicioProgreso = () => {
                                             { id: 'checked', label: 'Check', minWidth: 100, align: 'right', format: (_v: boolean, row: ProgresoItemGetType) => <Checkbox color="primary" checked={!!row.checked} disabled /> },
                                             { id: 'observaciones', label: 'observaciones', minWidth: 80, align: 'center', format: (v: string) => v ?? '' },
                                         ] as any}
-                                        rows={data.servicioOpcionesTipoServicio ?? []}
+                                        rows={servicioOpcionesTipoServicio ?? []}
+                                        headerColor="#1565c0"
+                                    />
+                                </Box>
+                            )
+                        }
+
+                        {editable && servicioOpcionesTipoServicioExtras && servicioOpcionesTipoServicioExtras.length > 0 ? (
+                            <ServicioOpcionesTipoServicioForm
+                                initial={ servicioOpcionesTipoServicioExtras as any}
+                                onSubmit={handleSaveOpcionesTipoServicio}
+                                loading={savingOpciones}
+                            />
+                        ) :
+                            (
+                                <Box sx={{ mb: 4 }} >
+                                    <Typography variant="h6" gutterBottom>SEVICIOS ADICIONALES</Typography>
+                                    <ProductsTable
+                                        columns={[
+                                            { id: 'opcion', label: 'Opcion', minWidth: 120, format: (_: any, row: ProgresoItemGetType) => row.opcionServicio.opcion ?? '' },
+                                            { id: 'checked', label: 'Check', minWidth: 100, align: 'right', format: (_v: boolean, row: ProgresoItemGetType) => <Checkbox color="primary" checked={!!row.checked} disabled /> },
+                                            { id: 'observaciones', label: 'observaciones', minWidth: 80, align: 'center', format: (v: string) => v ?? '' },
+                                        ] as any}
+                                        rows={servicioOpcionesTipoServicioExtras ?? []}
                                         headerColor="#1565c0"
                                     />
                                 </Box>

@@ -83,7 +83,7 @@ const postServicioHandler = async (req, res) => {
         if (body.total) body.total = parseFloat(body.total);
 
         // 3. Parseo de JSON Strings (Arrays anidados)
-        const camposJSON = ['servicioItems', 'productosCliente', 'imagenesMeta', 'opcionesServicioManual'];
+        const camposJSON = ['servicioItems', 'productosCliente', 'imagenesMeta', 'opcionesServicioManual','opcionesServicioExtras'];
         camposJSON.forEach(campo => {
             try {
                 if (typeof body[campo] === 'string') {
@@ -107,7 +107,7 @@ const postServicioHandler = async (req, res) => {
 
         const dataToSend = { 
             ...body, 
-            imagenFiles: imagenesParaPrisma // Aquí pasamos los archivos para el loop de Prisma
+            imagenFiles: imagenesParaPrisma 
         };
 
         const created = await postServicio(dataToSend);
@@ -296,10 +296,9 @@ const salidaServicioHandler = async (req, res) => {
             accionSalida: body.accionSalida,
             descripcionAccion: body.descripcionAccion,
             totalSalidaAnticipado: body.totalSalidaAnticipado,
-            sucursalId: body.sucursalId
         };
 
-        const updated = await salidaServicio(parseInt(id), dataToSend);
+        const updated = await salidaServicio(parseInt(id), dataToSend); 
         return res.status(200).json(responseSucces('Salida registrada', updated));
     } catch (err) {
         console.error('Salida servicio error:', err);

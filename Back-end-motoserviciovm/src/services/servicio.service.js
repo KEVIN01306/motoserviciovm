@@ -48,7 +48,7 @@ const getServicio = async (id) => {
 }
 
 const postServicio = async (data) => {
-    const { servicioItems, productosCliente, imagenesMeta, imagenFiles, opcionesServicioManual, ...base } = data;
+    const { servicioItems, productosCliente, imagenesMeta, imagenFiles, opcionesServicioManual,opcionesServicioExtras, ...base } = data;
     const uploaded = Array.isArray(imagenFiles) ? imagenFiles : [];
     const fechaEntrada = new Date();
 
@@ -103,6 +103,19 @@ const postServicio = async (data) => {
                 where: { tipoServicios: { some: { id: base.tipoServicioId } } },
             });
 
+            let opcionesExtras = [];
+
+            if (opciones.length > 0 && Array.isArray(opcionesServicioExtras) && opcionesServicioExtras.length > 0) {
+                // Ensure opcionesServicioExtra is parsed as an array of integers
+                const parsedOpcionesServicioExtras = opcionesServicioExtras.map((item) =>
+                    typeof item === "string" ? JSON.parse(item) : item
+                ).flat();
+
+                opcionesExtras = await tx.opcionServicio.findMany({
+                    where: { id: { in: parsedOpcionesServicioExtras } },
+                });
+            }
+
             if (opciones.length === 0 && Array.isArray(opcionesServicioManual) && opcionesServicioManual.length > 0) {
                 // Ensure opcionesServicioManual is parsed as an array of integers
                 const parsedOpcionesServicioManual = opcionesServicioManual.map((item) =>
@@ -114,12 +127,25 @@ const postServicio = async (data) => {
                 });
             }
 
+
             for (const opcion of opciones) {
                 await tx.servicioOpcionesTipoServicio.create({
                     data: {
                         servicioId: created.id,
                         opcionServicioId: opcion.id,
                         checked: false,
+                        observaciones: "",
+                    },
+                });
+            }
+
+            for (const opcion of opcionesExtras) {
+                await tx.servicioOpcionesTipoServicio.create({
+                    data: {
+                        servicioId: created.id,
+                        opcionServicioId: opcion.id,
+                        checked: false,
+                        extra:    true,
                         observaciones: "",
                     },
                 });
@@ -319,7 +345,7 @@ const salidaServicio = async (id, data) => {
                         estadoId: estados().activo,
                         descripcion: base.descripcionAccion,
                         total: base.totalSalidaAnticipado || 0,
-                        sucursalId: base.sucursalId,
+                        sucursalId: updated.sucursalId,
                     },
                 });
             }
@@ -341,6 +367,7 @@ const salidaServicio = async (id, data) => {
                         fechaEntrada: new Date(),
                         estadoId: estados().activo,
                         descripcion: base.descripcionAccion,
+                        sucursalId: updated.sucursalId,
                     },
                 });
             }
