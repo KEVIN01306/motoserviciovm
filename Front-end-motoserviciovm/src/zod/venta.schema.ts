@@ -7,6 +7,7 @@ export const ventaSchema = z.object({
     servicioId: z.number().optional().nullable(),
     reparacionId: z.number().optional().nullable(),
     total: z.number(),
+    descuento: z.number().optional(),
     sucursalId: z.number().min(1, 'La sucursal es obligatoria'),
     usuario: userSchema.optional(),
     estadoId: z.number().optional(),

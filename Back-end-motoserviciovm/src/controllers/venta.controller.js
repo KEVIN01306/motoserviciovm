@@ -35,6 +35,7 @@ const postVentaHandler = async (req, res) => {
         if (typeof data.servicioId !== 'undefined' && data.servicioId !== null) data.servicioId = parseInt(data.servicioId);
         if (typeof data.reparacionId !== 'undefined' && data.reparacionId !== null) data.reparacionId = parseInt(data.reparacionId);
         if (typeof data.total !== 'undefined') data.total = parseFloat(data.total);
+        if (typeof data.descuento !== 'undefined') data.descuento = parseFloat(data.descuento);
         if (typeof data.estadoId !== 'undefined') data.estadoId = parseInt(data.estadoId);
 
         // validate venta base
@@ -82,6 +83,7 @@ const putVentaHandler = async (req, res) => {
         if (typeof data.servicioId !== 'undefined' && data.servicioId !== null) data.servicioId = parseInt(data.servicioId);
         if (typeof data.reparacionId !== 'undefined' && data.reparacionId !== null) data.reparacionId = parseInt(data.reparacionId);
         if (typeof data.total !== 'undefined') data.total = parseFloat(data.total);
+        if (typeof data.descuento !== 'undefined') data.descuento = parseFloat(data.descuento);
         if (typeof data.estadoId !== 'undefined') data.estadoId = parseInt(data.estadoId);
 
         const validation = ventaSchema.partial().safeParse(data);

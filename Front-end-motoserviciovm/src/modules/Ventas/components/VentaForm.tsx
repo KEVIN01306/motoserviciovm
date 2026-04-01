@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Grid, TextField, Button, MenuItem, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Autocomplete, FormControlLabel, Checkbox, TableContainer } from '@mui/material';
+import { Grid, TextField, Button, MenuItem, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Autocomplete, FormControlLabel, Checkbox, TableContainer, InputAdornment } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { useForm } from 'react-hook-form';
@@ -12,6 +12,7 @@ import { getSucursales } from '../../../services/sucursal.services';
 import { useAuthStore } from '../../../store/useAuthStore';
 import type { ProductoGetType } from '../../../types/productoType';
 import { useSearchParams } from 'react-router-dom';
+import { AiOutlinePercentage } from 'react-icons/ai';
 
 type Props = {
   initial?: Partial<VentaType> & { productos?: VentaProductoType[] };
@@ -24,6 +25,7 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
   const [productosList, setProductosList] = useState<ProductoGetType[]>([]);
   const [linea, setLinea] = useState<VentaProductoGetType>(VentaProductoInitialState as any);
   const [items, setItems] = useState<VentaProductoGetType[]>((initial?.productos as VentaProductoGetType[]) ?? []);
+  const [descuento, setDescuento] = useState<number>(initial?.descuento ?? 0);
 
   useEffect(() => {
     (async () => {
@@ -141,11 +143,47 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
     );
   };
 
-  const total = useMemo(() => items.reduce((acc, it) => acc + Number(it.totalProducto || 0), 0), [items]);
+  useEffect(() => {
+    if (descuento !== undefined) {
+      setItems((s) => s.map((it) => ({ 
+        ...it, 
+        // Si el descuento es un porcentaje o valor, asígnalo aquí. 
+        // Si solo quieres marcar que tiene descuento, usa Boolean.
+        tieneDescuento: Boolean(descuento) 
+      })));
+    }
+    console.log('Updated items with descuento:', items);
+  }, [descuento]);
+
+  const total = useMemo(() => {
+  // 1. Sumamos el valor de todos los productos (Subtotal)
+  const subtotal = items.reduce((acc, it) => {
+    return acc + Number(it.totalProducto || 0);
+  }, 0);
+
+    // 2. Calculamos cuánto es el porcentaje en dinero
+    // Usamos Number() y fallback a 0 para evitar NaN si el input está vacío
+    const porcentaje = Number(descuento || 0) / 100;
+    const montoADescontar = subtotal * porcentaje;
+
+    // 3. Retornamos el gran total
+    return subtotal - montoADescontar;
+  }, [items, descuento]);
 
   useEffect(() => {
-    setValue('total', total as any);
+
+    const subtotal = items.reduce((acc, it) => {
+        return acc + Number(it.totalProducto || 0);
+      }, 0);
+
+    const porcentaje = Number(descuento || 0) / 100;
+    const montoADescontar = subtotal * porcentaje;
+    setValue('total', total + montoADescontar as any);
   }, [total, setValue]);
+
+  useEffect(() => {
+    setValue('descuento', descuento as any);
+  }, [descuento, setValue]);
 
   const internalSubmit = async (data: VentaType) => {
     // merge with defaults to avoid sending unwanted nested fields
@@ -196,12 +234,20 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
         />
       </Grid>
 
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <TextField focused label="Descuento" onChange={(e: any) => setDescuento(e.target.value)} value={descuento} fullWidth variant="standard" slotProps={{
+          input: {
+            endAdornment: <InputAdornment position="end"><AiOutlinePercentage /></InputAdornment>
+          }
+        }}  />
+      </Grid>
+
       <Grid size={{ xs: 12 }}>
         <Grid container spacing={1} alignItems="center">
             <Grid size={{ xs: 12, sm: 3 }}>
             <Autocomplete
               options={productosList}
-              getOptionLabel={(o: any) => o?.nombre ?? ''}
+              getOptionLabel={(o: any) => o?.codigo+'('+ (o?.nombre || '') + ')'}
               onChange={(_, val) => {
                 const prodId = val ? Number(val.id) : 0;
                 const prod = productosList.find(p => Number(p.id) === prodId);
@@ -264,7 +310,7 @@ const VentaForm = ({ initial, onSubmit, submitLabel = 'Guardar' }: Props) => {
                 <TableCell>
                   <TextField select value={it.productoId} onChange={(e) => updateLinea(idx, { productoId: Number(e.target.value) })} variant="standard">
                     {productosList.map((p) => (
-                      <MenuItem key={p.id} value={p.id} disabled={items.some((it2, i2) => i2 !== idx && Number(it2.productoId) === Number(p.id))}>{p.nombre}</MenuItem>
+                      <MenuItem key={p.id} value={p.id} disabled={items.some((it2, i2) => i2 !== idx && Number(it2.productoId) === Number(p.id))}>{p.codigo+'('+ (p.nombre || '') + ')'}</MenuItem>
                     ))}
                   </TextField>
                 </TableCell>

@@ -40,6 +40,7 @@ export const VentaInitialState: VentaType = {
     servicioId: null,
     reparacionId: null,
     total: 0,
+    descuento: 0.00,
     sucursalId: 0,
     estadoId: estados().enEspera,
 };
@@ -61,6 +62,7 @@ export const mergeVentaDataWithDefaults = (apiData: Partial<VentaType>): Partial
         servicioId: apiData.servicioId ?? VentaInitialState.servicioId,
         reparacionId: apiData.reparacionId ?? VentaInitialState.reparacionId,
         total: apiData.total ?? VentaInitialState.total,
+        descuento: apiData.descuento ?? VentaInitialState.descuento,
         estadoId: apiData.estadoId ?? VentaInitialState.estadoId,
     };
 }

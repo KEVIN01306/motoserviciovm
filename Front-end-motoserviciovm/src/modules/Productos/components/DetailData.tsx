@@ -21,6 +21,11 @@ const DetailData = ({ producto, id }: Props) => {
       <CardContent>
         <Box sx={{ mb: 2 }}>
           <Typography variant="h6" component="div" sx={{ fontWeight: 700 }}>
+            {producto?.codigo ? `Código: ${producto.codigo}` : "Código no disponible"}
+          </Typography>
+        </Box>
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="h6" component="div" sx={{ fontWeight: 700 }}>
             {producto?.nombre}
           </Typography>
         </Box>

@@ -40,6 +40,12 @@ const postProducto = async (data) => {
     }
     const newProducto = await prisma.producto.create({
         data: data,
+        include: { categoria: { select: { categoria: true } } },
+    });
+
+    await prisma.producto.update({
+        where: { id: newProducto.id },
+        data: { codigo: `${newProducto.categoria.categoria?.slice(0, 3).toUpperCase() || 'CAT'}-${newProducto.id.toString().padStart(6, '0')}` },
     });
     return newProducto;
 }
@@ -56,16 +62,24 @@ const putProducto = async (id, data) => {
 
     const oldImagen = existingProducto.imagen;
     if (data.imagen && data.imagen !== oldImagen) {
-       try {
+        try {
             await deleteImage(oldImagen);
-       } catch (error) {
+        } catch (error) {
             console.error('Error deleting old image:', error);
-       }
+        }
     }
 
     const updatedProducto = await prisma.producto.update({
         where: { id: id },
         data: data,
+        include: { categoria: { select: { categoria: true } } },
+
+    });
+
+
+    await prisma.producto.update({
+        where: { id: updatedProducto.id },
+        data: { codigo: `${updatedProducto.categoria.categoria?.slice(0, 3).toUpperCase() || 'CAT'}-${updatedProducto.id.toString().padStart(6, '0')}` },
     });
     return updatedProducto;
 }
@@ -73,7 +87,7 @@ const putProducto = async (id, data) => {
 const deleteProducto = async (id) => {
     const existingProducto = await prisma.producto.findFirst({
         where: { id: id },
-        
+
     });
     if (!existingProducto) {
         const error = new Error('DATA_NOT_FOUND');

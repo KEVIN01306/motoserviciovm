@@ -121,7 +121,9 @@ const Contabilidad: React.FC = () => {
     { id: 'costo', label: 'Costo', format: (value) => `Q ${(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
     { id: 'precioTotal', label: 'Precio', format: (value) => `Q ${(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
     { id: 'gananciaTotal', label: 'Ganancia', format: (value) => `Q ${(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
-    { id: 'total', label: 'Monto Total', format: (value) => `Q ${(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+    { id: 'total', label: 'Sub total', format: (value) => `Q ${(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+    { id: 'descuento', label: 'Descuento%', format: (value) => `${(value ? value : 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%` },
+    { id: 'total', label: 'Total', format: (value, row) => `Q ${(value - (value * (row?.descuento || 0) / 100)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
   ];
 
   const columnsIngresosEgresos: Column<IngresosEgresosGetType>[] = [

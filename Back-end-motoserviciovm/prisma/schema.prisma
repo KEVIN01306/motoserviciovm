@@ -233,6 +233,7 @@ model Servicio {
   fechaEntrada                 DateTime
   fechaSalida                  DateTime?
   total                        Float
+  descuento                     Float?
   observaciones                String?
   proximaFechaServicio         DateTime?
   descripcionProximoServicio   String?
@@ -372,6 +373,7 @@ model CategoriaProducto {
 
 model Producto {
   id              Int               @id @default(autoincrement())
+  codigo          String?            @unique
   nombre          String
   descripcion     String?
   precio          Float
@@ -396,6 +398,7 @@ model Venta {
   servicioId     Int?
   reparacionId   Int?
   total          Float
+  descuento       Float?
   estadoId       Int
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt

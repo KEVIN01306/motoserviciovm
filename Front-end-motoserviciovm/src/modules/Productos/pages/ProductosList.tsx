@@ -55,6 +55,7 @@ const ProductosList = () => {
             return (
                 String(i.id ?? "").toLowerCase().includes(lower) ||
                 (i.nombre ?? "").toLowerCase().includes(lower) ||
+                (i.codigo ?? "").toLowerCase().includes(lower) ||
                 (i.descripcion ?? "").toLowerCase().includes(lower) ||
                 (i.categoria?.categoria ?? "").toLowerCase().includes(lower)
             );
@@ -116,6 +117,7 @@ const ProductosList = () => {
         const base: Column<ProductoGetType>[] = [
             { id: "nombre", label: "Nombre", minWidth: 150 },
             { id: "categoria", label: "Categoría", minWidth: 120, format: (v) => (v ? (v as CategoriaProductoType).categoria : "-") },
+            { id: "codigo", label: "Código", minWidth: 120 },
             {
                 id: "cantidad",
                 label: "Cantidad",

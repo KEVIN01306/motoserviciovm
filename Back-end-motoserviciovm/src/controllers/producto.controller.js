@@ -58,6 +58,7 @@ const postProductoHandler = async (req, res) => {
         data.costo = parseFloat(data.costo);
         data.precio = parseFloat(data.precio);
         data.cantidad = parseInt(data.cantidad);
+        data.codigo = data.codigo ? String(data.codigo) : undefined;
 
         const validationResult = productoSchema.safeParse(data);
 

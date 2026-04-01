@@ -6,6 +6,7 @@ import type { CategoriaProductoType } from "./categoriaProductoType";
 export type ProductoType = z.infer<typeof productoSchema>;
 
 export type ProductoGetType = ProductoType & {
+    codigo: string;
     categoria: CategoriaProductoType;
 };
 

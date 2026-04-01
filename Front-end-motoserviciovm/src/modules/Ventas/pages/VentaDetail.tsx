@@ -97,10 +97,20 @@ const VentaDetail = () => {
                     <Typography sx={{ minWidth: 120, color: '#6b7280', fontWeight: 600 }}>Sucursal</Typography>
                     <Typography>{data.sucursal.nombre ?? '-'}</Typography>
                   </Box>
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 1 }}>
+                    <Typography sx={{ minWidth: 120, color: '#6b7280', fontWeight: 600 }}>Sub total</Typography>
+                    <Typography>{data.total}</Typography>
+                  </Box>
+
+
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 1 }}>
+                    <Typography sx={{ minWidth: 120, color: '#6b7280', fontWeight: 600 }}>Descuento%</Typography>
+                    <Typography>{data.descuento ? data.descuento + '%' : '-'}</Typography>
+                  </Box>  
 
                   <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 1 }}>
                     <Typography sx={{ minWidth: 120, color: '#6b7280', fontWeight: 600 }}>Total</Typography>
-                    <Typography>{data.total}</Typography>
+                    <Typography>{data.total - (data.total * (data.descuento ? data.descuento : 0)) / 100}</Typography>
                   </Box>
                 </Box>
               </Grid>

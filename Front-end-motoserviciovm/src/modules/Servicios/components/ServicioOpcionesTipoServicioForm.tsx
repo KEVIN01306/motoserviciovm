@@ -43,7 +43,7 @@ const ServicioOpcionesTipoServicioForm: React.FC<Props> = ({ initial, onSubmit, 
       servicioId, opcionServicioId, checked, observaciones, extra,
     })));
   };
-
+  
   return (
     <Paper sx={{ p: 2, mb: 2,  }} component="form" onSubmit={handleSubmit}>
       <TableContainer sx={{ width: '100%', overflowX: 'auto' }}>
