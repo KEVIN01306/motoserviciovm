@@ -41,6 +41,7 @@ export const servicioSchema = z.object({
     kilometrajeProximoServicio: z.number().optional().nullable(),
     descripcion: z.string().min(1, 'La descripcion es obligatoria'),
     total: z.number().optional(),
+    descuento: z.number().optional(),
     observaciones: z.string().optional(),
     proximaFechaServicio: z.coerce.date().optional().nullable(),
     descripcionProximoServicio: z.string().optional().nullable(),

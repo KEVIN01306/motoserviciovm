@@ -121,8 +121,9 @@ const Contabilidad: React.FC = () => {
     { id: 'costo', label: 'Costo', format: (value) => `Q ${(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
     { id: 'precioTotal', label: 'Precio', format: (value) => `Q ${(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
     { id: 'gananciaTotal', label: 'Ganancia', format: (value) => `Q ${(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
-    { id: 'total', label: 'Sub total', format: (value) => `Q ${(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
     { id: 'descuento', label: 'Descuento%', format: (value) => `${(value ? value : 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%` },
+    { id: 'descuento', label: 'Descuento', format: (_, row) => `Q${(row ? row.total * (row.descuento || 0) / 100 : 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+    { id: 'subtotal', label: 'Sub total', format: (_,row) => `Q ${(row?.total || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
     { id: 'total', label: 'Total', format: (value, row) => `Q ${(value - (value * (row?.descuento || 0) / 100)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
   ];
 
@@ -136,42 +137,6 @@ const Contabilidad: React.FC = () => {
       },
     },
   ];
-  /*
-   const metrics = [
-     {
-       title: 'Total Servicios',
-       value: "Q "+(data?.totalServicios || 0).toFixed(2),
-       //trend: 'up' as 'up',
-       //trendValue: 5.2,
-       icon: FaChartLine,
-       color: '#10b981',
-     },
-     {
-       title: 'Total Ventas',
-       value: "Q "+(data?.totalVentas || 0).toFixed(2),
-       //trend: 'down' as 'down',
-       //trendValue: 3.1,
-       icon: FaShoppingCart,
-       color: '#f59e0b',
-     },
-     {
-       title: 'Total Gastos',
-       value: "Q "+(data?.totalGastos || 0).toFixed(2),
-       //trend: 'down' as 'down',
-       //trendValue: 2.8,
-       icon: FaDollarSign,
-       color: '#ef4444',
-     },
-     {
-       title: 'Total Ingresos',
-       value: "Q "+(data?.totalIngresosGenerales || 0).toFixed(2),
-       //trend: 'up' as 'up',
-       //trendValue: 4.5,
-       icon: FaDollarSign,
-       color: '#3b82f6',
-     },
-   ];
-   */
 
   const metricsRepuestos = [
     {
@@ -183,6 +148,14 @@ const Contabilidad: React.FC = () => {
       color: '#f59e0b',
     },
     {
+      title: 'Total Descuentos Ventas',
+      value: "Q " + (data?.totalDescuentosVentas || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      //trend: 'down' as 'down',
+      //trendValue: 3.1,
+      icon: FaShoppingCart,
+      color: '#ef4444',
+    },
+      {
       title: 'Total Ganancias Ventas',
       value: "Q " + (data?.totalGananciasVentas || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       //trend: 'up' as 'up',
@@ -487,8 +460,6 @@ const Contabilidad: React.FC = () => {
               </Grid>
             ))}
           </Grid>
-
-
           <Typography variant="h6" gutterBottom>
             Ventas
           </Typography>
@@ -499,8 +470,9 @@ const Contabilidad: React.FC = () => {
                 id: ('Totales') as any,
                 costo: ("Q " + (data.ventasDetalle.reduce((sum, row) => sum + (row.costo || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
                 precioTotal: ("Q " + (data.ventasDetalle.reduce((sum, row) => sum + (row.precioTotal || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
-                gananciaTotal: ("Q " + (data.ventasDetalle.reduce((sum, row) => sum + (row.gananciaTotal || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
-                total: ("Q " + (data.ventasDetalle.reduce((sum, row) => sum + (row.total || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
+                gananciaTotal: ("Q " + (data.ventasDetalle.reduce((sum, row) => sum + (row.gananciaTotal - (row.gananciaTotal * (row?.descuento || 0) / 100) || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
+                subtotal: ("Q " + (data.ventasDetalle.reduce((sum, row) => sum + (row.total || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
+                total: ("Q " + (data.ventasDetalle.reduce((sum, row) => sum + (row.total - (row.total * (row?.descuento || 0) / 100) || 0), 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) as any,
               }}
             exportFileName="Detalle_Ventas_Contabilidad"
             showExportButton={true}

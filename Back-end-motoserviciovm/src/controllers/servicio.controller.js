@@ -81,6 +81,8 @@ const postServicioHandler = async (req, res) => {
             }
         });
         if (body.total) body.total = parseFloat(body.total);
+        if (body.descuento) body.descuento = parseFloat(body.descuento);
+
 
         // 3. Parseo de JSON Strings (Arrays anidados)
         const camposJSON = ['servicioItems', 'productosCliente', 'imagenesMeta', 'opcionesServicioManual','opcionesServicioExtras'];
@@ -168,9 +170,10 @@ const postServicioHandler = async (req, res) => {
             }
         });
         if (body.total !== undefined) body.total = parseFloat(body.total);
+        if (body.descuento !== undefined) body.descuento = parseFloat(body.descuento);
 
         // 3. Parseo de JSON Strings
-        const camposJSON = ['servicioItems', 'productosCliente', 'imagenesMeta'];
+        const camposJSON = ['servicioItems', 'productosCliente', 'imagenesMeta', 'opcionesServicioManual','opcionesServicioExtras'];
         camposJSON.forEach(campo => {
             try {
                 if (typeof body[campo] === 'string') {
@@ -243,6 +246,7 @@ const salidaServicioHandler = async (req, res) => {
 
         // Parse numeric fields
         if (body.total !== undefined) body.total = parseFloat(body.total);
+        if (body.descuento !== undefined) body.descuento = parseFloat(body.descuento);
         if (body.totalSalidaAnticipado !== undefined) body.totalSalidaAnticipado = parseFloat(body.totalSalidaAnticipado);
         if (body.kilometrajeProximoServicio !== undefined) {
             body.kilometrajeProximoServicio = parseInt(body.kilometrajeProximoServicio);
@@ -296,8 +300,9 @@ const salidaServicioHandler = async (req, res) => {
             accionSalida: body.accionSalida,
             descripcionAccion: body.descripcionAccion,
             totalSalidaAnticipado: body.totalSalidaAnticipado,
+            descuento: body.descuento,
         };
-
+        console.log('Data to send to salidaServicio:', dataToSend);
         const updated = await salidaServicio(parseInt(id), dataToSend); 
         return res.status(200).json(responseSucces('Salida registrada', updated));
     } catch (err) {

@@ -142,7 +142,9 @@ const VentasList = () => {
   const getTableColumns = (): Column<VentaGetType>[] => {
     const base: Column<VentaGetType>[] = [
       { id: 'createdAt', label: 'Creado', minWidth: 120, format: (v) => formatDate(v as any) },
-      { id: 'total', label: 'Total', minWidth: 100 },
+      { id: 'total', label: 'Total', minWidth: 100, format(value, row) {
+        return `Q ${Number(value - (value * (row?.descuento ? row.descuento : 0)) / 100 || 0).toFixed(2)}`;
+      }, },
       { id: 'estado', label: 'Estado', minWidth: 100, format: (v: EstadoType) => <Chip variant='outlined' label={v?.estado ?? ''} color={chipColorByEstado(v?.id ?? 0)} /> },
       { id: 'id', label: 'Codigo', minWidth: 50 },
       { id: 'usuario', label: 'Usuario', minWidth: 150, format: (v) => v?.primerNombre ?? '' },

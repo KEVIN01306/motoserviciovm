@@ -185,6 +185,7 @@ export const putFirmaSalida = async (
   try {
     const form = new FormData();
     form.append('total', String(data.total));
+    form.append('descuento', String(data.descuento));
     if (data.observaciones) form.append('observaciones', data.observaciones);
     if (data.proximaFechaServicio) form.append('proximaFechaServicio', typeof data.proximaFechaServicio === 'string' ? data.proximaFechaServicio : data.proximaFechaServicio.toISOString());
     if (data.descripcionProximoServicio) form.append('descripcionProximoServicio', data.descripcionProximoServicio);

@@ -36,6 +36,7 @@ const ServicioSalida = () => {
       // Solo enviar los campos requeridos
       const {
         total,
+        descuento,
         observaciones,
         proximaFechaServicio,
         descripcionProximoServicio,
@@ -54,6 +55,7 @@ const ServicioSalida = () => {
 
       await putFirmaSalida(id ?? '', {
         total,
+        descuento,
         observaciones,
         proximaFechaServicio: proximaFechaServicio || '',
         descripcionProximoServicio: descripcionProximoServicio || '',

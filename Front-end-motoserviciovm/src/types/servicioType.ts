@@ -40,6 +40,7 @@ export type ServicioGetType = ServicioType & {
   moto?: motoGetType;
   sucursal?: SucursalType;
   tipoServicio?: TipoServicioGetType;
+  descuento?: number;
   ventas: VentaGetType[];
   estado: EstadoType;
   mecanico: UserGetType;
@@ -91,7 +92,7 @@ export const ServicioProductoProximoInitialState: servicioProductoProximoType = 
 // Payload para la firma de salida (endpoint dedicado)
 export type ServicioSalidaPayloadType = Pick<
   ServicioType,
-  'total' | 'observaciones' | 'proximaFechaServicio' | 'descripcionProximoServicio' |'kilometrajeProximoServicio'
+  'total' | 'descuento' | 'observaciones' | 'proximaFechaServicio' | 'descripcionProximoServicio' |'kilometrajeProximoServicio'
 > & {
   firmaSalida: File;
   proximoServicioItems?: servicioProductoProximoType[];
@@ -106,6 +107,7 @@ export const ServicioInitialState: ServicioType = {
   firmaEntrada: '',
   firmaSalida: null,
   total: 0,
+  descuento: 0,
   observaciones: "",
   proximaFechaServicio: undefined,
   descripcionProximoServicio: "",
@@ -146,6 +148,7 @@ export const mergeServicioDataWithDefaults = (apiData: Partial<ServicioType>): P
   return {
     descripcion: apiData.descripcion ?? ServicioInitialState.descripcion,
     total: apiData.total ?? ServicioInitialState.total,
+    descuento: apiData.descuento ?? ServicioInitialState.descuento,
     observaciones: apiData.observaciones ?? ServicioInitialState.observaciones,
     proximaFechaServicio: apiData.proximaFechaServicio ?? ServicioInitialState.proximaFechaServicio,
     descripcionProximoServicio: apiData.descripcionProximoServicio ?? ServicioInitialState.descripcionProximoServicio,

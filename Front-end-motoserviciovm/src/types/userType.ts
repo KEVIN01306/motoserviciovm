@@ -29,7 +29,7 @@ export const UserInitialState = {
     roles:[],
     sucursales:[],
     motos: [],
-    fechaNac: null,
+    fechaNac: undefined,
     activo: true,
     estadoId: estados().activo
 }

@@ -23,6 +23,9 @@ export type contabilidadTotalesType = {
         totalIngresosRepuestos: number,
         totalCajaRepuestos: number,
 
+        // REPUESTOS DESCUENTOS
+        totalDescuentosVentas: number,
+
         // REPUESTOS DETALLE
         ventasDetalle: VentaGetType[],
         gastosRepuestosDetalle: IngresosEgresosGetType[],

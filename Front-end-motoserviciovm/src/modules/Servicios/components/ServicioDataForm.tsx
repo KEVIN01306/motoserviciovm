@@ -308,7 +308,7 @@ const ServicioDataForm = ({
       {Number(tipoServicioSelected?.cantidadOpcionesServicio) > 0 && (
         <Grid size={12}>
           <Paper sx={{ p: 2, mb: 2 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Opciones de Servicio Extras</Typography>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Opciones de Servicios Adicionales</Typography>
             <Autocomplete
               multiple
               freeSolo

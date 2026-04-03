@@ -1,5 +1,5 @@
-﻿import { useEffect, useState } from 'react';
-import { Grid, TextField, Button, Box, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Checkbox, Fab, FormControlLabel, Typography, Alert, FormControl, RadioGroup, Radio, Divider, Chip, Link } from '@mui/material';
+﻿import { useEffect, useMemo, useState } from 'react';
+import { Grid, TextField, Button, Box, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Checkbox, Fab, FormControlLabel, Typography, Alert, FormControl, RadioGroup, Radio, Divider, Chip, Link, InputAdornment } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useForm } from 'react-hook-form';
@@ -114,19 +114,6 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar' }: Prop
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  /*
-    useEffect(() => {
-      // persist draft: include form values, productosCliente and servicioItems
-      const subscription = watch((values) => {
-        try {
-          const draft = { ...(values ?? {}), productosCliente, servicioItems, imagenesMeta: imagenesMeta.map(m => ({ descripcion: m.descripcion })) } as any;
-          localStorage.setItem(LOCAL_KEY, JSON.stringify(draft));
-        } catch (e) { console.error(e); }
-      });
-      return () => subscription.unsubscribe();
-    }, [watch, productosCliente, servicioItems, imagenesMeta]);
-    */
-
 
   useEffect(() => {
     return () => {
@@ -136,31 +123,42 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar' }: Prop
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+
+    const [isTotalLocked, setIsTotalLocked] = useState(false);
+
+  const total = useMemo(() => {
+    const descuento = watch('descuento') ?? 0;
+    const totalCalculado = (Number(initial?.total ?? 0)) * (1 - (descuento / 100));
+
+    return totalCalculado ?? 0;
+  }, [watch('descuento'), initial?.total]);
+
+  useEffect(() => {
+    setValue('total', total);
+    setIsTotalLocked((watch('descuento') ?? 0) > 0);
+  }, [total, setValue, watch]);
+
   const internalSubmit = async (data: ServicioType) => {
-    // Solo enviar los campos requeridos para la salida
     let firmaSalidaFile: File | undefined = undefined;
     if (imagenGuardada) {
       if (imagenGuardada instanceof File) {
         firmaSalidaFile = imagenGuardada;
       } else if (typeof imagenGuardada === 'string' && imagenGuardada.startsWith('data:image')) {
-        // Convertir base64 a File
         const arr = imagenGuardada.split(',');
-
-        // 1. Agregamos el operador '?' y un valor por defecto para evitar el error TS2531
         const match = arr[0].match(/:(.*?);/);
         const mime = match ? match[1] : 'image/jpeg';
-
         const bstr = atob(arr[1]);
         let n = bstr.length;
         const u8arr = new Uint8Array(n);
         while (n--) u8arr[n] = bstr.charCodeAt(n);
-
         const file = new File([u8arr], 'firma.jpg', { type: mime });
         firmaSalidaFile = file;
       }
     }
+
+    // Enviar el valor real del total (sin descuento aplicado)
     const payload = {
-      total: data.total,
+      total: initial?.total, // Valor real del total
       observaciones: data.observaciones,
       proximaFechaServicio: data.proximaFechaServicio,
       descripcionProximoServicio: data.descripcionProximoServicio,
@@ -169,12 +167,12 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar' }: Prop
       proximoServicioItems: servicioProductoProximo.length > 0 ? servicioProductoProximo : undefined,
       accionSalida: data.accionSalida,
       totalSalidaAnticipado: data.totalSalidaAnticipado,
-      descripcionAccion: data.descripcionAccion
+      descripcionAccion: data.descripcionAccion,
+      descuento: data.descuento,
     };
     await onSubmit(payload);
   };
-
-  const total = watch('total')
+  
 
   const totalVentasDescuentos = initial?.ventas
     ?.filter(venta => venta.estadoId === estados().confirmado) // Filtra solo las confirmadas
@@ -219,7 +217,23 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar' }: Prop
         <TextField {...register('observaciones' as any)} label="Observaciones" fullWidth variant="standard" />
       </Grid>
       <Grid size={{ xs: 12 }}>
-        <TextField {...register('total' as any)} label="Total Servicio" type='number' fullWidth variant="standard" />
+        <TextField
+          value={total}
+          label="Total Servicio"
+          type='number'
+          fullWidth
+          variant="standard"
+          disabled={isTotalLocked} // Bloquear el campo si hay descuento
+        />
+      </Grid>
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <TextField {...register('descuento' as any)} label="Descuento%" type='number' fullWidth variant="standard"
+          slotProps={{
+            input: {
+              endAdornment: <InputAdornment position="end">%</InputAdornment>
+            }
+          }}
+        />
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
         <TextField {...register('kilometrajeProximoServicio' as any, { valueAsNumber: true })} label="Kilometraje del próximo servicio" type='number' fullWidth variant="standard" />

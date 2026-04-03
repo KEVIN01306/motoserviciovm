@@ -129,6 +129,27 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
         _sum: { monto: true },
     });
 
+    // DESCUENTOS EN VENTAS
+    const ventasDescuentos = await prisma.venta.findMany({
+    where: { 
+        estadoId: estados().confirmado, 
+        ...whereBase 
+    },
+    select: {
+        total: true,
+        descuento: true
+    }
+    });
+
+    const totalDescuentosVentas = ventasDescuentos.reduce((acc, venta) => {
+        const total = Number(venta.total) || 0;
+        const porcentajeDescuento = Number(venta.descuento) || 0;
+        
+        const neto = (total * porcentajeDescuento / 100);
+        
+        return acc + neto;
+    }, 0);
+
     // DETALLE DE GASTOS REPUESTOS
 
 
@@ -158,6 +179,9 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
         totalIngresosRepuestos: totalIngresosRepuestos._sum.monto || 0,
         totalCajaRepuestos: totalCajaRepuestos,
 
+        // REPUESTOS DESCUENTOS
+        totalDescuentosVentas: totalDescuentosVentas || 0,
+
         // REPUESTOS DETALLE
         ventasDetalle: Ventas,
         gastosRepuestosDetalle: IngresosEgresos.filter(ie => ie.moduloTallerId === tiposModulos().repuestos && ie.tipoId === tiposContabilidad().egreso),
@@ -168,7 +192,7 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
         totalIngresos: totalIngresosGenerales || 0,
         totalGastos: totalGastos._sum.monto || 0,
         totalCajaGeneral: (totalIngresosGenerales || 0) - (totalGastos._sum.monto || 0),
-       
+
         ingresosEgresosDetalle: IngresosEgresos,
     };
 }

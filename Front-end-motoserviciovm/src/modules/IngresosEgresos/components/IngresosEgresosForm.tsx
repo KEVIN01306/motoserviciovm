@@ -15,13 +15,25 @@ type Props = {
 
 const IngresosEgresosForm = forwardRef((props: Props, ref) => {
   const { initial, onSubmit, submitLabel = 'Guardar' } = props;
-  const { register, handleSubmit, setValue, formState: { isSubmitting }, reset,control } = useForm<IngresosEgresosType>({ defaultValues: { ...(initial ?? IngresosEgresosInitialState) } as any });
+  
+  const defaultValues = {
+    ...(IngresosEgresosInitialState),
+    ...initial
+  };
+
+  const { register, handleSubmit, setValue, formState: { isSubmitting }, reset, control } = useForm<IngresosEgresosType>({ 
+    defaultValues 
+  });
+
   const [sucursales, setSucursales] = useState<any[]>([]);
   const [sucursalSelected, setSucursalSelected] = useState<any | null>(null);
   const user = useAuthStore(state => state.user);
 
   useImperativeHandle(ref, () => ({
-    reset: () => reset(),
+    reset: () => {
+      reset(defaultValues); 
+      setSucursalSelected(null);
+    },
   }));
 
   useEffect(() => {
@@ -29,60 +41,80 @@ const IngresosEgresosForm = forwardRef((props: Props, ref) => {
       try {
         const s = await getSucursales();
         setSucursales(s);
-        const defaultId = initial?.sucursalId ?? undefined;
-        if (defaultId) {
-          const found = s.find((x: any) => Number(x.id) === Number(defaultId));
-          if (found) { setSucursalSelected(found); setValue('sucursalId' as any, found.id); }
-        } else {
-          const userSucArr = Array.isArray(user?.sucursales) ? user!.sucursales : [];
+        
+        const defaultId = initial?.sucursalId;
+        let targetId = defaultId;
+
+        if (!targetId) {
+          const userSucArr = Array.isArray(user?.sucursales) ? user.sucursales : [];
           if (userSucArr.length > 0) {
             const first = userSucArr[0];
-            const candidateId = typeof first === 'object' ? first?.id : Number(first);
-            const found = s.find((x: any) => Number(x.id) === Number(candidateId));
-            if (found) { setSucursalSelected(found); setValue('sucursalId' as any, found.id); }
+            targetId = typeof first === 'object' ? first?.id : Number(first);
+          }
+        }
+
+        if (targetId) {
+          const found = s.find((x: any) => Number(x.id) === Number(targetId));
+          if (found) {
+            setSucursalSelected(found);
+            setValue('sucursalId', found.id as any);
           }
         }
       } catch (e) { console.error(e); }
     })();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initial, user, setValue]);
 
   const internalSubmit = async (data: IngresosEgresosType) => {
-    await onSubmit({ ...data });
+    await onSubmit(data);
   };
 
   return (
     <FormEstructure handleSubmit={handleSubmit(internalSubmit)} pGrid={2}>
       <Grid size={{ xs: 12 }}>
-        <TextField {...register('descripcion' as any)} label="Descripción" fullWidth variant="standard" />
+        <TextField {...register('descripcion')} label="Descripción" fullWidth variant="standard" />
       </Grid>
 
       <Grid size={{ xs: 12, sm: 6 }}>
-        <TextField {...register('monto' as any, { valueAsNumber: true })} label="Monto" type="number" fullWidth variant="standard" />
+        <TextField {...register('monto', { valueAsNumber: true })} label="Monto" type="number" fullWidth variant="standard" />
       </Grid>
 
       <Grid size={{ xs: 12, sm: 6 }}>
-        <TextField select {...register('tipoId' as any)} defaultValue={initial?.tipoId ?? tiposContabilidad().egreso} label="Tipo" fullWidth variant="standard">
-          <MenuItem key={tiposContabilidad().egreso} selected value={tiposContabilidad().egreso}>Egreso</MenuItem>
-          <MenuItem key={tiposContabilidad().ingreso} value={tiposContabilidad().ingreso}>Ingreso</MenuItem>
-        </TextField>
+        <Controller
+          name="tipoId"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              select
+              label="Tipo"
+              fullWidth
+              variant="standard"
+            >
+              <MenuItem value={tiposContabilidad().egreso}>Egreso</MenuItem>
+              <MenuItem value={tiposContabilidad().ingreso}>Ingreso</MenuItem>
+            </TextField>
+          )}
+        />
       </Grid>
 
       <Grid size={{ xs: 12, sm: 6 }}>
         <Autocomplete
           options={sucursales}
-          getOptionLabel={(o: any) => o?.nombre ?? `Sucursal ${o?.id}`}
+          getOptionLabel={(o: any) => o?.nombre ?? ""}
           value={sucursalSelected}
-          onChange={(_, n) => { setSucursalSelected(n ?? null); setValue('sucursalId' as any, n?.id ?? 0); }}
-          isOptionEqualToValue={(a: any, b: any) => Number(a?.id) === Number(b?.id)}
+          onChange={(_, n) => { 
+            setSucursalSelected(n); 
+            setValue('sucursalId', n?.id ?? 0); 
+          }}
+          isOptionEqualToValue={(a, b) => a?.id === b?.id}
           renderInput={(params) => <TextField {...params} label="Sucursal" variant="standard" fullWidth />}
         />
       </Grid>
+
       <Grid size={{ xs: 12, sm: 6 }}>
         <Controller
           name="moduloTallerId"
           control={control}
-          defaultValue={initial?.moduloTallerId || 1}
           render={({ field }) => (
             <TextField
               {...field}
@@ -90,8 +122,8 @@ const IngresosEgresosForm = forwardRef((props: Props, ref) => {
               fullWidth
               label="Módulo"
               variant="standard"
-              value={field.value ?? ""} 
-            >
+              value={field.value || null} 
+              onChange={(e) => field.onChange(Number(e.target.value))}            >
               <MenuItem value={1}>Taller</MenuItem>
               <MenuItem value={2}>Repuestos</MenuItem>
             </TextField>
@@ -100,7 +132,9 @@ const IngresosEgresosForm = forwardRef((props: Props, ref) => {
       </Grid>
 
       <Grid size={{ xs: 12 }}>
-        <Button type="submit" variant="contained" fullWidth disabled={isSubmitting}>{submitLabel}</Button>
+        <Button type="submit" variant="contained" fullWidth disabled={isSubmitting}>
+          {submitLabel}
+        </Button>
       </Grid>
     </FormEstructure>
   );

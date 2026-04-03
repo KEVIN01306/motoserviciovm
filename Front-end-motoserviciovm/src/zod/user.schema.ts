@@ -6,7 +6,10 @@ export const userSchema = z.object({
   segundoNombre: z.string().optional(),
   primerApellido: z.string(),
   segundoApellido: z.string().optional(),
-  fechaNac: z.coerce.date().nullable(),
+  fechaNac: z.preprocess(
+  (arg) => (arg === "" || arg === null ? undefined : arg),
+    z.coerce.date().optional()
+  ),
   dpi: z.string().optional().nullable(),
   nit: z.string().optional().nullable(),
   tipo: z.string().optional(),
@@ -15,7 +18,7 @@ export const userSchema = z.object({
   numeroAuxTel: z.string().optional(),
   email: z
   .string()
-  .email("Correo inválido") // Valida el formato
+  .email("Correo inválido")
   .optional() 
   .nullable()
   .or(z.literal("")),

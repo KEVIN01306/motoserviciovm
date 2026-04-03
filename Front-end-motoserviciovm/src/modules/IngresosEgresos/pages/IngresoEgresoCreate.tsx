@@ -10,24 +10,28 @@ const IngresoEgresoCreate = () => {
   const formRef = useRef<any>(null);
 
   const handleSubmit = async (payload: any) => {
-    try {
-      const final = { ...payload };
-      if (final.tipoId === tiposContabilidad().egreso && !final.moduloTallerId) {
-        throw new Error('El campo Módulo Taller es obligatorio para Egresos');
-      }
-      if (final.tipoId === tiposContabilidad().ingreso) {
-        final.moduloTallerId = null;
-      }
-      await postIngresoEgreso(final);
-      successToast('Ingresos/Egreso creado');
-      if (formRef.current) {
-        formRef.current.reset();
-      }
-    } catch (err: any) {
-      errorToast(err.message || 'Error');
-    }
-  };
+  try {
+    const final = { 
+      ...payload,
+      moduloTallerId: payload.moduloTallerId ? Number(payload.moduloTallerId) : null,
+      tipoId: Number(payload.tipoId)
+    };
 
+    if (final.tipoId === tiposContabilidad().egreso && !final.moduloTallerId) {
+      errorToast('El campo Módulo es obligatorio para Egresos');
+      return;
+    }
+
+    await postIngresoEgreso(final);
+    successToast('Creado con éxito');
+
+    if (formRef.current) {
+      formRef.current.reset();
+    }
+  } catch (err: any) {
+    errorToast(err.message || 'Error');
+  }
+};
   const breadcrumbsData = [
     { label: 'Ingresos/Egresos', icon: <RiMoneyDollarCircleLine fontSize="inherit" />, href: '/admin/ingresos-egresos' },
     { label: 'Crear', icon: <RiMoneyDollarCircleLine fontSize="inherit" />, href: '/admin/ingresos-egresos/create' },

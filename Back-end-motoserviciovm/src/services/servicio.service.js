@@ -192,7 +192,7 @@ const postServicio = async (data) => {
 }
 
 const putServicio = async (id, data) => {
-    const { servicioItems, productosCliente, imagenesMeta, imagenFiles, opcionesServicioManual, sucursalId, motoId, clienteId, mecanicoId, tipoServicioId, estadoId, ...base } = data;
+    const { servicioItems, productosCliente, imagenesMeta, imagenFiles, opcionesServicioManual, sucursalId, motoId, clienteId, mecanicoId, tipoServicioId, estadoId,opcionesServicioExtras, ...base } = data;
     const uploaded = Array.isArray(imagenFiles) ? imagenFiles : [];
 
     console.log("putServicio called with data:", data);
@@ -313,10 +313,11 @@ const salidaServicio = async (id, data) => {
                     estadoId: estados().entregado,
                     fechaSalida: new Date(),
                     descuentosServicio: totalDescuentos._sum.descuentoTotal || 0,
+                    descuento: base.descuento,
                 },
             });
 
-             if (base.accionSalida === 'SOLOSALIDA') {
+            if (base.accionSalida === 'SOLOSALIDA') {
                 await tx.moto.update({
                     where: { id: updated.motoId },
                     data: { estadoId: estados().activo },

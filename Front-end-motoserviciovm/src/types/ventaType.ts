@@ -22,6 +22,7 @@ export type VentaGetType = VentaType & {
     precioTotal: number;
     gananciaTotal: number;
     descuentoTotal: number;
+    subtotal: number;
 };
 
 export type VentaProductoType = z.infer<typeof ventaProductoSchema>;

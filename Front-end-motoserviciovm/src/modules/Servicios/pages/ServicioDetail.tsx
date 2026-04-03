@@ -98,12 +98,18 @@ const ServicioDetail = () => {
     }, 0) || 0
   ).reduce((acc, curr) => acc + curr, 0) || 0;
 
-  const totalServicio =( data.ventas?.reduce((acc, venta) => acc + (venta.estadoId != estados().cancelado ? venta.total || 0 : 0), 0) || 0) + (data.total || 0) + (data.enReparaciones?.[0]?.total || 0) + (data.enParqueos?.[0]?.total || 0) - totalVentasDescuentos;
+  const totalServicio =( data.ventas?.reduce((acc, venta) => acc + 
+      (venta.estadoId != estados().cancelado ? venta.total || 0 : 0), 0) || 0) + 
+      (data.total || 0) + (data.enReparaciones?.[0]?.total || 0) + 
+      (data.enParqueos?.[0]?.total || 0) - 
+      totalVentasDescuentos - 
+      ((data.total || 0) * (data.descuento || 0) / 100);
 
   const dataTableTotales = [
     { label: 'Total Reparacion', value: `Q ${data.enReparaciones?.[0]?.total ? data.enReparaciones[0].total.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00'}` },
     { label: 'Total Parqueo', value: `Q ${data.enParqueos?.[0]?.total ? data.enParqueos[0].total.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00'}` },
     { label: 'Total Servicio', value: `Q ${data.total?.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? '0.00'}` },
+    { label: 'Descuento Servicio', value: `Q ${((data.total || 0) * (data.descuento || 0) / 100).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? '0.00'}` },
     { label: 'Total Ventas', value: `Q ${(data.ventas?.reduce((acc, venta) => acc + (venta.estadoId != estados().cancelado ? venta.total || 0 : 0), 0) - totalVentasDescuentos).toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? '0.00'}` },
     { label: 'Gran Total', value: `Q ${totalServicio.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
   ]
@@ -126,6 +132,7 @@ const ServicioDetail = () => {
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Cliente</Typography><Typography> <LinkStylesNavigate label={`${data.cliente?.primerNombre} ${data.cliente?.primerApellido} - ${data.cliente?.dpi || data.cliente?.nit || ""}`} onClick={() => goTo('/admin/users/'+data.cliente?.id)} variant='body2' /></Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Placa de la moto</Typography><Typography><LinkStylesNavigate label={data.moto?.placa ?? '-'} onClick={() => goTo('/admin/motos/'+data.moto?.id)} variant='body2' /></Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Kilometraje</Typography><Typography>{data.kilometraje ?? '-'}</Typography></Box>
+                <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Descuento%</Typography><Typography>{data.descuento ?? '-'}</Typography></Box>
                 <Box sx={{ mb: 1 }}><Typography sx={{ color: '#6b7280', fontWeight: 600 }}>Estado</Typography><Typography><Chip label={data.estado?.estado ?? '-'} color={chipColorByEstado(data.estado?.id)} variant='outlined' /></Typography></Box>
               </Grid>
               <Grid size={6}>
