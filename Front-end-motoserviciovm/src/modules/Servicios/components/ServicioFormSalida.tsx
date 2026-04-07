@@ -124,20 +124,6 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar' }: Prop
   }, []);
 
 
-    const [isTotalLocked, setIsTotalLocked] = useState(false);
-
-  const total = useMemo(() => {
-    const descuento = watch('descuento') ?? 0;
-    const totalCalculado = (Number(initial?.total ?? 0)) * (1 - (descuento / 100));
-
-    return totalCalculado ?? 0;
-  }, [watch('descuento'), initial?.total]);
-
-  useEffect(() => {
-    setValue('total', total);
-    setIsTotalLocked((watch('descuento') ?? 0) > 0);
-  }, [total, setValue, watch]);
-
   const internalSubmit = async (data: ServicioType) => {
     let firmaSalidaFile: File | undefined = undefined;
     if (imagenGuardada) {
@@ -158,7 +144,7 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar' }: Prop
 
     // Enviar el valor real del total (sin descuento aplicado)
     const payload = {
-      total: initial?.total, // Valor real del total
+      total: data.total, // Valor real del total
       observaciones: data.observaciones,
       proximaFechaServicio: data.proximaFechaServicio,
       descripcionProximoServicio: data.descripcionProximoServicio,
@@ -180,19 +166,26 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar' }: Prop
       return acc + (venta.descuentoTotal || 0); // Suma el descuento acumulado
     }, 0) || 0;
 
+  const totalConDescuento = useMemo(() => {
+  const descuento = watch('descuento') ?? 0;
+  const total = watch('total') ?? 0;
+
+  return total * (1 - (descuento / 100));
+}, [watch('descuento'), watch('total')]);
+
   const ventasValidas = initial?.ventas?.filter(v => v.estadoId == estados().confirmado) ?? [];
 
   const totalVentas = (ventasValidas.reduce((acc, venta) => acc + (venta.total || 0), 0) || 0);
-
+    
 
   const isVentasPendientes = (initial?.ventas && initial.ventas.map(v => v.estadoId).includes(estados().enEspera)) ?? false;
 
   const dataTableTotales = [
     { label: 'Total Reparacion', value: `Q ${initial?.enReparaciones?.[0]?.total ? initial.enReparaciones[0].total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}` },
     { label: 'Total Parqueo', value: `Q ${initial?.enParqueos?.[0]?.total ? initial.enParqueos[0].total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}` },
-    { label: 'Total Servicio', value: `Q ${Number(total)?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? '0.00'}` },
+    { label: 'Total Servicio', value: `Q ${Number(totalConDescuento)?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) ?? '0.00'}` },
     { label: 'Total Ventas', value: `Q ${((totalVentas - totalVentasDescuentos).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) ?? '0.00'}` },
-    { label: 'Gran Total', value: `Q ${((totalVentas + (Number(total) + (initial?.enReparaciones?.[0]?.total ?? 0)) + (initial?.enParqueos?.[0]?.total ?? 0) - totalVentasDescuentos).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }))}` },
+    { label: 'Gran Total', value: `Q ${((totalVentas + (Number(totalConDescuento) + (initial?.enReparaciones?.[0]?.total ?? 0)) + (initial?.enParqueos?.[0]?.total ?? 0) - totalVentasDescuentos).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }))}` },
   ]
 
   const chipColorByEstado = (id: number) => {
@@ -217,14 +210,22 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar' }: Prop
         <TextField {...register('observaciones' as any)} label="Observaciones" fullWidth variant="standard" />
       </Grid>
       <Grid size={{ xs: 12 }}>
+
         <TextField
-          value={total}
-          label="Total Servicio"
-          type='number'
+          value={totalConDescuento}
+          label="Total con descuento"
           fullWidth
           variant="standard"
-          disabled={isTotalLocked} // Bloquear el campo si hay descuento
+          disabled
         />
+        <TextField
+          {...register('total', { valueAsNumber: true })}
+          label="Total Servicio"
+          type="number"
+          fullWidth
+          variant="standard"
+        />
+      
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
         <TextField {...register('descuento' as any)} label="Descuento%" type='number' fullWidth variant="standard"

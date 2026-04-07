@@ -28,6 +28,7 @@ const Sider = ({ handleDrawerClose, mobileOpen, drawerOpen, setMobileOpen, windo
             display: { xs: 'block', sm: 'none'},
             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidthMobil, bgcolor: "rgb(251, 251, 252)" },
             borderRadius: 4,
+            
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
             backgroundColor: 'rgba(255, 255, 255, 0.3)',
             color: 'primary.main',
@@ -40,6 +41,8 @@ const Sider = ({ handleDrawerClose, mobileOpen, drawerOpen, setMobileOpen, windo
           variant="persistent"
           open={drawerOpen}
           sx={{
+            backgroundColor: "white",
+            border: "1px solid rgba(0, 0, 0, 0.12)",
             display: { xs: 'none', sm: 'block' },
             '& .MuiDrawer-paper': { boxSizing: 'border-box', border: 'none', width: drawerWidth, bgcolor: "rgb(251, 251, 252)" },
             transition: 'width 0.3s',
