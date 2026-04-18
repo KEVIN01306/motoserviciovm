@@ -152,7 +152,12 @@ const InputsForm = ({ register, control, watch, setValue, errors, id }: InputsFo
         params.estadoIds = `${estados().confirmado},${estados().enEspera}`;
         const res = await getCitas(params);
         if (!mounted) return;
-        setCitasFecha(res || []);
+
+
+        const tipoActual = tipos.find(t => String(t.id) === String(tipoServicioId));
+
+        const citasTipoHorario = res.filter( c => c.tipoServicio?.tipoHorarioId === Number(tipoActual?.tipoHorarioId) );
+        setCitasFecha(citasTipoHorario || []);
       } catch (e) {
         if (!mounted) return;
         setCitasFecha([]);
@@ -160,7 +165,7 @@ const InputsForm = ({ register, control, watch, setValue, errors, id }: InputsFo
     };
     fetchCitas();
     return () => { mounted = false; };
-  }, [fechaCita, sucursalId]);
+  }, [fechaCita, sucursalId, tipos, tipoServicioId]);
 
 
 

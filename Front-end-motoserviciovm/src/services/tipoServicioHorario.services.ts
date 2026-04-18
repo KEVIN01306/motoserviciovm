@@ -22,6 +22,7 @@ const getTiposServicioHorario = async (filters: TipoServicioHorarioFilters): Pro
     const response = await api.get<apiResponse<TipoServicioHorario[]>>(`${API_TIPO_SERVICIO_HORARIO}?${params}`);
     const items = response.data.data;
     if (!Array.isArray(items)) throw new Error('INVALID_API_RESPONSE_FORMAT');
+    console.log(items);
     return items;
   } catch (error) {
     if (axios.isAxiosError(error)) {

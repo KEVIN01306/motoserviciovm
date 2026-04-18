@@ -109,6 +109,9 @@ const putTipoServicioHorario = async (id, data) => {
         });
       }
     }
+  },{
+    maxWait: 5000, // Tiempo máximo para conseguir conexión
+    timeout: 15000
   });
 
   const full = await prisma.tipoServicioHorario.findUnique({ where: { id }, include: includeAll });

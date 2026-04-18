@@ -28,7 +28,7 @@ const getTiposServicio = async () => {
 const getTipoServicio = async (id) => {
     const tipo = await prisma.tipoServicio.findUnique({
         where: { id: id, estadoId: estados().activo },
-        include: { opcionServicios: true, tipoHorario: true },
+        include: { opcionServicios: true, tipoHorario: { include: { tipoServicioHorarios: true}} },
     });
     if (!tipo) {
         const error = new Error('DATA_NOT_FOUND');
