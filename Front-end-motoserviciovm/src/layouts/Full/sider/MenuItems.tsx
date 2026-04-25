@@ -15,7 +15,7 @@ const MenuItems = [
     { name: "INGRESOS/EGRESOS", link: "/admin/ingresos-egresos", icon: PiListNumbersBold, permiso: "ingresos-egresos:view" },
     { name: "CONTABILIDAD", link: "/admin/contabilidad", icon: PiCashRegisterDuotone, permiso: "contabilidad:view" },
     { name: "MOTOS", link: "/admin/motos", icon: RiBikeFill, permiso: "motos:view" },
-    { name: "HORARIOS", link: "/admin/horarios", icon: AutoFixHighOutlined, permiso: "motos:view" },
+    { name: "HORARIOS", link: "/admin/horarios", icon: AutoFixHighOutlined, permiso: "horarios:view" },
     { name: "CITAS", link: "/admin/citas", icon: AiTwotoneHome, permiso: "citas:view" },
     {
         module: "MOTOS",
