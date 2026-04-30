@@ -123,7 +123,7 @@ const Contabilidad: React.FC = () => {
     { id: 'gananciaTotal', label: 'Ganancia', format: (value) => `Q ${(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
     { id: 'descuento', label: 'Descuento%', format: (value) => `${(value ? value : 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%` },
     { id: 'descuento', label: 'Descuento', format: (_, row) => `Q${(row ? row.total * (row.descuento || 0) / 100 : 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
-    { id: 'subtotal', label: 'Sub total', format: (_,row) => `Q ${(row?.total || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+    { id: 'subtotal', label: 'Sub total', format: (_, row) => `Q ${(row ? (row.total|| 0) * (1 - (row.descuento || 0) / 100) : 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
     { id: 'total', label: 'Total', format: (value, row) => `Q ${(value - (value * (row?.descuento || 0) / 100)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
   ];
 
@@ -253,6 +253,14 @@ const Contabilidad: React.FC = () => {
     {
       title: 'Total Gastos',
       value: "Q " + (data?.totalGastos || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      //trend: 'down' as 'down',
+      //trendValue: 3.1,
+      icon: FaDollarSign,
+      color: '#ef4444',
+    },
+    {
+      title: 'Total Descuentos',
+      value: "Q " + (data?.totalDescuentos || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       //trend: 'down' as 'down',
       //trendValue: 3.1,
       icon: FaDollarSign,

@@ -34,6 +34,7 @@ export type contabilidadTotalesType = {
         // GENERALES
         totalIngresos: number,
         totalGastos: number,
+        totalDescuentos: number,
         totalCajaGeneral: number,
 
         ingresosEgresosDetalle: IngresosEgresosGetType[],

@@ -141,7 +141,7 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
     }
     });
 
-    const totalDescuentosVentas = ventasDescuentos.reduce((acc, venta) => {
+    const totalDescuentosVentas = await ventasDescuentos.reduce((acc, venta) => {
         const total = Number(venta.total) || 0;
         const porcentajeDescuento = Number(venta.descuento) || 0;
         
@@ -154,9 +154,9 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
 
 
     // TOTAL CAJA REPUESTOS
-    const totalCajaRepuestos = (totalVentas._sum.total || 0) - (totalGastosRepuestos._sum.monto || 0 ) + totalIngresosRepuestos._sum.monto || 0;
+    const totalCajaRepuestos = ((totalVentas._sum.total || 0) - (totalGastosRepuestos._sum.monto || 0 ) + totalIngresosRepuestos._sum.monto || 0 ) - totalDescuentosVentas || 0;
 
-    const totalIngresosGenerales = (totalServicios._sum.total + totalReparaciones._sum.total + totalParqueos._sum.total - (totalDescuentosServicios._sum.descuentosServicio || 0)) + (totalVentas._sum.total || 0) + (totalIngresos._sum.monto || 0);
+    const totalIngresosGenerales = ((totalServicios._sum.total + totalReparaciones._sum.total + totalParqueos._sum.total - (totalDescuentosServicios._sum.descuentosServicio || 0)) + (totalVentas._sum.total || 0) + (totalIngresos._sum.monto || 0)) - totalDescuentosVentas || 0;
     return {
 
         // TALLER 
@@ -191,6 +191,7 @@ const getTotalesContabilidad = async (sucursalIds,fechaInicio,fechaFin) => {
         // GENERALES
         totalIngresos: totalIngresosGenerales || 0,
         totalGastos: totalGastos._sum.monto || 0,
+        totalDescuentos: totalDescuentosVentas || 0,
         totalCajaGeneral: (totalIngresosGenerales || 0) - (totalGastos._sum.monto || 0),
 
         ingresosEgresosDetalle: IngresosEgresos,
