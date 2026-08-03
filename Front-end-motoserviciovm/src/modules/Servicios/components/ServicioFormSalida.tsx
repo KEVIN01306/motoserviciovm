@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Grid, TextField, Button, Box, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Checkbox, Fab, FormControlLabel, Typography, Alert, FormControl, RadioGroup, Radio, Divider, Chip, Link, InputAdornment } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -162,9 +162,12 @@ const ServicioFormSalida = ({ initial, onSubmit, submitLabel = 'Guardar' }: Prop
 
   const totalVentasDescuentos = initial?.ventas
     ?.filter(venta => venta.estadoId === estados().confirmado) // Filtra solo las confirmadas
-    ?.reduce((acc, venta) => {
-      return acc + (venta.descuentoTotal || 0); // Suma el descuento acumulado
-    }, 0) || 0;
+    ?.map(venta =>
+      venta.productos?.reduce((acc, producto) => {
+        const descuento = producto.descuento ? (producto.totalProducto || 0) : 0;
+        return acc + (descuento);
+      }, 0) || 0
+    ).reduce((acc, curr) => acc + curr, 0) || 0;
 
   const totalConDescuento = useMemo(() => {
   const descuento = watch('descuento') ?? 0;
